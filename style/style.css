@@ -1,0 +1,20 @@
+/* trasformo tutti i button  outline dark e white  */
+[data-bs-theme="dark"] .btn-outline-dark {
+    /* 1. Colore del testo e del bordo diventano chiari */
+    color: var(--bs-light);
+    border-color: var(--bs-light);
+}
+
+[data-bs-theme="dark"] .btn-outline-dark:hover {
+    /* 2. Quando passi col mouse (Hover) */
+    background-color: var(--bs-light);
+    color: var(--bs-dark);
+    border-color: var(--bs-light);
+}
+
+[data-bs-theme="dark"] #btn-pubblica,
+[data-bs-theme="dark"] #btn-pubblica-icon {
+    background-color: var(--bs-light);
+    border-color: var(--bs-light);
+    color: var(--bs-dark);
+}
