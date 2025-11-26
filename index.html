@@ -6,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Header Responsive Priorità</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="/style/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
     <style>
-        /* REGOLE DI "ULTIMA SPIAGGIA" */
-        
         /* Il titolo UniMarket rimane visibile quasi sempre. 
            Sparisce SOLO se lo schermo è più piccolo di 370px (es. Galaxy Fold chiuso, vecchi iPhone) */
         @media (max-width: 370px) {
@@ -23,44 +24,59 @@
 <body>
 
     <header class="container-fluid p-0">
-        
+
         <div class="p-2 p-sm-3 border-bottom">
             <div class="row align-items-center justify-content-between g-0 flex-nowrap">
-                
+
                 <div class="col-auto d-flex align-items-center">
                     <a href="#" class="d-inline-flex align-items-center justify-content-center 
-                                       bg-primary text-decoration-none rounded-4 shadow-sm me-2 me-sm-3" 
-                                       style="width: 48px; height: 48px; flex-shrink: 0;">
+                                       bg-primary text-decoration-none rounded-4 shadow-sm me-2 me-sm-3"
+                        style="width: 48px; height: 48px; flex-shrink: 0;">
                         <img src="images/logo-white.png" alt="U" style="width: 24px;">
                     </a>
-                    
+
                     <div class="site-info lh-1">
-                        
+
                         <h1 class="h5 m-0 fw-bold titolo-sito">UniMarket</h1>
-                        
+
                         <span class="small text-muted d-none d-md-block">Marketplace per studenti</span>
                     </div>
                 </div>
 
                 <div class="col-auto d-flex align-items-center gap-1 gap-sm-2">
-                    <button class="btn btn-link text-dark text-decoration-none p-1 p-sm-2">♥</button>
-                    <button class="btn btn-link text-dark text-decoration-none p-1 p-sm-2 me-1 me-sm-2"><a href="carrello.html" class="text-decoration-none">🛒</a></button>
+                    <button class="btn btn-link text-dark text-decoration-none p-1 p-sm-2"><i
+                            class="bi bi-suit-heart text-body"></i></button>
+                    <a href="carrello.html"
+                        class="btn btn-link text-dark text-decoration-none p-1 p-sm-2 me-1 me-sm-2"><i
+                            class="bi bi-cart text-body"></i></a>
 
                     <div class="d-flex gap-1 gap-sm-2">
-                        
-                        <button class="btn btn-outline-dark d-flex align-items-center gap-2 px-2 px-sm-3">
-                            <img src="images/login-dark.png" alt="" style="width: 16px; height: 16px;"> 
-                            <span class="d-none d-lg-inline"><a href="login.html" class="text-decoration-none">Login</a></span>
+
+                        <button class="btn btn-outline-dark d-none d-md-flex align-items-center gap-2 px-2 px-sm-3">
+                            <i class="bi bi-box-arrow-in-right text-body"></i>
+                            <span><a href="login.html" class="text-dark text-decoration-none">Login</a></span>
                         </button>
 
-                        <button class="btn btn-outline-dark d-flex align-items-center gap-2 px-2 px-sm-3">
-                            <img src="images/registarazione-dark.png" alt="" style="width: 16px; height: 16px;"> 
-                            <span class="d-none d-lg-inline">Registrati</span>
+                        <button class="btn btn-outline-dark d-none d-md-flex align-items-center gap-2 px-2 px-sm-3">
+                            <i class="bi bi-person-add text-body"></i>
+                            <span>Registrati</span>
                         </button>
 
-                        <button class="btn btn-dark d-none d-md-block">Pubblica</button>
-                        
-                        <button class="btn px-2"><img src="images/luna.png" alt="Modo scuro"></button>
+                        <button id="btn-pubblica" class="btn btn-dark">
+                            <i class="bi bi-plus-circle"></i>
+                            <span class="d-none d-md-inline ms-1">Pubblica</span>
+                        </button>
+
+
+                        <button id="btn-tema" class="btn">
+                            <i id="icona-luna" class="bi bi-moon"></i>
+                            <i id="icona-sole" class="bi bi-sun d-none"></i>
+                        </button>
+
+                        <button class="btn btn-link text-dark p-1 d-md-none" type="button" data-bs-toggle="offcanvas"
+                            data-bs-target="#menuMobile">
+                            <i class="bi bi-list fs-2"></i>
+                        </button>
                     </div>
                 </div>
 
@@ -68,11 +84,17 @@
         </div>
 
         <div class="row m-0">
-            <div class="col-12 d-flex align-items-center px-3 py-2 border-bottom bg-light bg-opacity-10 overflow-x-auto">
-                <div class="categories d-flex gap-2 text-nowrap"> 
-                    <button class="btn btn-sm btn-primary rounded-pill px-3">Tutti</button>
-                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 border-0">Libri</button>
-                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 border-0">Appunti</button>
+            <div class="col-12 d-flex align-items-center px-3 py-2 border-bottom bg-opacity-10 overflow-x-auto">
+                <div class="categories d-flex gap-2 text-nowrap">
+                    <button class="btn btn-sm btn-primary rounded-pill px-3">
+                        <span>Tutti</span>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 border-0">
+                        <span class="text-body">Libri</span>
+                    </button>
+                    <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 border-0">
+                        <span class="text-body">Appunti</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -83,5 +105,88 @@
         <p>Contenuto...</p>
     </div>
 
+
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="menuMobile">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title fw-bold">Menu UniMarket</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+
+        <div class="offcanvas-body d-flex flex-column gap-3">
+
+            <div class="p-3 bg-light rounded-3 text-center">
+                <p class="mb-2 text-muted small">Accedi per gestire i tuoi annunci</p>
+                <div class="d-grid gap-2">
+                    <a href="login.html" class="btn btn-outline-dark">
+                        <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                    </a>
+                    <a href="register.html" class="btn btn-dark">
+                        <i class="bi bi-person-add me-2"></i>Registrati
+                    </a>
+                </div>
+            </div>
+
+            <hr class="my-1">
+
+            <ul class="list-unstyled fw-medium fs-5">
+                <li class="mb-3"><a href="#" class="text-decoration-none text-body"><i
+                            class="bi bi-suit-heart me-3"></i>Preferiti</a></li>
+                <li class="mb-3"><a href="#" class="text-decoration-none text-body"><i
+                            class="bi bi-cart me-3"></i>Carrello</a></li>
+                <li class="mb-3"><a href="#" class="text-decoration-none text-body"><i
+                            class="bi bi-question-circle me-3"></i>Aiuto e Supporto</a></li>
+            </ul>
+
+        </div>
+    </div>
+
+
+    <script>
+        const bottone = document.getElementById('btn-tema');
+        const html = document.documentElement;
+        const iconaLuna = document.getElementById('icona-luna');
+        const iconaSole = document.getElementById('icona-sole');
+
+        //funzione che aggiorna fisicamente l'aspetto (attributo + icone)
+        const applicaTema = (tema) => {
+            //cambio attributo di Bootstrap
+            html.setAttribute('data-bs-theme', tema);
+            //salva la scelta nella memoria del browser
+            localStorage.setItem('temaPreferito', tema);
+            // Gestisce le icone
+            if (tema === 'dark') {
+                iconaLuna.classList.add('d-none');
+                iconaSole.classList.remove('d-none');
+                bottone.classList.replace('btn-outline-secondary', 'btn-outline-light');
+            } else {
+                iconaLuna.classList.remove('d-none');
+                iconaSole.classList.add('d-none');
+                bottone.classList.replace('btn-outline-light', 'btn-outline-secondary');
+            }
+        };
+
+        //funzione che capisce quale tema usare all'avvio
+        const caricaTemaIniziale = () => {
+            // Controlla se abbiamo salvato una scelta in passato
+            const temaSalvato = localStorage.getItem('temaPreferito');
+            if (temaSalvato) {
+                // Se c'è una memoria, usiamo quella
+                return temaSalvato;
+            }
+            // Se è la prima visita, controlliamo le preferenze del Sistema Operativo dell'utente
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
+        applicaTema(caricaTemaIniziale());
+
+        //al click del puslante invertiamo il tema
+        bottone.addEventListener('click', () => {
+            const temaAttuale = html.getAttribute('data-bs-theme');
+            const nuovoTema = temaAttuale === 'dark' ? 'light' : 'dark';
+            applicaTema(nuovoTema);
+        });
+    </script>
+
 </body>
+
 </html>
