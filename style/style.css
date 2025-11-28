@@ -1,1 +1,24 @@
 
+/* Mantieni leggibili i pulsanti Login/Registrati al passaggio del mouse
+   sia in tema chiaro che scuro. Le regole usano le variabili di Bootstrap
+   per adattarsi al tema impostato con `data-bs-theme`. */
+#btn-login.btn-outline-dark:hover,
+#btn-register.btn-outline-dark:hover,
+#btn-login.btn-outline-dark:focus,
+#btn-register.btn-outline-dark:focus,
+#btn-login.btn-outline-dark:active,
+#btn-register.btn-outline-dark:active,
+#btn-login.btn-outline-light:hover,
+#btn-register.btn-outline-light:hover,
+#btn-login.btn-outline-light:focus,
+#btn-register.btn-outline-light:focus,
+#btn-login.btn-outline-light:active,
+#btn-register.btn-outline-light:active {
+	background-color: transparent !important;
+	color: var(--bs-body-color) !important;
+	border-color: currentColor !important;
+}
+
+/* Icone ereditano il colore del bottone */
+#btn-login .bi, #btn-register .bi { color: inherit !important; }
+
