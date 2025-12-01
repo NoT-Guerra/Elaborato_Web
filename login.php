@@ -1,3 +1,42 @@
+<?php
+session_start();
+
+// Placeholder for database connection
+// require_once 'db_connection.php';
+
+$error_message = '';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    // Admin login
+    if ($email === 'admin@gmail.com' && $password === 'admin') {
+        $_SESSION['loggedin'] = true;
+        $_SESSION['is_admin'] = true;
+        $_SESSION['email'] = $email;
+        header('Location: index.php');
+        exit;
+    }
+
+    // Regular user login (this part will need database integration)
+    // For now, let's simulate a user login
+    // In a real application, you would query the database
+    // $stmt = $pdo->prepare("SELECT * FROM users WHERE email = ?");
+    // $stmt->execute([$email]);
+    // $user = $stmt->fetch();
+    // if ($user && password_verify($password, $user['password'])) {
+    if ($email === 'user@example.com' && $password === 'password') { // Simulated user
+        $_SESSION['loggedin'] = true;
+        $_SESSION['is_admin'] = false;
+        $_SESSION['email'] = $email;
+        header('Location: index.php');
+        exit;
+    } else {
+        $error_message = 'Credenziali non valide.';
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="it">
 
@@ -40,6 +79,10 @@
                     <h1 class="h3 mb-3 fw-bold text-center">Accedi a UniMarket</h1>
                     <p class="text-muted mb-4 text-center">Benvenuto! Inserisci le tue credenziali per accedere</p>
 
+                    <?php if ($error_message): ?>
+                        <div class="alert alert-danger"><?php echo $error_message; ?></div>
+                    <?php endif; ?>
+
                     <form action="login.php" method="post">
                         <div class="mb-3">
                             <label for="email">Email </label>
@@ -63,7 +106,7 @@
 
                         <button type="submit" class="btn w-100 btn-dark mb-1">Accedi</button>
                     </form>
-                    <p class="text-body mt-3 mb-0 text-center">Non hai un accacount? <a href="#" class="text-decoration-none text-improtant">Registrati ora</a></p>
+                    <p class="text-body mt-3 mb-0 text-center">Non hai un accacount? <a href="register.php" class="text-decoration-none text-improtant">Registrati ora</a></p>
                 </div>
             </div>
     <!-- Bootstrap JS caricato in fondo per migliori prestazioni -->
