@@ -48,31 +48,32 @@ $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
                     <div class="d-flex gap-1 gap-sm-2">
 
                         <?php if (!$isLogged): ?>
-                        <a id="btn-login" href="login.php"
-                            class="btn btn-outline-dark bg-transparent text-body d-none d-md-flex align-items-center gap-2 px-2 px-sm-3">
-                            <i class="bi bi-box-arrow-in-right text-body"></i>
-                            <span class="ms-1">Login</span>
-                        </a>
+                            <a id="btn-login" href="login.php"
+                                class="btn btn-outline-dark bg-transparent text-body d-none d-md-flex align-items-center gap-2 px-2 px-sm-3">
+                                <i class="bi bi-box-arrow-in-right text-body"></i>
+                                <span class="ms-1">Login</span>
+                            </a>
 
-                        <a id="btn-register" href="register.html"
-                            class="btn btn-outline-dark bg-transparent text-body d-none d-md-flex align-items-center gap-2 px-2 px-sm-3">
-                            <i class="bi bi-person-add text-body"></i>
-                            <span class="ms-1">Registrati</span>
-                        </a>
+                            <a id="btn-register" href="register.html"
+                                class="btn btn-outline-dark bg-transparent text-body d-none d-md-flex align-items-center gap-2 px-2 px-sm-3">
+                                <i class="bi bi-person-add text-body"></i>
+                                <span class="ms-1">Registrati</span>
+                            </a>
                         <?php endif; ?>
 
                         <?php if ($isAdmin): ?>
-                        <a id="btn-admin" href="admin.html" class="btn btn-outline-secondary d-flex align-items-center">
-                            <i class="bi bi-gear"></i>
-                            <span class="d-none d-md-inline ms-1">Admin</span>
-                        </a>
+                            <a id="btn-admin" href="admin.html" class="btn btn-outline-secondary d-flex align-items-center">
+                                <i class="bi bi-gear"></i>
+                                <span class="d-none d-md-inline ms-1">Admin</span>
+                            </a>
                         <?php endif; ?>
 
                         <?php if ($isLogged): ?>
-                        <a id="btn-logout" href="logout.php" class="btn btn-outline-secondary d-flex align-items-center">
-                            <i class="bi bi-box-arrow-right"></i>
-                            <span class="d-none d-md-inline ms-1">Logout</span>
-                        </a>
+                            <a id="btn-logout" href="logout.php"
+                                class="btn btn-outline-secondary d-flex align-items-center">
+                                <i class="bi bi-box-arrow-right"></i>
+                                <span class="d-none d-md-inline ms-1">Logout</span>
+                            </a>
                         <?php endif; ?>
 
                         <a id="btn-pubblica" href="pubblica.html" class="btn btn-dark d-flex align-items-center">
@@ -86,7 +87,7 @@ $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
                             <i id="icona-sole" class="bi bi-sun d-none"></i>
                         </button>
 
-                        
+
 
                         <button class="btn btn-link text-dark p-1 d-md-none" type="button" data-bs-toggle="offcanvas"
                             data-bs-target="#menuMobile">
@@ -198,14 +199,14 @@ $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
                 <p class="mb-2 text-muted small">Accedi per gestire i tuoi annunci</p>
                 <div class="d-grid gap-2">
                     <?php if (!$isLogged): ?>
-                    <a id="btn-mobile-login" href="login.php" class="btn btn-outline-dark">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>Login
-                    </a>
-                    <a id="btn-mobile-register" href="register.html" class="btn btn-dark">
-                        <i class="bi bi-person-add me-2"></i>Registrati
-                    </a>
+                        <a id="btn-mobile-login" href="login.php" class="btn btn-outline-dark">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                        </a>
+                        <a id="btn-mobile-register" href="register.html" class="btn btn-dark">
+                            <i class="bi bi-person-add me-2"></i>Registrati
+                        </a>
                     <?php else: ?>
-                    <a href="logout.php" class="btn btn-outline-secondary">Logout</a>
+                        <a href="logout.php" class="btn btn-outline-secondary">Logout</a>
                     <?php endif; ?>
                 </div>
             </div>
@@ -226,92 +227,92 @@ $isAdmin = isset($_SESSION['is_admin']) && $_SESSION['is_admin'];
 
     <!-- javascriptttttttttttttttttttttttttttttttttttttttt -->
 
-<script>
-    const bottone = document.getElementById('btn-tema');
-    const html = document.documentElement;
-    const iconaLuna = document.getElementById('icona-luna');
-    const iconaSole = document.getElementById('icona-sole');
-    
-    // Selezioniamo il nuovo link Pubblica
-    const btnPubblica = document.getElementById('btn-pubblica');
+    <script>
+        const bottone = document.getElementById('btn-tema');
+        const html = document.documentElement;
+        const iconaLuna = document.getElementById('icona-luna');
+        const iconaSole = document.getElementById('icona-sole');
 
-    // Selezioniamo i bottoni DESKTOP
-    const btnLogin = document.getElementById('btn-login');
-    const btnRegister = document.getElementById('btn-register');
+        // Selezioniamo il nuovo link Pubblica
+        const btnPubblica = document.getElementById('btn-pubblica');
 
-    // Selezioniamo i bottoni MOBILE
-    const btnMobileLogin = document.getElementById('btn-mobile-login');
-    const btnMobileRegister = document.getElementById('btn-mobile-register');
+        // Selezioniamo i bottoni DESKTOP
+        const btnLogin = document.getElementById('btn-login');
+        const btnRegister = document.getElementById('btn-register');
 
-    const applicaTema = (tema) => {
-        html.setAttribute('data-bs-theme', tema);
-        localStorage.setItem('temaPreferito', tema);
+        // Selezioniamo i bottoni MOBILE
+        const btnMobileLogin = document.getElementById('btn-mobile-login');
+        const btnMobileRegister = document.getElementById('btn-mobile-register');
 
-        if (tema === 'dark') {
-            // --- MODALITÀ SCURA (Sfondo scuro) ---
-            iconaLuna.classList.add('d-none');
-            iconaSole.classList.remove('d-none');
+        const applicaTema = (tema) => {
+            html.setAttribute('data-bs-theme', tema);
+            localStorage.setItem('temaPreferito', tema);
 
-            // Toggle Tema (Bottone luna/sole)
-            bottone.classList.replace('btn-outline-secondary', 'btn-outline-light');
-            
-            // LOGICA PUBBLICA: In Dark Mode il bottone diventa BIANCO (btn-light)
-            if (btnPubblica) { btnPubblica.classList.remove('btn-dark'); btnPubblica.classList.add('btn-light'); }
+            if (tema === 'dark') {
+                // --- MODALITÀ SCURA (Sfondo scuro) ---
+                iconaLuna.classList.add('d-none');
+                iconaSole.classList.remove('d-none');
 
-            // Desktop Login/Register
-            if (btnLogin) btnLogin.classList.replace('btn-outline-dark', 'btn-outline-light');
-            if (btnRegister) btnRegister.classList.replace('btn-outline-dark', 'btn-outline-light');
+                // Toggle Tema (Bottone luna/sole)
+                bottone.classList.replace('btn-outline-secondary', 'btn-outline-light');
 
-            // Gestione Mobile
-            if (btnMobileLogin) btnMobileLogin.classList.replace('btn-outline-dark', 'btn-outline-light');
-            if (btnMobileRegister) {
-                btnMobileRegister.classList.remove('btn-dark'); 
-                btnMobileRegister.classList.add('btn-light');   
+                // LOGICA PUBBLICA: In Dark Mode il bottone diventa BIANCO (btn-light)
+                if (btnPubblica) { btnPubblica.classList.remove('btn-dark'); btnPubblica.classList.add('btn-light'); }
+
+                // Desktop Login/Register
+                if (btnLogin) btnLogin.classList.replace('btn-outline-dark', 'btn-outline-light');
+                if (btnRegister) btnRegister.classList.replace('btn-outline-dark', 'btn-outline-light');
+
+                // Gestione Mobile
+                if (btnMobileLogin) btnMobileLogin.classList.replace('btn-outline-dark', 'btn-outline-light');
+                if (btnMobileRegister) {
+                    btnMobileRegister.classList.remove('btn-dark');
+                    btnMobileRegister.classList.add('btn-light');
+                }
+
+            } else {
+                // --- MODALITÀ CHIARA (Sfondo bianco) ---
+                iconaLuna.classList.remove('d-none');
+                iconaSole.classList.add('d-none');
+
+                // Toggle Tema (Bottone luna/sole)
+                bottone.classList.replace('btn-outline-light', 'btn-outline-secondary');
+
+                // LOGICA PUBBLICA: In Light Mode il bottone diventa NERO (btn-dark)
+                if (btnPubblica) { btnPubblica.classList.remove('btn-light'); btnPubblica.classList.add('btn-dark'); }
+
+                // Desktop Login/Register
+                if (btnLogin) btnLogin.classList.replace('btn-outline-light', 'btn-outline-dark');
+                if (btnRegister) btnRegister.classList.replace('btn-outline-light', 'btn-outline-dark');
+
+                // Gestione Mobile
+                if (btnMobileLogin) btnMobileLogin.classList.replace('btn-outline-light', 'btn-outline-dark');
+                if (btnMobileRegister) {
+                    btnMobileRegister.classList.remove('btn-light');
+                    btnMobileRegister.classList.add('btn-dark');
+                }
             }
+        };
 
-        } else {
-            // --- MODALITÀ CHIARA (Sfondo bianco) ---
-            iconaLuna.classList.remove('d-none');
-            iconaSole.classList.add('d-none');
+        const caricaTemaIniziale = () => {
+            const temaSalvato = localStorage.getItem('temaPreferito');
+            if (temaSalvato) return temaSalvato;
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
 
-            // Toggle Tema (Bottone luna/sole)
-            bottone.classList.replace('btn-outline-light', 'btn-outline-secondary');
-            
-            // LOGICA PUBBLICA: In Light Mode il bottone diventa NERO (btn-dark)
-            if (btnPubblica) { btnPubblica.classList.remove('btn-light'); btnPubblica.classList.add('btn-dark'); }
+        // Avvio immediato
+        applicaTema(caricaTemaIniziale());
 
-            // Desktop Login/Register
-            if (btnLogin) btnLogin.classList.replace('btn-outline-light', 'btn-outline-dark');
-            if (btnRegister) btnRegister.classList.replace('btn-outline-light', 'btn-outline-dark');
+        // Listener click
+        bottone.addEventListener('click', () => {
+            const temaAttuale = html.getAttribute('data-bs-theme');
+            const nuovoTema = temaAttuale === 'dark' ? 'light' : 'dark';
+            applicaTema(nuovoTema);
+        });
+    </script>
 
-            // Gestione Mobile
-            if (btnMobileLogin) btnMobileLogin.classList.replace('btn-outline-light', 'btn-outline-dark');
-            if (btnMobileRegister) {
-                btnMobileRegister.classList.remove('btn-light'); 
-                btnMobileRegister.classList.add('btn-dark');     
-            }
-        }
-    };
-
-    const caricaTemaIniziale = () => {
-        const temaSalvato = localStorage.getItem('temaPreferito');
-        if (temaSalvato) return temaSalvato;
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    };
-    
-    // Avvio immediato
-    applicaTema(caricaTemaIniziale());
-
-    // Listener click
-    bottone.addEventListener('click', () => {
-        const temaAttuale = html.getAttribute('data-bs-theme');
-        const nuovoTema = temaAttuale === 'dark' ? 'light' : 'dark';
-        applicaTema(nuovoTema);
-    });
-</script>
-
-<!-- Bootstrap JS (caricato in fondo per performance) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Bootstrap JS (caricato in fondo per performance) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
