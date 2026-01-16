@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Header Responsive Priorità</title>
+    <title>Home</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="style/style.css">
@@ -25,7 +25,7 @@
                     </div>
 
                     <div class="site-info lh-1">
-                        <h1 class="h5 m-0 fw-bold titolo-sito">UniMarket</h1>
+                        <h1 class="h5 m-0 fw-bold titolo-sito">UniboMarket</h1>
                         <span class="small text-muted d-none d-md-block">Marketplace per studenti</span>
                     </div>
                 </div>
@@ -89,6 +89,88 @@
                 </div>
             </div>
         </div>
+        <!-- BARRA DI RICERCA -->
+        <div class="row m-0 border-bottom bg-body">
+            <div class="col-12 px-3 py-3">
+                <div class="input-group">
+                    <span class="input-group-text bg-transparent">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" id="searchInput" class="form-control"
+                        placeholder="Cerca libri o appunti per titolo..." aria-label="Cerca">
+                </div>
+            </div>
+        </div>
+        <!-- FILTRO CONDIZIONE-->
+        <div class="container-fluid mt-4">
+            <div class="row">
+
+                <!-- BOTTONE COLLAPSE MOBILE -->
+                <div class="d-md-none mb-3 px-3">
+                    <button class="btn btn-outline-primary w-100" type="button" data-bs-toggle="collapse"
+                        data-bs-target="#filtriSidebarMobile" aria-expanded="false" aria-controls="filtriSidebarMobile">
+                        Filtri <i class="bi bi-funnel ms-2"></i>
+                    </button>
+                </div>
+
+                <!-- SIDEBAR FILTRI COLLAPSABILE -->
+                <aside class="col-12 col-md-3 col-lg-2 mb-4">
+                    <div class="collapse d-md-block" id="filtriSidebarMobile">
+                        <div class="card shadow-sm">
+                            <div class="card-body">
+
+                                <h6 class="fw-bold mb-3">Filtra risultati</h6>
+
+                                <!-- FACOLTÀ -->
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">Facoltà</label>
+                                    <select id="filterFacolta" class="form-select form-select-sm">
+                                        <option value="">Tutte</option>
+                                        <option value="ingegneria">Ingegneria</option>
+                                        <option value="medicina">Medicina</option>
+                                        <option value="economia">Economia</option>
+                                        <option value="giurisprudenza">Giurisprudenza</option>
+                                    </select>
+                                </div>
+
+                                <!-- CONDIZIONI -->
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">Condizioni</label>
+                                    <select id="filterCondizioni" class="form-select form-select-sm">
+                                        <option value="">Tutte</option>
+                                        <option value="nuovo">Nuovo</option>
+                                        <option value="ottimo">Ottimo</option>
+                                        <option value="buono">Buono</option>
+                                        <option value="usato">Usato</option>
+                                    </select>
+                                </div>
+
+                                <!-- PREZZO MASSIMO -->
+                                <div class="mb-3">
+                                    <label class="form-label small fw-semibold">
+                                        Prezzo massimo: <span id="prezzoValore">50€</span>
+                                    </label>
+                                    <input type="range" id="filterPrezzo" class="form-range" min="0" max="100" step="5"
+                                        value="50">
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+
+
+                <!-- LISTA ANNUNCI -->
+                <section class="col-12 col-md-9 col-lg-10">
+                    <div id="lista-annunci" class="row g-3">
+                        <!-- annunci -->
+                    </div>
+                </section>
+
+            </div>
+        </div>
+
+
 
     </header>
 
@@ -198,94 +280,155 @@
 
     <!-- javascriptttttttttttttttttttttttttttttttttttttttt -->
 
-<script>
-    const bottone = document.getElementById('btn-tema');
-    const html = document.documentElement;
-    const iconaLuna = document.getElementById('icona-luna');
-    const iconaSole = document.getElementById('icona-sole');
-    
-    // Selezioniamo il nuovo link Pubblica
-    const btnPubblica = document.getElementById('btn-pubblica');
+    <script>
+        const bottone = document.getElementById('btn-tema');
+        const html = document.documentElement;
+        const iconaLuna = document.getElementById('icona-luna');
+        const iconaSole = document.getElementById('icona-sole');
 
-    // Selezioniamo i bottoni DESKTOP
-    const btnLogin = document.getElementById('btn-login');
-    const btnRegister = document.getElementById('btn-register');
+        // Selezioniamo il nuovo link Pubblica
+        const btnPubblica = document.getElementById('btn-pubblica');
 
-    // Selezioniamo i bottoni MOBILE
-    const btnMobileLogin = document.getElementById('btn-mobile-login');
-    const btnMobileRegister = document.getElementById('btn-mobile-register');
+        // Selezioniamo i bottoni DESKTOP
+        const btnLogin = document.getElementById('btn-login');
+        const btnRegister = document.getElementById('btn-register');
 
-    const applicaTema = (tema) => {
-        html.setAttribute('data-bs-theme', tema);
-        localStorage.setItem('temaPreferito', tema);
+        // Selezioniamo i bottoni MOBILE
+        const btnMobileLogin = document.getElementById('btn-mobile-login');
+        const btnMobileRegister = document.getElementById('btn-mobile-register');
 
-        if (tema === 'dark') {
-            // --- MODALITÀ SCURA (Sfondo scuro) ---
-            iconaLuna.classList.add('d-none');
-            iconaSole.classList.remove('d-none');
+        const applicaTema = (tema) => {
+            html.setAttribute('data-bs-theme', tema);
+            localStorage.setItem('temaPreferito', tema);
 
-            // Toggle Tema (Bottone luna/sole)
-            bottone.classList.replace('btn-outline-secondary', 'btn-outline-light');
-            
-            // LOGICA PUBBLICA: In Dark Mode il bottone diventa BIANCO (btn-light)
-            btnPubblica.classList.remove('btn-dark');
-            btnPubblica.classList.add('btn-light');
+            if (tema === 'dark') {
+                // --- MODALITÀ SCURA (Sfondo scuro) ---
+                iconaLuna.classList.add('d-none');
+                iconaSole.classList.remove('d-none');
 
-            // Desktop Login/Register
-            if (btnLogin) btnLogin.classList.replace('btn-outline-dark', 'btn-outline-light');
-            if (btnRegister) btnRegister.classList.replace('btn-outline-dark', 'btn-outline-light');
+                // Toggle Tema (Bottone luna/sole)
+                bottone.classList.replace('btn-outline-secondary', 'btn-outline-light');
 
-            // Gestione Mobile
-            if (btnMobileLogin) btnMobileLogin.classList.replace('btn-outline-dark', 'btn-outline-light');
-            if (btnMobileRegister) {
-                btnMobileRegister.classList.remove('btn-dark'); 
-                btnMobileRegister.classList.add('btn-light');   
+                // LOGICA PUBBLICA: In Dark Mode il bottone diventa BIANCO (btn-light)
+                btnPubblica.classList.remove('btn-dark');
+                btnPubblica.classList.add('btn-light');
+
+                // Desktop Login/Register
+                if (btnLogin) btnLogin.classList.replace('btn-outline-dark', 'btn-outline-light');
+                if (btnRegister) btnRegister.classList.replace('btn-outline-dark', 'btn-outline-light');
+
+                // Gestione Mobile
+                if (btnMobileLogin) btnMobileLogin.classList.replace('btn-outline-dark', 'btn-outline-light');
+                if (btnMobileRegister) {
+                    btnMobileRegister.classList.remove('btn-dark');
+                    btnMobileRegister.classList.add('btn-light');
+                }
+
+            } else {
+                // --- MODALITÀ CHIARA (Sfondo bianco) ---
+                iconaLuna.classList.remove('d-none');
+                iconaSole.classList.add('d-none');
+
+                // Toggle Tema (Bottone luna/sole)
+                bottone.classList.replace('btn-outline-light', 'btn-outline-secondary');
+
+                // LOGICA PUBBLICA: In Light Mode il bottone diventa NERO (btn-dark)
+                btnPubblica.classList.remove('btn-light');
+                btnPubblica.classList.add('btn-dark');
+
+                // Desktop Login/Register
+                if (btnLogin) btnLogin.classList.replace('btn-outline-light', 'btn-outline-dark');
+                if (btnRegister) btnRegister.classList.replace('btn-outline-light', 'btn-outline-dark');
+
+                // Gestione Mobile
+                if (btnMobileLogin) btnMobileLogin.classList.replace('btn-outline-light', 'btn-outline-dark');
+                if (btnMobileRegister) {
+                    btnMobileRegister.classList.remove('btn-light');
+                    btnMobileRegister.classList.add('btn-dark');
+                }
             }
+        };
 
-        } else {
-            // --- MODALITÀ CHIARA (Sfondo bianco) ---
-            iconaLuna.classList.remove('d-none');
-            iconaSole.classList.add('d-none');
+        const caricaTemaIniziale = () => {
+            const temaSalvato = localStorage.getItem('temaPreferito');
+            if (temaSalvato) return temaSalvato;
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        };
 
-            // Toggle Tema (Bottone luna/sole)
-            bottone.classList.replace('btn-outline-light', 'btn-outline-secondary');
-            
-            // LOGICA PUBBLICA: In Light Mode il bottone diventa NERO (btn-dark)
-            btnPubblica.classList.remove('btn-light');
-            btnPubblica.classList.add('btn-dark');
+        // Avvio immediato
+        applicaTema(caricaTemaIniziale());
 
-            // Desktop Login/Register
-            if (btnLogin) btnLogin.classList.replace('btn-outline-light', 'btn-outline-dark');
-            if (btnRegister) btnRegister.classList.replace('btn-outline-light', 'btn-outline-dark');
+        // Listener click
+        bottone.addEventListener('click', () => {
+            const temaAttuale = html.getAttribute('data-bs-theme');
+            const nuovoTema = temaAttuale === 'dark' ? 'light' : 'dark';
+            applicaTema(nuovoTema);
+        });
+    </script>
 
-            // Gestione Mobile
-            if (btnMobileLogin) btnMobileLogin.classList.replace('btn-outline-light', 'btn-outline-dark');
-            if (btnMobileRegister) {
-                btnMobileRegister.classList.remove('btn-light'); 
-                btnMobileRegister.classList.add('btn-dark');     
-            }
+    <!-- Bootstrap JS (caricato in fondo per performance) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- script per la gestione della barra di ricerca -->
+    <script>
+        const searchInput = document.getElementById("searchInput");
+
+        searchInput.addEventListener("input", function () {
+            const query = this.value.toLowerCase();
+            const annunci = document.querySelectorAll(".annuncio");
+
+            annunci.forEach(annuncio => {
+                const titolo = annuncio.dataset.title.toLowerCase();
+                annuncio.style.display = titolo.includes(query) ? "block" : "none";
+            });
+        });
+    </script>
+
+    <!-- script per il filtro-->
+    <script>
+        const searchInputFilter = document.getElementById("searchInput");
+        const filterFacolta = document.getElementById("filterFacolta");
+        const filterCondizioni = document.getElementById("filterCondizioni");
+        const filterPrezzo = document.getElementById("filterPrezzo");
+        const prezzoValore = document.getElementById("prezzoValore");
+
+        const annunci = document.querySelectorAll(".annuncio");
+
+        function filtraAnnunci() {
+            const query = searchInputFilter.value.toLowerCase();
+            const facolta = filterFacolta.value;
+            const condizione = filterCondizioni.value;
+            const prezzoMax = parseInt(filterPrezzo.value);
+
+            prezzoValore.textContent = prezzoMax + "€";
+
+            annunci.forEach(annuncio => {
+                const titolo = annuncio.dataset.title.toLowerCase();
+                const annFacolta = annuncio.dataset.facolta;
+                const annCondizione = annuncio.dataset.condizione;
+                const prezzo = parseInt(annuncio.dataset.prezzo);
+
+                const matchTitolo = titolo.includes(query);
+                const matchFacolta = !facolta || facolta === annFacolta;
+                const matchCondizione = !condizione || condizione === annCondizione;
+                const matchPrezzo = prezzo <= prezzoMax;
+
+                if (matchTitolo && matchFacolta && matchCondizione && matchPrezzo) {
+                    annuncio.classList.remove("nascosto");
+                } else {
+                    annuncio.classList.add("nascosto");
+                }
+
+            });
         }
-    };
 
-    const caricaTemaIniziale = () => {
-        const temaSalvato = localStorage.getItem('temaPreferito');
-        if (temaSalvato) return temaSalvato;
-        return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-    };
-    
-    // Avvio immediato
-    applicaTema(caricaTemaIniziale());
+        // LIVE EVENTS
+        searchInput.addEventListener("input", filtraAnnunci);
+        filterFacolta.addEventListener("change", filtraAnnunci);
+        filterCondizioni.addEventListener("change", filtraAnnunci);
+        filterPrezzo.addEventListener("input", filtraAnnunci);
+    </script>
 
-    // Listener click
-    bottone.addEventListener('click', () => {
-        const temaAttuale = html.getAttribute('data-bs-theme');
-        const nuovoTema = temaAttuale === 'dark' ? 'light' : 'dark';
-        applicaTema(nuovoTema);
-    });
-</script>
-
-<!-- Bootstrap JS (caricato in fondo per performance) -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 </body>
 
