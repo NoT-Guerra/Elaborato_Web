@@ -9,7 +9,47 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-    <!-- Tema -->
+    <style>
+        /* Sincronizzazione stili con Index */
+        .card-annuncio {
+            transition: transform 0.2s;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Responsive Image Wrapper */
+        .img-wrapper {
+            height: 220px; /* Altezza fissa per uniformità */
+            overflow: hidden;
+            background-color: #f8f9fa;
+        }
+
+        .img-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Mantiene le proporzioni senza distorcere */
+        }
+
+        .btn-preferiti {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 10;
+            background: white;
+            border: none;
+            border-radius: 50%;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .price-badge { font-size: 1rem; }
+    </style>
+
     <script>
         (function () {
             try {
@@ -37,42 +77,115 @@
                 </span>
                 <div>
                     <div class="fw-bold">Preferiti</div>
-                    <div class="text-muted small">Nessun annuncio salvato</div>
+                    <div id="contatore-preferiti" class="text-muted small">Nessun annuncio salvato</div>
                 </div>
             </div>
         </header>
 
-        <!-- STATO VUOTO -->
-        <main class="flex-grow-1 d-flex align-items-center justify-content-center text-center px-4">
-            <div>
+        <main class="flex-grow-1 container py-4">
+            <div id="vuoto-msg" class="text-center mt-5 d-none">
                 <div class="mb-4">
                     <i class="bi bi-heart fs-1 text-danger"></i>
                 </div>
-
-                <h5 class="fw-bold mb-2">
-                    Nessun annuncio salvato
-                </h5>
-
-                <p class="text-muted mb-4">
-                    Inizia a salvare i tuoi annunci preferiti<br>
-                    cliccando sul cuore
-                </p>
-
-                <a href="index.html" class="btn btn-outline-secondary px-4 py-2 fw-bold">
-                    Scopri annunci
-                </a>
+                <h5 class="fw-bold mb-2">Nessun annuncio salvato</h5>
+                <p class="text-muted mb-4">Inizia a salvare i tuoi annunci preferiti cliccando sul cuore</p>
+                <a href="indexVr2.html" class="btn btn-outline-secondary px-4 py-2 fw-bold">Scopri annunci</a>
             </div>
-        </main>
 
-        <!-- PULSANTE AIUTO -->
-        <button class="btn btn-secondary rounded-circle position-fixed end-0 me-3 mb-3" style="bottom:1rem;"
-            aria-label="Aiuto">
-            <i class="bi bi-question-circle"></i>
-        </button>
+            <div id="lista-preferiti" class="row g-4"></div>
+        </main>
 
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
 
+    <script>
+        function renderizzaPreferiti() {
+            const container = document.getElementById('lista-preferiti');
+            const vuotoMsg = document.getElementById('vuoto-msg');
+            const contatoreHeader = document.getElementById('contatore-preferiti');
+            
+            const preferiti = JSON.parse(localStorage.getItem('mieiPreferiti')) || [];
+
+            container.innerHTML = '';
+
+            // 1. Aggiornamento Contatore nell'Header
+            if (preferiti.length > 0) {
+                vuotoMsg.classList.add('d-none');
+                contatoreHeader.textContent = preferiti.length + (preferiti.length === 1 ? " annuncio salvato" : " annunci salvati");
+            } else {
+                vuotoMsg.classList.remove('d-none');
+                contatoreHeader.textContent = "Nessun annuncio salvato";
+            }
+
+            // 2. Generazione Card
+            preferiti.forEach(item => {
+                const card = `
+                    <div class="col-xl-4 col-lg-6 annuncio" 
+                         data-title="${item.title}" 
+                         data-facolta="${item.facolta}" 
+                         data-condizione="${item.condizione}" 
+                         data-prezzo="${item.prezzo}" 
+                         data-categoria="${item.categoria}">
+                        <div class="card h-100 border-0 shadow-sm card-annuncio">
+                            <button class="btn-preferiti" onclick="rimuovi('${item.title.replace(/'/g, "\\'")}')">
+                                <i class="bi bi-suit-heart-fill text-danger"></i>
+                            </button>
+                            <div class="img-wrapper">
+                                <img src="${item.img}" alt="${item.title}" class="img-fluid">
+                            </div>
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="fw-bold mb-0 text-truncate" style="max-width: 70%;">${item.title}</h6>
+                                    <span class="badge bg-primary-subtle text-primary price-badge">€${item.prezzo}</span>
+                                </div>
+                                <p class="small text-muted mb-2 text-truncate-2">${item.desc}</p>
+                                <div class="d-flex justify-content-between align-items-center mb-3">
+                                    <span class="badge bg-light text-dark border">
+                                        <i class="bi bi-book me-1"></i>${item.categoria}
+                                    </span>
+                                    <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>${item.luogo || 'Politecnico'}</small>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span class="badge bg-success-subtle text-success">${item.condizione}</span>
+                                        <small class="text-muted d-block mt-1">${item.tempo || 'Recentemente'}</small>
+                                    </div>
+                                    <button class="btn btn-dark btn-sm px-3 rounded-pill" onclick="spostaNelCarrello('${item.title.replace(/'/g, "\\'")}')">
+                                        <i class="bi bi-cart-plus me-1"></i>Aggiungi
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>`;
+                container.innerHTML += card;
+            });
+        }
+
+        function spostaNelCarrello(title) {
+            let preferiti = JSON.parse(localStorage.getItem('mieiPreferiti')) || [];
+            let carrello = JSON.parse(localStorage.getItem('mioCarrello')) || [];
+
+            const index = preferiti.findIndex(p => p.title === title);
+            if (index !== -1) {
+                carrello.push(preferiti[index]);
+                localStorage.setItem('mioCarrello', JSON.stringify(carrello));
+                
+                preferiti.splice(index, 1);
+                localStorage.setItem('mieiPreferiti', JSON.stringify(preferiti));
+                
+                renderizzaPreferiti();
+            }
+        }
+
+        function rimuovi(title) {
+            let preferiti = JSON.parse(localStorage.getItem('mieiPreferiti')) || [];
+            preferiti = preferiti.filter(p => p.title !== title);
+            localStorage.setItem('mieiPreferiti', JSON.stringify(preferiti));
+            renderizzaPreferiti();
+        }
+
+        document.addEventListener('DOMContentLoaded', renderizzaPreferiti);
+    </script>
+</body>
 </html>
