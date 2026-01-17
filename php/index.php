@@ -280,31 +280,31 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
                 <!-- Azioni -->
                 <div class="d-flex align-items-center gap-2">
                     <!-- Bottone Preferiti - visibile solo su schermi medi e grandi -->
-                    <a href="preferiti.html"
+                    <a href="preferiti.php"
                         class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
                         <i class="bi bi-suit-heart"></i>
                         <span id="cart-counter" class="badge rounded-pill bg-danger d-none">0</span>
                     </a>
 
                     <!-- Bottone Carrello - visibile solo su schermi medi e grandi -->
-                    <a href="carrello.html"
+                    <a href="carrello.php"
                         class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
                         <i class="bi bi-cart"></i>
                         <span id="cart-counter-header" class="badge rounded-pill bg-danger d-none">0</span>
                     </a>
 
                     <!-- I bottoni Login e Registrati rimangono già d-none d-md-flex -->
-                    <a href="login.html" class="btn btn-outline-dark d-none d-md-flex align-items-center px-3">
+                    <a href="login.php" class="btn btn-outline-dark d-none d-md-flex align-items-center px-3">
                         <i class="bi bi-box-arrow-in-right me-2"></i>Login
                     </a>
-                    <a id="btn-register" href="register.html"
+                    <a id="btn-register" href="register.php"
                         class="btn btn-outline-dark d-none d-md-flex align-items-center gap-2 px-2 px-sm-3">
                         <i class="bi bi-person-add"></i>
                         <span class="ms-1">Registrati</span>
                     </a>
 
                     <!-- Bottone Pubblica - già responsive -->
-                    <a href="pubblica.html" class="btn btn-dark d-flex align-items-center justify-content-center px-3">
+                    <a href="pubblica.php" class="btn btn-dark d-flex align-items-center justify-content-center px-3">
                         <i class="bi bi-plus-circle"></i>
                         <span class="d-none d-md-inline ms-2">Pubblica</span>
                     </a>
@@ -331,11 +331,11 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
                 </div>
                 <div class="offcanvas-body p-0">
                     <div class="p-3 d-grid gap-2">
-                        <a href="login.html"
+                        <a href="login.php"
                             class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
                             <i class="bi bi-box-arrow-in-right"></i> Login
                         </a>
-                        <a href="register.html"
+                        <a href="register.php"
                             class="btn btn-outline-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
                             <i class="bi bi-person-add"></i> Registrati
                         </a>
@@ -344,14 +344,14 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
                     <hr class="my-0 opacity-10">
 
                     <div class="list-group list-group-flush">
-                        <a href="preferiti.html" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                        <a href="preferiti.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                             <i class="bi bi-suit-heart me-3"></i> Preferiti
                         </a>
-                        <a href="carrello.html" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                        <a href="carrello.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                             <i class="bi bi-cart me-3"></i> Carrello
                         </a>
                         <hr class="my-0 opacity-10">
-                        <a href="admin.html" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                        <a href="admin.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                             <i class="bi bi-shield-lock me-3"></i> Pannello Admin
                         </a>
                         <a href="#" class="list-group-item list-group-item-action border-0 py-3 px-4">
@@ -539,7 +539,7 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
                             </div>
                             <h5 class="text-muted">Nessun annuncio disponibile</h5>
                             <p class="text-muted">Sii il primo a pubblicare un annuncio!</p>
-                            <a href="pubblica.html" class="btn btn-primary">
+                            <a href="pubblica.php" class="btn btn-primary">
                                 <i class="bi bi-plus-circle me-2"></i>Pubblica annuncio
                             </a>
                         </div>
