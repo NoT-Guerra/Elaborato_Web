@@ -175,15 +175,23 @@
                 </div>
 
                 <!-- Azioni -->
+                <!-- Azioni -->
                 <div class="d-flex align-items-center gap-2">
-                    <a href="preferiti.html" class="btn btn-link text-body p-1 p-sm-2 position-relative">
+                    <!-- Bottone Preferiti - visibile solo su schermi medi e grandi -->
+                    <a href="preferiti.html"
+                        class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
                         <i class="bi bi-suit-heart"></i>
                         <span id="cart-counter" class="badge rounded-pill bg-danger d-none">0</span>
                     </a>
-                    <a href="carrello.html" class="btn btn-link text-body p-1 p-sm-2 position-relative">
+
+                    <!-- Bottone Carrello - visibile solo su schermi medi e grandi -->
+                    <a href="carrello.html"
+                        class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
                         <i class="bi bi-cart"></i>
                         <span id="cart-counter-header" class="badge rounded-pill bg-danger d-none">0</span>
                     </a>
+
+                    <!-- I bottoni Login e Registrati rimangono già d-none d-md-flex -->
                     <a href="login.html" class="btn btn-outline-dark d-none d-md-flex align-items-center px-3">
                         <i class="bi bi-box-arrow-in-right me-2"></i>Login
                     </a>
@@ -192,14 +200,20 @@
                         <i class="bi bi-person-add"></i>
                         <span class="ms-1">Registrati</span>
                     </a>
-                    <a href="pubblica.html" class="btn btn-dark d-flex align-items-center px-3">
-                        <i class="bi bi-plus-circle me-2"></i><span class="d-none d-md-inline">Pubblica</span>
+
+                    <!-- Bottone Pubblica - già responsive -->
+                    <a href="pubblica.html" class="btn btn-dark d-flex align-items-center justify-content-center px-3">
+                        <i class="bi bi-plus-circle"></i>
+                        <span class="d-none d-md-inline ms-2">Pubblica</span>
                     </a>
+
+                    <!-- Bottone Tema - rimane sempre visibile -->
                     <button id="btn-tema" class="btn btn-outline-secondary">
                         <i id="icona-luna" class="bi bi-moon"></i>
                         <i id="icona-sole" class="bi bi-sun d-none"></i>
                     </button>
-                    <!-- button per menù a tendina-->
+
+                    <!-- Bottone menu a tendina - rimane sempre visibile -->
                     <button class="btn btn-link text-body p-0 ms-2" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#menuMobile">
                         <i class="bi bi-list fs-2"></i>
@@ -211,12 +225,12 @@
             <div class="offcanvas offcanvas-end" tabindex="-1" id="menuMobile" aria-labelledby="menuMobileLabel">
                 <div class="offcanvas-header border-bottom">
                     <h5 class="offcanvas-title fw-bold" id="menuMobileLabel">UniboMarket</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas"
-                        aria-label="Close"></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body p-0">
                     <div class="p-3 d-grid gap-2">
-                        <a href="login.html" class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                        <a href="login.html"
+                            class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
                             <i class="bi bi-box-arrow-in-right"></i> Login
                         </a>
                         <a href="register.html"
@@ -327,8 +341,7 @@
                         <div class="card h-100 border-0 shadow-sm card-annuncio">
                             <button class="btn-preferiti"><i class="bi bi-suit-heart"></i></button>
                             <div class="img-wrapper">
-                                <img
-                                    src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600"
+                                <img src="https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600"
                                     alt="Libro Analisi Matematica">
                             </div>
                             <div class="card-body">
@@ -362,8 +375,7 @@
                         <div class="card h-100 border-0 shadow-sm card-annuncio">
                             <button class="btn-preferiti"><i class="bi bi-suit-heart"></i></button>
                             <div class="img-wrapper">
-                                <img
-                                    src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=600"
+                                <img src="https://images.unsplash.com/photo-1455390582262-044cdead277a?auto=format&fit=crop&w=600"
                                     alt="Appunti Diritto">
                             </div>
                             <div class="card-body">
@@ -397,8 +409,7 @@
                         <div class="card h-100 border-0 shadow-sm card-annuncio">
                             <button class="btn-preferiti"><i class="bi bi-suit-heart"></i></button>
                             <div class="img-wrapper">
-                                <img
-                                    src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=600"
+                                <img src="https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=600"
                                     alt="Libro Fisica">
                             </div>
                             <div class="card-body">
