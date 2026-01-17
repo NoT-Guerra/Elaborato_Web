@@ -1,3 +1,72 @@
+<?php
+    // Connessione al database
+    require_once 'database.php';
+    
+    // Query per ottenere gli annunci con le relative informazioni
+    $sql = "SELECT 
+                a.id_annuncio,
+                a.titolo,
+                a.descrizione,
+                a.prezzo,
+                a.data_pubblicazione,
+                a.is_digitale,
+                a.immagine_url,
+                a.is_attivo,
+                a.is_venduto,
+                cp.nome_categoria,
+                cond.nome_condizione,
+                f.nome_facolta,
+                cs.nome_corso,
+                u.nome as nome_venditore,
+                u.cognome as cognome_venditore
+            FROM annuncio a
+            JOIN categoria_prodotto cp ON a.categoria_id = cp.id_categoria
+            JOIN condizione_prodotto cond ON a.condizione_id = cond.id_condizione
+            LEFT JOIN facolta f ON a.facolta_id = f.id_facolta
+            LEFT JOIN corso_studio cs ON a.corso_id = cs.id_corso
+            JOIN utenti u ON a.venditore_id = u.id_utente
+            WHERE a.is_attivo = 1 AND a.is_venduto = 0
+            ORDER BY a.data_pubblicazione DESC";
+    
+    $result = $conn->query($sql);
+    $annunci = [];
+    if ($result && $result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            $annunci[] = $row;
+        }
+    }
+    
+    // Ottieni categorie distinte per i filtri
+    $sql_categorie = "SELECT nome_categoria FROM categoria_prodotto";
+    $result_categorie = $conn->query($sql_categorie);
+    $categorie = [];
+    if ($result_categorie && $result_categorie->num_rows > 0) {
+        while($row = $result_categorie->fetch_assoc()) {
+            $categorie[] = $row['nome_categoria'];
+        }
+    }
+    
+    // Ottieni facoltà distinte per i filtri
+    $sql_facolta = "SELECT nome_facolta FROM facolta";
+    $result_facolta = $conn->query($sql_facolta);
+    $facolta_list = [];
+    if ($result_facolta && $result_facolta->num_rows > 0) {
+        while($row = $result_facolta->fetch_assoc()) {
+            $facolta_list[] = $row['nome_facolta'];
+        }
+    }
+    
+    // Ottieni condizioni distinte per i filtri
+    $sql_condizioni = "SELECT nome_condizione FROM condizione_prodotto";
+    $result_condizioni = $conn->query($sql_condizioni);
+    $condizioni_list = [];
+    if ($result_condizioni && $result_condizioni->num_rows > 0) {
+        while($row = $result_condizioni->fetch_assoc()) {
+            $condizioni_list[] = $row['nome_condizione'];
+        }
+    }
+    ?>
+
 <!DOCTYPE html>
 <html lang="it">
 
@@ -166,75 +235,7 @@
 </head>
 
 <body>
-    <?php
-    // Connessione al database
-    require_once 'db_config.php';
     
-    // Query per ottenere gli annunci con le relative informazioni
-    $sql = "SELECT 
-                a.id_annuncio,
-                a.titolo,
-                a.descrizione,
-                a.prezzo,
-                a.data_pubblicazione,
-                a.is_digitale,
-                a.immagine_url,
-                a.is_attivo,
-                a.is_venduto,
-                cp.nome_categoria,
-                cond.nome_condizione,
-                f.nome_facolta,
-                cs.nome_corso,
-                u.nome as nome_venditore,
-                u.cognome as cognome_venditore
-            FROM annuncio a
-            JOIN categoria_prodotto cp ON a.categoria_id = cp.id_categoria
-            JOIN condizione_prodotto cond ON a.condizione_id = cond.id_condizione
-            LEFT JOIN facolta f ON a.facolta_id = f.id_facolta
-            LEFT JOIN corso_studio cs ON a.corso_id = cs.id_corso
-            JOIN utenti u ON a.venditore_id = u.id_utente
-            WHERE a.is_attivo = 1 AND a.is_venduto = 0
-            ORDER BY a.data_pubblicazione DESC";
-    
-    $result = $conn->query($sql);
-    $annunci = [];
-    if ($result && $result->num_rows > 0) {
-        while($row = $result->fetch_assoc()) {
-            $annunci[] = $row;
-        }
-    }
-    
-    // Ottieni categorie distinte per i filtri
-    $sql_categorie = "SELECT nome_categoria FROM categoria_prodotto";
-    $result_categorie = $conn->query($sql_categorie);
-    $categorie = [];
-    if ($result_categorie && $result_categorie->num_rows > 0) {
-        while($row = $result_categorie->fetch_assoc()) {
-            $categorie[] = $row['nome_categoria'];
-        }
-    }
-    
-    // Ottieni facoltà distinte per i filtri
-    $sql_facolta = "SELECT nome_facolta FROM facolta";
-    $result_facolta = $conn->query($sql_facolta);
-    $facolta_list = [];
-    if ($result_facolta && $result_facolta->num_rows > 0) {
-        while($row = $result_facolta->fetch_assoc()) {
-            $facolta_list[] = $row['nome_facolta'];
-        }
-    }
-    
-    // Ottieni condizioni distinte per i filtri
-    $sql_condizioni = "SELECT nome_condizione FROM condizione_prodotto";
-    $result_condizioni = $conn->query($sql_condizioni);
-    $condizioni_list = [];
-    if ($result_condizioni && $result_condizioni->num_rows > 0) {
-        while($row = $result_condizioni->fetch_assoc()) {
-            $condizioni_list[] = $row['nome_condizione'];
-        }
-    }
-    ?>
-
     <!-- Header -->
     <header class="sticky-top bg-body border-bottom shadow-sm">
         <div class="container-fluid p-2 p-sm-3">
