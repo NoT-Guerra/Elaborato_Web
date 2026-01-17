@@ -1,27 +1,18 @@
 <?php
-class Database {
-    private $host = 'localhost';
-    private $db_name = 'marketplace_universitario';
-    private $username = 'root';
-    private $password = '';
-    private $conn;
+// Configurazione database MySQL locale
+$servername = "localhost";
+$username = "root"; // Inserisci il tuo username MySQL
+$password = ""; // Inserisci la tua password MySQL
+$database = "marketplace_universitario";
 
-    public function connect() {
-        $this->conn = null;
-        
-        try {
-            $this->conn = new PDO(
-                "mysql:host={$this->host};dbname={$this->db_name}",
-                $this->username,
-                $this->password,
-                array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8")
-            );
-            $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        } catch(PDOException $e) {
-            die("Errore di connessione: " . $e->getMessage());
-        }
-        
-        return $this->conn;
-    }
+// Crea connessione
+$conn = new mysqli($servername, $username, $password, $database);
+
+// Verifica connessione
+if ($conn->connect_error) {
+    die("Connessione fallita: " . $conn->connect_error);
 }
+
+// Imposta il charset, per gestire anche le emoji
+$conn->set_charset("utf8mb4");
 ?>
