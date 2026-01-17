@@ -1,3 +1,19 @@
+<?php
+session_start();
+
+// accesso non eseguito
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] != true) {
+    header('Location: login.php');
+    exit;
+}
+
+// accesso eseguito ma non è admin
+if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != true) {
+    header('Location: index.php');
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html lang="it" data-bs-theme="light">
 
@@ -5,11 +21,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pannello Admin - UniMarket</title>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-   <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="style/style.css">
 </head>
 
 <body class="bg-body">
@@ -80,9 +96,12 @@
 
         <!-- Tabs -->
         <ul class="nav nav-tabs mb-4" id="adminTabs">
-            <li class="nav-item"><button class="nav-link active fw-semibold" data-bs-target="#users" data-bs-toggle="tab"><i class="fas fa-users me-2"></i>Utenti</button></li>
-            <li class="nav-item"><button class="nav-link fw-semibold" data-bs-target="#announcements" data-bs-toggle="tab"><i class="fas fa-file-alt me-2"></i>Annunci</button></li>
-            <li class="nav-item"><button class="nav-link fw-semibold" data-bs-target="#categories" data-bs-toggle="tab"><i class="fas fa-layer-group me-2"></i>Categorie</button></li>
+            <li class="nav-item"><button class="nav-link active fw-semibold" data-bs-target="#users"
+                    data-bs-toggle="tab"><i class="fas fa-users me-2"></i>Utenti</button></li>
+            <li class="nav-item"><button class="nav-link fw-semibold" data-bs-target="#announcements"
+                    data-bs-toggle="tab"><i class="fas fa-file-alt me-2"></i>Annunci</button></li>
+            <li class="nav-item"><button class="nav-link fw-semibold" data-bs-target="#categories"
+                    data-bs-toggle="tab"><i class="fas fa-layer-group me-2"></i>Categorie</button></li>
         </ul>
 
         <!-- Contenuto Tabs -->
@@ -97,7 +116,13 @@
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead>
-                                    <tr><th class="ps-4">ID</th><th>Nome</th><th>Email</th><th>Università</th><th class="text-end pe-4">Azioni</th></tr>
+                                    <tr>
+                                        <th class="ps-4">ID</th>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Università</th>
+                                        <th class="text-end pe-4">Azioni</th>
+                                    </tr>
                                 </thead>
                                 <tbody id="usersTableBody"></tbody>
                             </table>
@@ -116,7 +141,14 @@
                         <div class="table-responsive">
                             <table class="table table-hover mb-0">
                                 <thead>
-                                    <tr><th class="ps-4">Titolo</th><th>Tipo</th><th>Prezzo</th><th>Venditore</th><th>Data</th><th class="text-end pe-4">Azioni</th></tr>
+                                    <tr>
+                                        <th class="ps-4">Titolo</th>
+                                        <th>Tipo</th>
+                                        <th>Prezzo</th>
+                                        <th>Venditore</th>
+                                        <th>Data</th>
+                                        <th class="text-end pe-4">Azioni</th>
+                                    </tr>
                                 </thead>
                                 <tbody id="announcementsTableBody"></tbody>
                             </table>
@@ -131,12 +163,15 @@
                     <div class="col-lg-6">
                         <div class="card border-0 shadow-sm h-100">
                             <div class="card-header bg-white border-bottom py-3">
-                                <h5 class="card-title mb-0 fw-bold"><i class="fas fa-book me-2"></i>Gestione Materie</h5>
+                                <h5 class="card-title mb-0 fw-bold"><i class="fas fa-book me-2"></i>Gestione Materie
+                                </h5>
                             </div>
                             <div class="card-body">
                                 <div class="row g-2 mb-4">
-                                    <div class="col"><input type="text" class="form-control" id="newSubject" placeholder="Nuova materia"></div>
-                                    <div class="col-auto d-flex align-items-end"><button class="btn btn-primary" id="addSubjectBtn"><i class="fas fa-plus me-2"></i>Aggiungi</button></div>
+                                    <div class="col"><input type="text" class="form-control" id="newSubject"
+                                            placeholder="Nuova materia"></div>
+                                    <div class="col-auto d-flex align-items-end"><button class="btn btn-primary"
+                                            id="addSubjectBtn"><i class="fas fa-plus me-2"></i>Aggiungi</button></div>
                                 </div>
                                 <div class="scrollable-content" id="subjectsList"></div>
                             </div>
@@ -145,12 +180,15 @@
                     <div class="col-lg-6">
                         <div class="card border-0 shadow-sm h-100">
                             <div class="card-header bg-white border-bottom py-3">
-                                <h5 class="card-title mb-0 fw-bold"><i class="fas fa-graduation-cap me-2"></i>Gestione Facoltà</h5>
+                                <h5 class="card-title mb-0 fw-bold"><i class="fas fa-graduation-cap me-2"></i>Gestione
+                                    Facoltà</h5>
                             </div>
                             <div class="card-body">
                                 <div class="row g-2 mb-4">
-                                    <div class="col"><input type="text" class="form-control" id="newFaculty" placeholder="Nuova facoltà"></div>
-                                    <div class="col-auto d-flex align-items-end"><button class="btn btn-primary" id="addFacultyBtn"><i class="fas fa-plus me-2"></i>Aggiungi</button></div>
+                                    <div class="col"><input type="text" class="form-control" id="newFaculty"
+                                            placeholder="Nuova facoltà"></div>
+                                    <div class="col-auto d-flex align-items-end"><button class="btn btn-primary"
+                                            id="addFacultyBtn"><i class="fas fa-plus me-2"></i>Aggiungi</button></div>
                                 </div>
                                 <div class="scrollable-content" id="facultiesList"></div>
                             </div>
@@ -165,12 +203,16 @@
     <div class="modal fade" id="resetPasswordModal">
         <div class="modal-dialog">
             <div class="modal-content">
-                <div class="modal-header"><h5 class="modal-title fw-bold">Reset Password</h5><button class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Reset Password</h5><button class="btn-close"
+                        data-bs-dismiss="modal"></button>
+                </div>
                 <div class="modal-body">
                     <p class="mb-3" id="resetPasswordUserInfo"></p>
                     <div class="mb-3">
                         <label class="form-label fw-semibold">Nuova Password</label>
-                        <input type="password" class="form-control" id="newPassword" placeholder="Minimo 6 caratteri" minlength="6" required>
+                        <input type="password" class="form-control" id="newPassword" placeholder="Minimo 6 caratteri"
+                            minlength="6" required>
                         <div class="form-text">La password deve essere di almeno 6 caratteri</div>
                     </div>
                 </div>
@@ -186,21 +228,10 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         const users = [
-            {id:"1", firstName:"Marco", lastName:"Rossi", email:"marco.r@university.it", university:"Politecnico di Milano"},
-            {id:"2", firstName:"Sofia", lastName:"Martini", email:"sofia.m@university.it", university:"Università di Bologna"},
-            {id:"3", firstName:"Alessandro", lastName:"Totti", email:"alessandro.t@university.it", university:"Sapienza Università di Roma"},
-            {id:"4", firstName:"Giulia", lastName:"Ponti", email:"giulia.p@university.it", university:"Università di Torino"},
-            {id:"5", firstName:"Francesca", lastName:"Bianchi", email:"francesca.b@university.it", university:"Università di Padova"},
+            { id: "1", firstName: "Marco", lastName: "Rossi", email: "marco.r@university.it", university: "Politecnico di Milano" }
         ];
         const announcements = [
-            {id:"1", title:"Analisi Matematica 1 - Bramanti", price:25, seller:"Marco R.", publishedDate:"2025-11-18", type:"Libro", status:"attivo"},
-            {id:"2", title:"Appunti Diritto Costituzionale", price:15, seller:"Sofia M.", publishedDate:"2025-11-17", type:"Appunti", status:"attivo"},
-            {id:"3", title:"Fisica Generale 1 - Mazzoldi", price:30, seller:"Alessandro T.", publishedDate:"2025-11-16", type:"Libro", status:"venduto"},
-            {id:"4", title:"Appunti Programmazione Java", price:12, seller:"Giulia P.", publishedDate:"2025-11-15", type:"Appunti", status:"attivo"},
-            {id:"5", title:"Chimica Organica - Bruice", price:45, seller:"Francesca B.", publishedDate:"2025-11-14", type:"Libro", status:"venduto"},
-            {id:"6", title:"Appunti Storia Contemporanea", price:10, seller:"Luca N.", publishedDate:"2025-11-13", type:"Appunti", status:"attivo"},
-            {id:"7", title:"Economia Aziendale - Airoldi", price:28, seller:"Martina C.", publishedDate:"2025-11-12", type:"Libro", status:"attivo"},
-            {id:"8", title:"Appunti Anatomia Umana", price:20, seller:"Elena S.", publishedDate:"2025-11-11", type:"Appunti", status:"attivo"},
+            { id: "1", title: "Analisi Matematica 1 - Bramanti", price: 25, seller: "Marco R.", publishedDate: "2025-11-18", type: "Libro", status: "attivo" }
         ];
         let subjects = ["Analisi Matematica", "Fisica", "Programmazione", "Economia", "Diritto"];
         let faculties = ["Ingegneria", "Medicina", "Economia", "Giurisprudenza", "Informatica", "Lettere e Filosofia"];
@@ -335,7 +366,7 @@
             setTimeout(() => toast._element.remove(), 3000);
         }
 
-        window.openResetPassword = function(userId) {
+        window.openResetPassword = function (userId) {
             selectedUser = users.find(u => u.id === userId);
             if (selectedUser) {
                 document.getElementById('resetPasswordUserInfo').innerHTML = `
@@ -346,29 +377,30 @@
             }
         };
 
-        window.deleteUser = function(userId) {
+        window.deleteUser = function (userId) {
             if (confirm('Eliminare questo utente?')) {
                 const index = users.findIndex(u => u.id === userId);
                 if (index > -1) { users.splice(index, 1); loadUsers(); updateStats(); showToast('Utente eliminato'); }
             }
         };
 
-        window.deleteAnnouncement = function(announcementId) {
+        window.deleteAnnouncement = function (announcementId) {
             if (confirm('Eliminare questo annuncio?')) {
                 const index = announcements.findIndex(a => a.id === announcementId);
                 if (index > -1) { announcements.splice(index, 1); loadAnnouncements(); updateStats(); showToast('Annuncio eliminato'); }
             }
         };
 
-        window.deleteSubject = function(index) {
+        window.deleteSubject = function (index) {
             if (confirm('Eliminare questa materia?')) { subjects.splice(index, 1); loadSubjects(); showToast('Materia rimossa'); }
         };
 
-        window.deleteFaculty = function(index) {
+        window.deleteFaculty = function (index) {
             if (confirm('Eliminare questa facoltà?')) { faculties.splice(index, 1); loadFaculties(); showToast('Facoltà rimossa'); }
         };
 
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
+
 </html>
