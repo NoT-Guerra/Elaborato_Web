@@ -1,4 +1,7 @@
 <?php
+// Inizia la sessione
+session_start();
+
 // Connessione al database
 require_once 'config/database.php';
 
@@ -70,6 +73,9 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
         $condizioni_list[] = $row['nome_condizione'];
     }
 }
+
+// Verifica se l'utente è loggato
+$is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
 ?>
 
 <!DOCTYPE html>
@@ -293,15 +299,28 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
                         <span id="cart-counter-header" class="badge rounded-pill bg-danger d-none">0</span>
                     </a>
 
-                    <!-- I bottoni Login e Registrati rimangono già d-none d-md-flex -->
-                    <a href="login.php" class="btn btn-outline-dark d-none d-md-flex align-items-center px-3">
-                        <i class="bi bi-box-arrow-in-right me-2"></i>Login
-                    </a>
-                    <a id="btn-register" href="register.php"
-                        class="btn btn-outline-dark d-none d-md-flex align-items-center gap-2 px-2 px-sm-3">
-                        <i class="bi bi-person-add"></i>
-                        <span class="ms-1">Registrati</span>
-                    </a>
+                    <?php if ($is_logged_in): ?>
+                        <!-- Se l'utente è loggato, mostra Logout e Nome utente -->
+                        <div class="d-none d-md-flex align-items-center">
+                            <span class="me-3 text-muted">
+                                <i class="bi bi-person-circle me-1"></i>
+                                <?php echo htmlspecialchars($_SESSION['nome'] . ' ' . $_SESSION['cognome']); ?>
+                            </span>
+                            <a href="logout.php" class="btn btn-outline-dark d-flex align-items-center px-3">
+                                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                            </a>
+                        </div>
+                    <?php else: ?>
+                        <!-- Se l'utente NON è loggato, mostra Login e Registrati -->
+                        <a href="login.php" class="btn btn-outline-dark d-none d-md-flex align-items-center px-3">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                        </a>
+                        <a id="btn-register" href="register.php"
+                            class="btn btn-outline-dark d-none d-md-flex align-items-center gap-2 px-2 px-sm-3">
+                            <i class="bi bi-person-add"></i>
+                            <span class="ms-1">Registrati</span>
+                        </a>
+                    <?php endif; ?>
 
                     <!-- Bottone Pubblica - già responsive -->
                     <a href="pubblica.php" class="btn btn-dark d-flex align-items-center justify-content-center px-3">
@@ -331,14 +350,28 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
                 </div>
                 <div class="offcanvas-body p-0">
                     <div class="p-3 d-grid gap-2">
-                        <a href="login.php"
-                            class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
-                            <i class="bi bi-box-arrow-in-right"></i> Login
-                        </a>
-                        <a href="register.php"
-                            class="btn btn-outline-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
-                            <i class="bi bi-person-add"></i> Registrati
-                        </a>
+                        <?php if ($is_logged_in): ?>
+                            <!-- Se loggato, mostra Logout e nome utente nel menu mobile -->
+                            <div class="text-center mb-2">
+                                <i class="bi bi-person-circle fs-2 mb-2"></i>
+                                <h6 class="mb-0"><?php echo htmlspecialchars($_SESSION['nome'] . ' ' . $_SESSION['cognome']); ?></h6>
+                                <small class="text-muted"><?php echo htmlspecialchars($_SESSION['email']); ?></small>
+                            </div>
+                            <a href="logout.php"
+                                class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                                <i class="bi bi-box-arrow-right"></i> Logout
+                            </a>
+                        <?php else: ?>
+                            <!-- Se NON loggato, mostra Login e Registrati nel menu mobile -->
+                            <a href="login.php"
+                                class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a>
+                            <a href="register.php"
+                                class="btn btn-outline-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                                <i class="bi bi-person-add"></i> Registrati
+                            </a>
+                        <?php endif; ?>
                     </div>
 
                     <hr class="my-0 opacity-10">
@@ -351,9 +384,11 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
                             <i class="bi bi-cart me-3"></i> Carrello
                         </a>
                         <hr class="my-0 opacity-10">
-                        <a href="admin.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
-                            <i class="bi bi-shield-lock me-3"></i> Pannello Admin
-                        </a>
+                        <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
+                            <a href="admin.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                                <i class="bi bi-shield-lock me-3"></i> Pannello Admin
+                            </a>
+                        <?php endif; ?>
                         <a href="#" class="list-group-item list-group-item-action border-0 py-3 px-4">
                             <i class="bi bi-question-circle me-3"></i> Aiuto e Supporto
                         </a>
