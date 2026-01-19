@@ -57,7 +57,7 @@ foreach ($db_items as $row) {
         'subtitle' => $row['nome_corso'] ?? 'Corso non specificato',
         'university' => $row['nome_facolta'] ?? 'Facoltà non specificata',
         'price' => (float) $row['prezzo'],
-        'image' => !empty($row['immagine_url']) ? $row['immagine_url'] : 'images/placeholder-book.png'
+        'image' => !empty($row['immagine_url']) ? $row['immagine_url'] : 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e'
     ];
 }
 
@@ -137,7 +137,7 @@ function format_currency($amount)
                     <span class="fw-bold fs-5">Totale</span>
                     <span class="fw-bold fs-5"><?php echo format_currency($total); ?></span>
                 </div>
-                <button class="btn btn-dark w-100 py-3 mt-3 fw-bold">Procedi al pagamento</button>
+                <button class="btn btn-primary w-100 py-3 mt-3 fw-bold">Procedi al pagamento</button>
             </div>
         <?php else: ?>
             <div class="text-center py-5">

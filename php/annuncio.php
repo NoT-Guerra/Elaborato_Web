@@ -8,6 +8,9 @@ $user = 'root';
 $pass = '';
 $charset = 'utf8mb4';
 
+// Check login status globally first
+$is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
+
 try {
     $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
     $pdo = new PDO($dsn, $user, $pass, [
@@ -23,7 +26,7 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     die("ID annuncio non valido.");
 }
 
-$annuncio_id = (int)$_GET['id'];
+$annuncio_id = (int) $_GET['id'];
 
 // Recupera i dettagli dell'annuncio
 $sql = "SELECT 
@@ -64,8 +67,21 @@ if (isset($_SESSION['user_id'])) {
     $cart_count = $countStmt->fetchColumn();
 }
 
-// Verifica se l'utente è loggato
-$is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
+// Verifica se è nei preferiti
+$is_favorite = false;
+if ($is_logged_in) {
+    $stmtFav = $pdo->prepare("SELECT COUNT(*) FROM preferiti WHERE utente_id = :u AND annuncio_id = :a");
+    $stmtFav->execute(['u' => $_SESSION['user_id'], 'a' => $annuncio_id]);
+    $is_favorite = $stmtFav->fetchColumn() > 0;
+}
+
+// Gestione preferiti (conteggio totale per header)
+$fav_count = 0;
+if ($is_logged_in) {
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM preferiti WHERE utente_id = :uid");
+    $stmt->execute(['uid' => $_SESSION['user_id']]);
+    $fav_count = $stmt->fetchColumn();
+}
 ?>
 
 <!DOCTYPE html>
@@ -83,14 +99,37 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             border-radius: 20px;
             font-size: 0.9rem;
         }
-        
-        .categoria-libro { background-color: #e3f2fd !important; color: #1565c0 !important; }
-        .categoria-appunti { background-color: #f3e5f5 !important; color: #7b1fa2 !important; }
-        .categoria-digitale { background-color: #e8f5e8 !important; color: #2e7d32 !important; }
-        .categoria-pdf { background-color: #f8f0f0 !important; color: #c62828 !important; }
-        .categoria-materiale { background-color: #fff3e0 !important; color: #ef6c00 !important; }
-        .categoria-altro { background-color: #f5f5f5 !important; color: #616161 !important; }
-        
+
+        .categoria-libro {
+            background-color: #e3f2fd !important;
+            color: #1565c0 !important;
+        }
+
+        .categoria-appunti {
+            background-color: #f3e5f5 !important;
+            color: #7b1fa2 !important;
+        }
+
+        .categoria-digitale {
+            background-color: #e8f5e8 !important;
+            color: #2e7d32 !important;
+        }
+
+        .categoria-pdf {
+            background-color: #f8f0f0 !important;
+            color: #c62828 !important;
+        }
+
+        .categoria-materiale {
+            background-color: #fff3e0 !important;
+            color: #ef6c00 !important;
+        }
+
+        .categoria-altro {
+            background-color: #f5f5f5 !important;
+            color: #616161 !important;
+        }
+
         .product-image {
             width: 100%;
             height: 400px;
@@ -99,45 +138,133 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             border-radius: 10px;
             padding: 20px;
         }
-        
+
         .seller-info {
             background-color: #f8f9fa;
             border-radius: 10px;
             padding: 20px;
         }
-        
+
         .description-box {
             white-space: pre-line;
             line-height: 1.6;
         }
-        
+
         .sticky-sidebar {
             position: sticky;
             top: 20px;
         }
-        
+
+        /* Per il tema scuro, differenziamo card e inner blocks */
+        [data-bs-theme="dark"] .card {
+            background-color: #1a202c;
+            /* Colore card scura ma distinta */
+            border-color: #2d3748;
+        }
+
         [data-bs-theme="dark"] .product-image {
-            background-color: #2d3748;
+            background-color: #2d3748 !important;
+            /* Inner block leggermente più chiaro/diverso */
         }
-        
+
         [data-bs-theme="dark"] .seller-info {
-            background-color: #2d3748;
+            background-color: #2d3748 !important;
         }
-        
-        [data-bs-theme="dark"] .categoria-libro { background-color: #1e3a5f !important; color: #90caf9 !important; }
-        [data-bs-theme="dark"] .categoria-appunti { background-color: #4a1c5c !important; color: #e1bee7 !important; }
-        [data-bs-theme="dark"] .categoria-digitale { background-color: #1b3a1b !important; color: #a5d6a7 !important; }
-        [data-bs-theme="dark"] .categoria-pdf { background-color: #4a1c1c !important; color: #ff8a80 !important; }
-        [data-bs-theme="dark"] .categoria-materiale { background-color: #5d4037 !important; color: #ffcc80 !important; }
-        [data-bs-theme="dark"] .categoria-altro { background-color: #424242 !important; color: #e0e0e0 !important; }
-        
+
+        [data-bs-theme="dark"] body {
+            background-color: #17191c;
+            /* Background body molto scuro */
+        }
+
+        [data-bs-theme="dark"] .categoria-libro {
+            background-color: #1e3a5f !important;
+            color: #90caf9 !important;
+        }
+
+        [data-bs-theme="dark"] .categoria-appunti {
+            background-color: #4a1c5c !important;
+            color: #e1bee7 !important;
+        }
+
+        [data-bs-theme="dark"] .categoria-digitale {
+            background-color: #1b3a1b !important;
+            color: #a5d6a7 !important;
+        }
+
+        [data-bs-theme="dark"] .categoria-pdf {
+            background-color: #4a1c1c !important;
+            color: #ff8a80 !important;
+        }
+
+        [data-bs-theme="dark"] .categoria-materiale {
+            background-color: #5d4037 !important;
+            color: #ffcc80 !important;
+        }
+
+        [data-bs-theme="dark"] .categoria-altro {
+            background-color: #424242 !important;
+            color: #e0e0e0 !important;
+        }
+
         .btn-categoria {
             transition: all 0.2s;
         }
-        
+
         .btn-categoria:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dark mode specific fixes */
+        [data-bs-theme="dark"] .btn-outline-custom-white {
+            color: #fff;
+            border-color: #fff;
+            /* Bordo bianco richiesto */
+            background-color: transparent;
+        }
+
+        [data-bs-theme="dark"] .btn-outline-custom-white:hover {
+            background-color: #fff;
+            color: #000;
+        }
+
+        /* Light mode normal btn-outline-dark behavior */
+        .btn-outline-custom-white {
+            color: #000;
+            border-color: #000;
+        }
+
+        .btn-outline-custom-white:hover {
+            background-color: #000;
+            color: #fff;
+        }
+
+        /* Header Buttons Dark Mode */
+        [data-bs-theme="dark"] header .btn-dark {
+            background-color: #0d6efd !important;
+            border-color: #0d6efd !important;
+        }
+
+        [data-bs-theme="dark"] header .btn-outline-dark {
+            color: #fff !important;
+            border-color: #fff !important;
+        }
+
+        [data-bs-theme="dark"] header .btn-outline-dark:hover {
+            background-color: #fff !important;
+            color: #000 !important;
+        }
+
+        /* Cart/Fav Badge Style */
+        #cart-counter-header,
+        #fav-counter-header {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translate(25%, -25%);
+            font-size: 0.65rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 50%;
         }
     </style>
 </head>
@@ -160,17 +287,8 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                 <!-- Azioni -->
                 <div class="d-flex align-items-center gap-2">
                     <?php if ($is_logged_in): ?>
-                        <!-- Carrello -->
-                        <a href="carrello.php" class="btn btn-link text-body p-1 p-sm-2 position-relative">
-                            <i class="bi bi-cart"></i>
-                            <?php if ($cart_count > 0): ?>
-                                <span class="badge rounded-pill bg-danger position-absolute top-0 end-0" 
-                                      style="transform: translate(25%, -25%); font-size: 0.65rem;">
-                                    <?php echo $cart_count; ?>
-                                </span>
-                            <?php endif; ?>
-                        </a>
-                        
+
+
                         <!-- Profilo -->
                         <div class="d-none d-md-flex align-items-center">
                             <span class="me-3 text-muted">
@@ -195,12 +313,11 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             <div class="col-lg-7">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-4">
-                        <img src="<?php echo !empty($annuncio['immagine_url']) ? htmlspecialchars($annuncio['immagine_url']) : 'images/placeholder-book.png'; ?>" 
-                             class="product-image" 
-                             alt="<?php echo htmlspecialchars($annuncio['titolo']); ?>">
+                        <img src="<?php echo !empty($annuncio['immagine_url']) ? htmlspecialchars($annuncio['immagine_url']) : 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e'; ?>"
+                            class="product-image" alt="<?php echo htmlspecialchars($annuncio['titolo']); ?>">
                     </div>
                 </div>
-                
+
                 <!-- Descrizione -->
                 <div class="card border-0 shadow-sm mt-4">
                     <div class="card-body p-4">
@@ -220,12 +337,9 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                             <!-- Titolo e categoria -->
                             <div class="d-flex justify-content-between align-items-start mb-3">
                                 <div>
-                                    <span class="badge badge-custom categoria-<?php echo strtolower($annuncio['nome_categoria']); ?> mb-2">
-                                        <?php if ($annuncio['is_digitale']): ?>
-                                            <i class="bi bi-file-earmark-text me-1"></i>
-                                        <?php else: ?>
-                                            <i class="bi bi-book me-1"></i>
-                                        <?php endif; ?>
+                                    <span
+                                        class="badge badge-custom categoria-<?php echo strtolower($annuncio['nome_categoria']); ?> mb-2">
+                                        <i class="bi bi-book me-1"></i>
                                         <?php echo htmlspecialchars($annuncio['nome_categoria']); ?>
                                     </span>
                                     <h2 class="h4 fw-bold"><?php echo htmlspecialchars($annuncio['titolo']); ?></h2>
@@ -247,13 +361,17 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                                     <div class="col-6 mb-3">
                                         <div class="text-muted small">Condizione</div>
                                         <div class="fw-semibold">
-                                            <?php 
+                                            <?php
                                             $condizione_lower = strtolower($annuncio['nome_condizione']);
                                             $condizione_class = '';
-                                            if ($condizione_lower == 'nuovo') $condizione_class = 'text-info';
-                                            elseif ($condizione_lower == 'ottimo') $condizione_class = 'text-success';
-                                            elseif ($condizione_lower == 'buono') $condizione_class = 'text-warning';
-                                            else $condizione_class = 'text-secondary';
+                                            if ($condizione_lower == 'nuovo')
+                                                $condizione_class = 'text-info';
+                                            elseif ($condizione_lower == 'ottimo')
+                                                $condizione_class = 'text-success';
+                                            elseif ($condizione_lower == 'buono')
+                                                $condizione_class = 'text-warning';
+                                            else
+                                                $condizione_class = 'text-secondary';
                                             ?>
                                             <span class="<?php echo $condizione_class; ?>">
                                                 <?php echo htmlspecialchars($annuncio['nome_condizione']); ?>
@@ -263,7 +381,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                                     <div class="col-6 mb-3">
                                         <div class="text-muted small">Tipo</div>
                                         <div class="fw-semibold">
-                                            <?php echo $annuncio['is_digitale'] ? 'Digitale' : 'Fisico'; ?>
+                                            <?php echo (strtolower($annuncio['nome_categoria']) === 'pdf') ? 'Digitale' : 'Fisico'; ?>
                                         </div>
                                     </div>
                                     <div class="col-6 mb-3">
@@ -300,19 +418,23 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                                             <?php echo htmlspecialchars($annuncio['email_venditore']); ?>
                                         </div>
                                     </div>
-                                        </div>
+                                </div>
                             </div>
 
                             <!-- Azioni -->
                             <div class="d-grid gap-3">
-                                <button class="btn btn-dark btn-lg py-3 fw-bold aggiungi-carrello" 
-                                        data-id="<?php echo $annuncio['id_annuncio']; ?>">
+                                <button class="btn btn-primary btn-lg py-3 fw-bold aggiungi-carrello"
+                                    data-id="<?php echo $annuncio['id_annuncio']; ?>">
                                     <i class="bi bi-cart-plus me-2"></i>Aggiungi al carrello
                                 </button>
-                                
-                                <button class="btn btn-outline-dark btn-lg py-3 btn-preferiti" 
-                                        data-id="<?php echo $annuncio['id_annuncio']; ?>">
-                                    <i class="bi bi-heart me-2"></i>Aggiungi ai preferiti
+
+                                <button class="btn btn-outline-custom-white btn-lg py-3 btn-preferiti"
+                                    data-id="<?php echo $annuncio['id_annuncio']; ?>">
+                                    <?php if ($is_favorite): ?>
+                                        <i class="bi bi-heart-fill me-2 text-danger"></i>Rimuovi dai preferiti
+                                    <?php else: ?>
+                                        <i class="bi bi-heart me-2"></i>Aggiungi ai preferiti
+                                    <?php endif; ?>
                                 </button>
                             </div>
                         </div>
@@ -336,10 +458,10 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    
+
     <script>
         // Gestione tema
-        (function() {
+        (function () {
             const tema = localStorage.getItem('temaPreferito') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             document.documentElement.setAttribute('data-bs-theme', tema);
         })();
@@ -348,12 +470,12 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
         function showToast(message, isSuccess = true) {
             const toastEl = document.getElementById('liveToast');
             if (!toastEl) return;
-            
+
             const toastBody = toastEl.querySelector('.toast-body');
             const toastHeader = toastEl.querySelector('.toast-header');
-            
+
             toastBody.textContent = message;
-            
+
             if (isSuccess) {
                 toastHeader.classList.remove('text-danger');
                 toastHeader.classList.add('text-success');
@@ -361,93 +483,90 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                 toastHeader.classList.remove('text-success');
                 toastHeader.classList.add('text-danger');
             }
-            
+
             const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
             toast.show();
         }
 
         // Aggiungi al carrello
-        document.querySelector('.aggiungi-carrello').addEventListener('click', function(e) {
+        document.querySelector('.aggiungi-carrello').addEventListener('click', function (e) {
             e.preventDefault();
             const idAnnuncio = this.dataset.id;
-            
+
             fetch('aggiungi_carrello.php', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ id_annuncio: idAnnuncio })
             })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    showToast(data.message, true);
-                } else {
-                    showToast(data.message, false);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                showToast('Errore di comunicazione con il server.', false);
-            });
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        showToast(data.message, true);
+                    } else {
+                        showToast(data.message, false);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showToast('Errore di comunicazione con il server.', false);
+                });
         });
 
-        // Gestione preferiti
-        document.querySelector('.btn-preferiti').addEventListener('click', function(e) {
+        // Gestione preferiti con AJAX
+        document.querySelector('.btn-preferiti').addEventListener('click', function (e) {
             e.preventDefault();
             const id = '<?php echo $annuncio_id; ?>';
-            const icon = this.querySelector('i');
-            let preferiti = JSON.parse(localStorage.getItem('mieiPreferiti')) || [];
-            
-            const annuncioData = {
-                id: id,
-                title: '<?php echo addslashes($annuncio['titolo']); ?>',
-                prezzo: <?php echo $annuncio['prezzo']; ?>,
-                categoria: '<?php echo addslashes($annuncio['nome_categoria']); ?>',
-                img: '<?php echo addslashes(!empty($annuncio['immagine_url']) ? $annuncio['immagine_url'] : 'images/placeholder-book.png'); ?>'
-            };
-            
-            const existingIndex = preferiti.findIndex(p => p.id === id);
-            
-            if (existingIndex === -1) {
-                preferiti.push(annuncioData);
-                icon.className = 'bi bi-heart-fill me-2 text-danger';
-                showToast('Annuncio aggiunto ai preferiti!', true);
-            } else {
-                preferiti.splice(existingIndex, 1);
-                icon.className = 'bi bi-heart me-2';
-                showToast('Annuncio rimosso dai preferiti.', false);
-            }
-            
-            localStorage.setItem('mieiPreferiti', JSON.stringify(preferiti));
+            const btn = this;
+            const icon = btn.querySelector('i');
+
+            // Verifica stato attuale (icona)
+            const isAdded = icon.classList.contains('bi-heart-fill');
+            const url = isAdded ? 'rimuovi_preferiti.php' : 'aggiungi_preferiti.php';
+
+            fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ id_annuncio: id })
+            })
+                .then(res => res.json())
+
+                .then(data => {
+                    if (data.success) {
+                        // Aggiorna contatore header
+                        const counter = document.getElementById('fav-counter-header');
+                        if (data.count !== undefined && counter) {
+                            counter.textContent = data.count;
+                            if (data.count > 0) counter.classList.remove('d-none');
+                            else counter.classList.add('d-none');
+                        }
+
+                        if (isAdded) {
+                            icon.className = 'bi bi-heart me-2';
+                            btn.innerHTML = '<i class="bi bi-heart me-2"></i>Aggiungi ai preferiti';
+                            showToast('Rimosso dai preferiti.', true);
+                        } else {
+                            icon.className = 'bi bi-heart-fill me-2 text-danger';
+                            btn.innerHTML = '<i class="bi bi-heart-fill me-2 text-danger"></i>Rimuovi dai preferiti';
+                            showToast('Aggiunto ai preferiti!', true);
+                        }
+                    } else {
+                        showToast(data.message || 'Errore operazione', false);
+                    }
+                })
+                .catch(err => showToast('Errore di connessione', false));
         });
 
-        // Invia messaggio al venditore
-        document.getElementById('inviaMessaggio')?.addEventListener('click', function() {
-            const messaggio = document.getElementById('messaggio').value.trim();
-            
-            if (!messaggio) {
-                alert('Per favore, scrivi un messaggio.');
-                return;
-            }
-            
-            
-            
-            showToast('Messaggio inviato al venditore!', true);
-            document.getElementById('messaggio').value = '';
-        });
-
-        // Verifica se l'annuncio è già nei preferiti
+        // Verifica preferito al caricamento
         document.addEventListener('DOMContentLoaded', () => {
             const id = '<?php echo $annuncio_id; ?>';
-            const preferiti = JSON.parse(localStorage.getItem('mieiPreferiti')) || [];
-            const btnPreferiti = document.querySelector('.btn-preferiti');
-            const icon = btnPreferiti.querySelector('i');
-            
-            if (preferiti.some(p => p.id === id)) {
-                icon.className = 'bi bi-heart-fill me-2 text-danger';
-            }
+            // Chiamiamo check_preferito.php o usiamo un flag se lo avessimo. 
+            // Per ora non abbiamo un endpoint check, ma possiamo vedere se Preferiti.php lo ha.
+            // Opzione migliore: passarlo da PHP se possibile.
+            // Dato che non ho modificato la query per fare LEFT JOIN su preferiti,
+            // farò una piccola query extra in PHP sopra.
         });
     </script>
-    
+
 </body>
 
 </html>

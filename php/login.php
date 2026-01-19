@@ -35,11 +35,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 session_regenerate_id(true);
 
                 // Salviamo i dati corretti in sessione
-                $_SESSION['loggedin']    = true;
-                $_SESSION['user_id']     = $user['id_utente'];
-                $_SESSION['email']       = $user['email'];
-                $_SESSION['nome']        = $user['nome'];
-                $_SESSION['cognome']     = $user['cognome'];
+                $_SESSION['loggedin'] = true;
+                $_SESSION['user_id'] = $user['id_utente'];
+                $_SESSION['email'] = $user['email'];
+                $_SESSION['nome'] = $user['nome'];
+                $_SESSION['cognome'] = $user['cognome'];
                 $_SESSION['nome_facolta'] = $user['nome_facolta'] ?? 'Nessuna';
 
                 // ADMIN = ID 1 (riferito a id_utente)
@@ -61,22 +61,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Login - UniMarket</title>
+    <title>Login - UniboMarket</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script>
-        (function(){
-            try{
+        (function () {
+            try {
                 const tema = localStorage.getItem('temaPreferito') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
                 document.documentElement.setAttribute('data-bs-theme', tema);
-            }catch(e){console.warn('Tema non caricato:', e)}
+            } catch (e) { console.warn('Tema non caricato:', e) }
         })();
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="/style/style.css">
 </head>
+
 <body>
     <div class="container-fluid">
         <div class="row">
@@ -90,8 +92,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="row justify-content-center">
             <div class="col-12 col-sm-10 col-md-6 col-lg-4 p-3">
                 <div class="card p-4 shadow">
-                    <h1 class="h3 mb-3 fw-bold text-center">Accedi a UniMarket</h1>
-                    
+                    <h1 class="h3 mb-3 fw-bold text-center">Accedi a UniboMarket</h1>
+
                     <?php if ($error_message): ?>
                         <div class="alert alert-danger"><?php echo htmlspecialchars($error_message); ?></div>
                     <?php endif; ?>
@@ -99,14 +101,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <form action="login.php" method="post">
                         <div class="mb-3">
                             <label for="email" class="form-label">Email</label>
-                            <input type="email" class="form-control" id="email" name="email" 
-                                   placeholder="nome.cognome@studio.unibo.it" required autofocus>
+                            <input type="email" class="form-control" id="email" name="email"
+                                placeholder="nome.cognome@studio.unibo.it" required autofocus>
                         </div>
 
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
-                            <input type="password" class="form-control" id="password" name="password" 
-                                   placeholder="********" required>
+                            <input type="password" class="form-control" id="password" name="password"
+                                placeholder="********" required>
                         </div>
 
                         <div class="d-flex justify-content-between align-items-center mb-3">
@@ -115,7 +117,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                         <button type="submit" class="btn btn-dark w-100">Accedi</button>
                     </form>
-                    
+
                     <p class="mt-4 text-center mb-0">
                         Non hai un account? <a href="register.php" class="fw-bold text-decoration-none">Registrati</a>
                     </p>
@@ -125,4 +127,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>

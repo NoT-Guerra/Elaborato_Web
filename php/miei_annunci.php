@@ -13,7 +13,7 @@ $user_id = $_SESSION['user_id'];
 // Gestione eliminazione annuncio
 if (isset($_GET['elimina']) && is_numeric($_GET['elimina'])) {
     $annuncio_id = $_GET['elimina'];
-    
+
     // Verifica che l'annuncio appartenga all'utente
     $check_stmt = $conn->prepare("SELECT venditore_id FROM annuncio WHERE id_annuncio = ?");
     $check_stmt->bind_param("i", $annuncio_id);
@@ -21,14 +21,14 @@ if (isset($_GET['elimina']) && is_numeric($_GET['elimina'])) {
     $check_stmt->bind_result($venditore_id);
     $check_stmt->fetch();
     $check_stmt->close();
-    
+
     if ($venditore_id == $user_id) {
         // Elimina l'annuncio
         $delete_stmt = $conn->prepare("DELETE FROM annuncio WHERE id_annuncio = ?");
         $delete_stmt->bind_param("i", $annuncio_id);
         $delete_stmt->execute();
         $delete_stmt->close();
-        
+
         $success_message = "Annuncio eliminato con successo!";
     } else {
         $error_message = "Non hai i permessi per eliminare questo annuncio.";
@@ -43,7 +43,8 @@ $sql = "SELECT
             a.prezzo,
             a.data_pubblicazione,
             a.data_modifica,
-            a.is_digitale,
+            a.data_pubblicazione,
+            a.data_modifica,
             a.immagine_url,
             a.is_attivo,
             a.is_venduto,
@@ -78,7 +79,17 @@ $cart_stmt->bind_param("i", $user_id);
 $cart_stmt->execute();
 $cart_stmt->bind_result($cart_count);
 $cart_stmt->fetch();
+$cart_stmt->fetch();
 $cart_stmt->close();
+
+// Ottieni numero di articoli nei preferiti
+$fav_count = 0;
+$fav_stmt = $conn->prepare("SELECT COUNT(*) FROM preferiti WHERE utente_id = ?");
+$fav_stmt->bind_param("i", $user_id);
+$fav_stmt->execute();
+$fav_stmt->bind_result($fav_count);
+$fav_stmt->fetch();
+$fav_stmt->close();
 
 $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
 ?>
@@ -306,6 +317,59 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
         .modal-confirm .btn-danger:focus {
             background: #ee3535;
         }
+
+        /* Dark Mode Contrast Improvements */
+        [data-bs-theme="dark"] body {
+            background-color: #17191c !important;
+        }
+
+        [data-bs-theme="dark"] .card {
+            background-color: #1a202c;
+            border-color: #2d3748;
+        }
+
+        [data-bs-theme="dark"] .img-wrapper {
+            background-color: #2d3748;
+        }
+
+        [data-bs-theme="dark"] .modal-content {
+            background-color: #1a202c;
+            border-color: #2d3748;
+        }
+
+        /* Header Buttons Dark Mode */
+        [data-bs-theme="dark"] header .btn-dark {
+            background-color: #0d6efd !important;
+            border-color: #0d6efd !important;
+        }
+
+        [data-bs-theme="dark"] header .btn-outline-dark {
+            color: #fff !important;
+            border-color: #fff !important;
+        }
+
+        [data-bs-theme="dark"] header .btn-outline-dark:hover {
+            background-color: #fff !important;
+            color: #000 !important;
+        }
+
+        /* Cart/Fav Badge Style */
+        #cart-counter-header,
+        #fav-counter-header {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translate(25%, -25%);
+            font-size: 0.65rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 50%;
+        }
+
+        /* Theme Toggle Button Dark Mode */
+        [data-bs-theme="dark"] #btn-tema {
+            color: #fff !important;
+            border-color: #fff !important;
+        }
     </style>
 </head>
 
@@ -320,19 +384,24 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                         style="width: 48px; height: 48px;">
                         <i class="bi bi-book text-white fs-3"></i>
                     </div>
-                    <a href="index.php" class="btn btn-link text-body p-0 me-3"><i class="bi bi-arrow-left fs-4"></i></a>
+                    <a href="index.php" class="btn btn-link text-body p-0 me-3"><i
+                            class="bi bi-arrow-left fs-4"></i></a>
                     <div>
                         <h1 class="h5 fw-bold mb-0">UniboMarket</h1>
                         <p class="text-muted small mb-0 d-none d-md-block">I miei annunci</p>
                     </div>
                 </div>
-                
+
                 <!-- Azioni -->
                 <div class="d-flex align-items-center gap-2">
                     <!-- Bottone Preferiti -->
                     <a href="preferiti.php"
                         class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
                         <i class="bi bi-suit-heart"></i>
+                        <span id="fav-counter-header"
+                            class="badge rounded-pill bg-danger <?php echo ($fav_count > 0) ? '' : 'd-none'; ?>">
+                            <?php echo $fav_count; ?>
+                        </span>
                     </a>
 
                     <!-- Bottone Carrello -->
@@ -443,9 +512,6 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             <h1 class="h3 fw-bold">I miei annunci</h1>
             <div>
                 <span class="badge bg-primary rounded-pill"><?php echo count($annunci); ?> annunci</span>
-                <a href="pubblica.php" class="btn btn-primary ms-3">
-                    <i class="bi bi-plus-circle me-2"></i>Nuovo annuncio
-                </a>
             </div>
         </div>
 
@@ -454,15 +520,15 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                 <?php foreach ($annunci as $annuncio):
                     $categoria_lower = strtolower($annuncio['nome_categoria']);
                     $classe_categoria = 'categoria-' . $categoria_lower;
-                    
+
                     // Formatta la data
                     $data_pubblicazione = date('d/m/Y H:i', strtotime($annuncio['data_pubblicazione']));
                     $data_modifica = $annuncio['data_modifica'] ? date('d/m/Y H:i', strtotime($annuncio['data_modifica'])) : null;
-                    
+
                     // URL immagine di default
                     $immagine_url = $annuncio['immagine_url'] ?? 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600';
-                ?>
-                    <div class="col-xl-4 col-lg-6 col-md-6">
+                    ?>
+                    <div class="col-xl-3 col-lg-4 col-md-6 col-12">
                         <div class="card h-100 border-0 shadow-sm card-annuncio">
                             <!-- Badge stato -->
                             <div class="status-badge">
@@ -477,11 +543,13 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
 
                             <!-- Pulsanti azione -->
                             <div class="action-buttons">
-                                <button class="btn-action" onclick="confirmDelete(<?php echo $annuncio['id_annuncio']; ?>, '<?php echo htmlspecialchars(addslashes($annuncio['titolo'])); ?>')"
-                                        title="Elimina annuncio" <?php echo $annuncio['is_venduto'] ? 'disabled' : ''; ?>>
-                                    <i class="bi bi-trash <?php echo $annuncio['is_venduto'] ? 'text-muted' : 'text-danger'; ?>"></i>
+                                <button class="btn-action"
+                                    onclick="confirmDelete(<?php echo $annuncio['id_annuncio']; ?>, '<?php echo htmlspecialchars(addslashes($annuncio['titolo'])); ?>')"
+                                    title="Elimina annuncio" <?php echo $annuncio['is_venduto'] ? 'disabled' : ''; ?>>
+                                    <i
+                                        class="bi bi-trash <?php echo $annuncio['is_venduto'] ? 'text-muted' : 'text-danger'; ?>"></i>
                                 </button>
-                                
+
                             </div>
 
                             <!-- Immagine -->
@@ -509,11 +577,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                                 <!-- Informazioni -->
                                 <div class="mb-3">
                                     <span class="badge <?php echo $classe_categoria; ?> border me-2">
-                                        <?php if ($annuncio['is_digitale']): ?>
-                                            <i class="bi bi-file-earmark-text me-1"></i>
-                                        <?php else: ?>
-                                            <i class="bi bi-book me-1"></i>
-                                        <?php endif; ?>
+                                        <i class="bi bi-book me-1"></i>
                                         <?php echo htmlspecialchars($annuncio['nome_categoria']); ?>
                                     </span>
                                     <span class="badge bg-info-subtle text-info">
@@ -627,7 +691,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
         });
     </script>
 
-    
+
 </body>
 
 </html>

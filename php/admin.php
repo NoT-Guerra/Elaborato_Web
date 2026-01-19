@@ -115,12 +115,130 @@ if ($result) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pannello Admin - UniMarket</title>
+    <title>Pannello Admin - UniboMarket</title>
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style/style.css">
+    <style>
+        [data-bs-theme="dark"] #btn-tema {
+            color: #fff !important;
+            border-color: #fff !important;
+        }
+
+        /* Dark Mode Improvements */
+        [data-bs-theme="dark"] body {
+            background-color: #1a202c !important;
+            /* Darker background */
+            color: #e2e8f0;
+        }
+
+        [data-bs-theme="dark"] .card {
+            background-color: #2d3748 !important;
+            /* Lighter than body */
+            border-color: #4a5568 !important;
+        }
+
+        /* Opaque Header in Light Mode */
+        header.sticky-top {
+            background-color: #fff;
+        }
+
+        [data-bs-theme="dark"] header.sticky-top {
+            background-color: #1a202c;
+            /* Match dark body bg */
+        }
+
+        [data-bs-theme="dark"] .table,
+        [data-bs-theme="dark"] .table> :not(caption)>*>* {
+            background-color: #2d3748 !important;
+            /* Force uniform background everywhere */
+            color: #e2e8f0 !important;
+        }
+
+        [data-bs-theme="dark"] .table-hover tbody tr:hover>* {
+            background-color: #2d3748 !important;
+            /* Disable hover color change */
+            color: #fff !important;
+        }
+
+        [data-bs-theme="dark"] .border-bottom {
+            border-color: #4a5568 !important;
+        }
+
+        /* Responsive Table/Card Layout */
+        @media (max-width: 768px) {
+            .table-responsive-stack thead {
+                display: none;
+            }
+
+            .table-responsive-stack tr {
+                display: flex;
+                flex-direction: column;
+                border-bottom: 1px solid #dee2e6;
+                margin-bottom: 1rem;
+                background-color: var(--bs-body-bg);
+                box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+                border-radius: 0.5rem;
+                padding: 1rem;
+            }
+
+            [data-bs-theme="dark"] .table-responsive-stack tr {
+                border-color: #718096;
+                /* Lighter border for better visibility */
+                background-color: #2d3748;
+                /* Card background in dark mode */
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+                /* Stronger shadow */
+            }
+
+            .table-responsive-stack td {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                border: none;
+                padding: 0.75rem 0;
+                /* Slightly more padding */
+                width: 100%;
+                /* Ensure full width */
+            }
+
+            .table-responsive-stack td::before {
+                content: attr(data-label);
+                font-weight: bold;
+                margin-right: 1rem;
+                color: var(--bs-secondary);
+                text-align: left;
+                flex-shrink: 0;
+                /* Prevent label wrapping issues */
+            }
+
+            [data-bs-theme="dark"] .table-responsive-stack td::before {
+                color: #cbd5e0 !important;
+                /* Lighter text for labels in dark mode */
+            }
+
+            .table-responsive-stack td.td-actions {
+                justify-content: center;
+                /* Center buttons */
+                margin-top: 1rem;
+                padding-top: 1rem;
+                border-top: 1px solid #dee2e6;
+                gap: 15px;
+                /* More space between buttons */
+            }
+
+            [data-bs-theme="dark"] .table-responsive-stack td.td-actions {
+                border-top: 1px solid #718096 !important;
+                /* Lighter border separator */
+            }
+
+            .table-responsive-stack td.td-actions::before {
+                display: none;
+            }
+        }
+    </style>
 </head>
 
 <body>
@@ -137,7 +255,10 @@ if ($result) {
                         <p class="small mb-0">Gestisci utenti, annunci e categorie</p>
                     </div>
                 </div>
-                <!-- Bottone tema rimosso -->
+                <button id="btn-tema" class="btn btn-outline-secondary">
+                    <i id="icona-luna" class="bi bi-moon"></i>
+                    <i id="icona-sole" class="bi bi-sun d-none"></i>
+                </button>
             </div>
         </div>
     </header>
@@ -145,7 +266,7 @@ if ($result) {
     <main class="container-fluid py-4">
         <!-- Statistiche -->
         <div class="row mb-4 g-3">
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body d-flex align-items-center">
                         <div class="bg-primary bg-opacity-10 text-primary p-3 rounded me-3">
@@ -158,7 +279,7 @@ if ($result) {
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body d-flex align-items-center">
                         <div class="bg-success bg-opacity-10 text-success p-3 rounded me-3">
@@ -167,12 +288,13 @@ if ($result) {
                         <div>
                             <p class="small mb-1">Annunci Attivi</p>
                             <h3 class="mb-0 fw-bold" id="activeAnnouncements">
-                                <?php echo $stats['active_announcements'] ?? 0; ?></h3>
+                                <?php echo $stats['active_announcements'] ?? 0; ?>
+                            </h3>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-md-4">
+            <div class="col-12 col-md-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body d-flex align-items-center">
                         <div class="bg-info bg-opacity-10 text-info p-3 rounded me-3">
@@ -208,7 +330,7 @@ if ($result) {
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0">
+                            <table class="table table-hover mb-0 table-responsive-stack">
                                 <thead>
                                     <tr>
                                         <th class="ps-4">ID</th>
@@ -221,13 +343,17 @@ if ($result) {
                                 <tbody id="usersTableBody">
                                     <?php foreach ($users as $user): ?>
                                         <tr>
-                                            <td class="ps-4 fw-semibold"><?php echo htmlspecialchars($user['id']); ?></td>
-                                            <td><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?>
+                                            <td data-label="ID" class="ps-4 fw-semibold">
+                                                <?php echo htmlspecialchars($user['id']); ?>
                                             </td>
-                                            <td><?php echo htmlspecialchars($user['email']); ?></td>
-                                            <td><?php echo htmlspecialchars($user['university'] ?? 'Non specificata'); ?>
+                                            <td data-label="Nome">
+                                                <?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?>
                                             </td>
-                                            <td class="text-end pe-4">
+                                            <td data-label="Email"><?php echo htmlspecialchars($user['email']); ?></td>
+                                            <td data-label="Università">
+                                                <?php echo htmlspecialchars($user['university'] ?? 'Non specificata'); ?>
+                                            </td>
+                                            <td data-label="Azioni" class="text-end pe-4 td-actions">
                                                 <button class="btn btn-outline-primary btn-sm me-2"
                                                     onclick="openResetPassword(<?php echo $user['id']; ?>)">
                                                     <i class="fas fa-key me-1"></i>Reset
@@ -254,7 +380,7 @@ if ($result) {
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0">
+                            <table class="table table-hover mb-0 table-responsive-stack">
                                 <thead>
                                     <tr>
                                         <th class="ps-4">Titolo</th>
@@ -268,7 +394,7 @@ if ($result) {
                                 <tbody id="announcementsTableBody">
                                     <?php foreach ($announcements as $ann): ?>
                                         <tr>
-                                            <td class="ps-4">
+                                            <td data-label="Titolo" class="ps-4">
                                                 <span
                                                     class="badge <?php echo $ann['status'] === 'venduto' ? 'bg-success' : 'bg-primary'; ?> me-2">
                                                     <?php echo $ann['status'] === 'venduto' ? 'Venduto' : 'Attivo'; ?>
@@ -278,13 +404,15 @@ if ($result) {
                                                     <?php echo htmlspecialchars($ann['title']); ?>
                                                 </span>
                                             </td>
-                                            <td><span
+                                            <td data-label="Tipo"><span
                                                     class="badge bg-secondary"><?php echo htmlspecialchars($ann['type']); ?></span>
                                             </td>
-                                            <td class="fw-semibold">€<?php echo number_format($ann['price'], 2); ?></td>
-                                            <td><?php echo htmlspecialchars($ann['seller']); ?></td>
-                                            <td><?php echo htmlspecialchars($ann['publishedDate']); ?></td>
-                                            <td class="text-end pe-4">
+                                            <td data-label="Prezzo" class="fw-semibold">
+                                                €<?php echo number_format($ann['price'], 2); ?></td>
+                                            <td data-label="Venditore"><?php echo htmlspecialchars($ann['seller']); ?></td>
+                                            <td data-label="Data"><?php echo htmlspecialchars($ann['publishedDate']); ?>
+                                            </td>
+                                            <td data-label="Azioni" class="text-end pe-4 td-actions">
                                                 <button class="btn btn-outline-danger btn-sm"
                                                     onclick="deleteAnnouncement(<?php echo $ann['id']; ?>)">
                                                     <i class="fas fa-trash-alt me-1"></i>Elimina
@@ -411,6 +539,16 @@ if ($result) {
             document.getElementById('addFacultyBtn').addEventListener('click', addFaculty);
             document.getElementById('confirmResetBtn').addEventListener('click', confirmReset);
 
+            // Listener bottone tema
+            const btnTema = document.getElementById('btn-tema');
+            if (btnTema) {
+                btnTema.addEventListener('click', () => {
+                    const nuovoTema = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark';
+                    localStorage.setItem('temaPreferito', nuovoTema);
+                    applyTheme();
+                });
+            }
+
             // Applica il tema salvato
             applyTheme();
 
@@ -426,54 +564,17 @@ if ($result) {
             // Leggi il tema dalle altre pagine o usa default
             const tema = localStorage.getItem('temaPreferito') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
+            const iconaLuna = document.getElementById('icona-luna');
+            const iconaSole = document.getElementById('icona-sole');
+
             if (tema === 'dark') {
-                document.body.classList.add('bg-dark', 'text-white');
-                document.body.classList.remove('bg-body');
+                if (iconaLuna) iconaLuna.classList.add('d-none');
+                if (iconaSole) iconaSole.classList.remove('d-none');
                 document.documentElement.setAttribute('data-bs-theme', 'dark');
-
-                // Applica classi per header e card
-                document.querySelector('header').classList.add('bg-dark', 'border-secondary');
-                document.querySelectorAll('.card').forEach(card => {
-                    card.classList.add('bg-dark', 'text-white');
-                });
-                document.querySelectorAll('.card-header').forEach(header => {
-                    header.classList.add('bg-dark', 'border-secondary');
-                });
-                document.querySelectorAll('.table').forEach(table => {
-                    table.classList.add('table-dark');
-                });
-                document.querySelectorAll('.nav-tabs .nav-link').forEach(link => {
-                    if (link.classList.contains('active')) {
-                        link.classList.add('bg-dark', 'border-dark', 'text-white');
-                    }
-                });
-                document.querySelectorAll('.btn-link').forEach(btn => {
-                    btn.classList.add('text-white');
-                });
             } else {
-                document.body.classList.remove('bg-dark', 'text-white');
-                document.body.classList.add('bg-body');
+                if (iconaLuna) iconaLuna.classList.remove('d-none');
+                if (iconaSole) iconaSole.classList.add('d-none');
                 document.documentElement.setAttribute('data-bs-theme', 'light');
-
-                // Ripristina classi light
-                document.querySelector('header').classList.remove('bg-dark', 'border-secondary');
-                document.querySelectorAll('.card').forEach(card => {
-                    card.classList.remove('bg-dark', 'text-white');
-                });
-                document.querySelectorAll('.card-header').forEach(header => {
-                    header.classList.remove('bg-dark', 'border-secondary');
-                });
-                document.querySelectorAll('.table').forEach(table => {
-                    table.classList.remove('table-dark');
-                });
-                document.querySelectorAll('.nav-tabs .nav-link').forEach(link => {
-                    if (link.classList.contains('active')) {
-                        link.classList.remove('bg-dark', 'border-dark', 'text-white');
-                    }
-                });
-                document.querySelectorAll('.btn-link').forEach(btn => {
-                    btn.classList.remove('text-white');
-                });
             }
         }
 
@@ -481,11 +582,11 @@ if ($result) {
             const tbody = document.getElementById('usersTableBody');
             tbody.innerHTML = users.map(user => `
                 <tr>
-                    <td class="ps-4 fw-semibold">${user.id}</td>
-                    <td>${user.firstName} ${user.lastName}</td>
-                    <td>${user.email}</td>
-                    <td>${user.university || 'Non specificata'}</td>
-                    <td class="text-end pe-4">
+                    <td data-label="ID" class="ps-4 fw-semibold">${user.id}</td>
+                    <td data-label="Nome">${user.firstName} ${user.lastName}</td>
+                    <td data-label="Email">${user.email}</td>
+                    <td data-label="Università">${user.university || 'Non specificata'}</td>
+                    <td data-label="Azioni" class="text-end pe-4 td-actions">
                         <button class="btn btn-outline-primary btn-sm me-2" onclick="openResetPassword(${user.id})">
                             <i class="fas fa-key me-1"></i>Reset
                         </button>
@@ -501,15 +602,15 @@ if ($result) {
             const tbody = document.getElementById('announcementsTableBody');
             tbody.innerHTML = announcements.map(a => `
                 <tr>
-                    <td class="ps-4">
+                    <td data-label="Titolo" class="ps-4">
                         <span class="badge ${a.status === 'venduto' ? 'bg-success' : 'bg-primary'} me-2">${a.status === 'venduto' ? 'Venduto' : 'Attivo'}</span>
                         <span class="text-truncate d-inline-block" style="max-width:200px" title="${a.title}">${a.title}</span>
                     </td>
-                    <td><span class="badge bg-secondary">${a.type}</span></td>
-                    <td class="fw-semibold">€${parseFloat(a.price).toFixed(2)}</td>
-                    <td>${a.seller}</td>
-                    <td>${a.publishedDate}</td>
-                    <td class="text-end pe-4">
+                    <td data-label="Tipo"><span class="badge bg-secondary">${a.type}</span></td>
+                    <td data-label="Prezzo" class="fw-semibold">€${parseFloat(a.price).toFixed(2)}</td>
+                    <td data-label="Venditore">${a.seller}</td>
+                    <td data-label="Data">${a.publishedDate}</td>
+                    <td data-label="Azioni" class="text-end pe-4 td-actions">
                         <button class="btn btn-outline-danger btn-sm" onclick="deleteAnnouncement(${a.id})">
                             <i class="fas fa-trash-alt me-1"></i>Elimina
                         </button>

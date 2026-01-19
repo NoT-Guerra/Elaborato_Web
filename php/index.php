@@ -14,7 +14,8 @@ $sql = "SELECT
                 a.descrizione,
                 a.prezzo,
                 a.data_pubblicazione,
-                a.is_digitale,
+                a.data_pubblicazione,
+                -- a.is_digitale removed
                 a.immagine_url,
                 a.is_attivo,
                 a.is_venduto,
@@ -82,6 +83,19 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
     $stmt->execute();
     $stmt->bind_result($cart_count);
     $stmt->fetch();
+    $stmt->close();
+}
+
+// Ottieni i preferiti dell'utente per impostare lo stato iniziale dei cuori
+$favorites = [];
+if ($is_logged_in && isset($_SESSION['user_id'])) {
+    $stmt = $conn->prepare("SELECT annuncio_id FROM preferiti WHERE utente_id = ?");
+    $stmt->bind_param("i", $_SESSION['user_id']);
+    $stmt->execute();
+    $result_fav = $stmt->get_result();
+    while ($row = $result_fav->fetch_assoc()) {
+        $favorites[] = $row['annuncio_id'];
+    }
     $stmt->close();
 }
 ?>
@@ -159,6 +173,17 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             border-color: #4a5568;
         }
 
+        #cart-counter-header,
+        #fav-counter-header {
+            position: absolute;
+            top: 0;
+            right: 0;
+            transform: translate(25%, -25%);
+            font-size: 0.65rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 50%;
+        }
+
         [data-bs-theme="dark"] .btn-preferiti {
             background-color: #374151;
             color: #e9ecef;
@@ -190,8 +215,8 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         }
 
         [data-bs-theme="dark"] #btn-tema {
-            color: #f8f9fa;
-            border-color: #4a5568;
+            color: #fff !important;
+            border-color: #fff !important;
         }
 
         [data-bs-theme="dark"] .btn-outline-dark:hover i {
@@ -333,6 +358,22 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 overflow-x: hidden !important;
             }
         }
+
+        /* Header Buttons Dark Mode */
+        [data-bs-theme="dark"] header .btn-dark {
+            background-color: #0d6efd !important;
+            border-color: #0d6efd !important;
+        }
+
+        [data-bs-theme="dark"] header .btn-outline-dark {
+            color: #fff !important;
+            border-color: #fff !important;
+        }
+
+        [data-bs-theme="dark"] header .btn-outline-dark:hover {
+            background-color: #fff !important;
+            color: #000 !important;
+        }
     </style>
 </head>
 
@@ -360,7 +401,13 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     <a href="preferiti.php"
                         class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
                         <i class="bi bi-suit-heart"></i>
-                        <span id="cart-counter" class="badge rounded-pill bg-danger d-none">0</span>
+                        <?php
+                        $fav_count = count($favorites);
+                        ?>
+                        <span id="fav-counter-header"
+                            class="badge rounded-pill bg-danger <?php echo ($fav_count > 0) ? '' : 'd-none'; ?>">
+                            <?php echo $fav_count; ?>
+                        </span>
                     </a>
 
                     <!-- Bottone Carrello - visibile solo su schermi medi e grandi -->
@@ -550,82 +597,81 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 </div>
             </aside>
 
-                        <!-- Annunci -->
-<section class="col-lg-9 col-md-8">
-    <div class="row g-4" id="lista-annunci">
-        <?php if (count($annunci) > 0): ?>
-            <?php foreach ($annunci as $annuncio):
-                $categoria_lower = strtolower($annuncio['nome_categoria']);
-                $facolta_lower = strtolower($annuncio['nome_facolta'] ?? '');
-                $condizione_lower = strtolower($annuncio['nome_condizione']);
-                $classe_categoria = 'categoria-' . $categoria_lower;
+            <!-- Annunci -->
+            <section class="col-lg-9 col-md-8">
+                <div class="row g-4" id="lista-annunci">
+                    <?php if (count($annunci) > 0): ?>
+                        <?php foreach ($annunci as $annuncio):
+                            $categoria_lower = strtolower($annuncio['nome_categoria']);
+                            $facolta_lower = strtolower($annuncio['nome_facolta'] ?? '');
+                            $condizione_lower = strtolower($annuncio['nome_condizione']);
+                            $classe_categoria = 'categoria-' . $categoria_lower;
 
-                // Formatta la data
-                $data_pubblicazione = date('d/m/Y', strtotime($annuncio['data_pubblicazione']));
-                $oggi = date('Y-m-d');
-                $data_pub = date('Y-m-d', strtotime($annuncio['data_pubblicazione']));
+                            // Formatta la data
+                            $data_pubblicazione = date('d/m/Y', strtotime($annuncio['data_pubblicazione']));
+                            $oggi = date('Y-m-d');
+                            $data_pub = date('Y-m-d', strtotime($annuncio['data_pubblicazione']));
 
-                if ($data_pub == $oggi) {
-                    $tempo_pubblicazione = 'Oggi';
-                } elseif ($data_pub == date('Y-m-d', strtotime('-1 day'))) {
-                    $tempo_pubblicazione = 'Ieri';
-                } else {
-                    $differenza = (strtotime($oggi) - strtotime($data_pub)) / (60 * 60 * 24);
-                    if ($differenza < 7) {
-                        $tempo_pubblicazione = floor($differenza) . ' giorni fa';
-                    } else {
-                        $tempo_pubblicazione = $data_pubblicazione;
-                    }
-                }
+                            if ($data_pub == $oggi) {
+                                $tempo_pubblicazione = 'Oggi';
+                            } elseif ($data_pub == date('Y-m-d', strtotime('-1 day'))) {
+                                $tempo_pubblicazione = 'Ieri';
+                            } else {
+                                $differenza = (strtotime($oggi) - strtotime($data_pub)) / (60 * 60 * 24);
+                                if ($differenza < 7) {
+                                    $tempo_pubblicazione = floor($differenza) . ' giorni fa';
+                                } else {
+                                    $tempo_pubblicazione = $data_pubblicazione;
+                                }
+                            }
 
-                // URL immagine di default se non presente
-                $immagine_url = $annuncio['immagine_url'] ?? 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600';
-                ?>
-                <div class="col-xl-4 col-lg-6 annuncio"
-                    data-title="<?php echo htmlspecialchars($annuncio['titolo']); ?>"
-                    data-facolta="<?php echo $facolta_lower; ?>" data-condizione="<?php echo $condizione_lower; ?>"
-                    data-prezzo="<?php echo $annuncio['prezzo']; ?>"
-                    data-categoria="<?php echo $categoria_lower; ?>">
-                    <div class="card h-100 border-0 shadow-sm card-annuncio">
-                        <button class="btn-preferiti" data-id="<?php echo $annuncio['id_annuncio']; ?>">
-                            <i class="bi bi-suit-heart"></i>
-                        </button>
-                        <!-- Link attorno all'immagine -->
-                        <a href="annuncio.php?id=<?php echo $annuncio['id_annuncio']; ?>" 
-                           class="img-wrapper d-block text-decoration-none">
-                            <img src="<?php echo $immagine_url; ?>"
-                                alt="<?php echo htmlspecialchars($annuncio['titolo']); ?>"
-                                class="w-100 h-100">
-                        </a>
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <h6 class="fw-bold mb-0 text-truncate">
-                                    <?php echo htmlspecialchars($annuncio['titolo']); ?>
-                                </h6>
-                                <span class="badge bg-primary-subtle text-primary price-badge">
-                                    €<?php echo number_format($annuncio['prezzo'], 2); ?>
-                                </span>
-                            </div>
-                            <p class="small text-muted mb-2">
-                                <?php echo htmlspecialchars(substr($annuncio['descrizione'], 0, 100) . (strlen($annuncio['descrizione']) > 100 ? '...' : '')); ?>
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="badge <?php echo $classe_categoria; ?> border">
-                                    <?php if ($annuncio['is_digitale']): ?>
-                                        <i class="bi bi-file-earmark-text me-1"></i>
-                                    <?php else: ?>
-                                        <i class="bi bi-book me-1"></i>
-                                    <?php endif; ?>
-                                    <?php echo htmlspecialchars($annuncio['nome_categoria']); ?>
-                                </span>
-                                <small class="text-muted">
-                                    <i class="bi bi-geo-alt me-1"></i>
-                                    <?php echo htmlspecialchars($annuncio['nome_facolta'] ?? 'N/A'); ?>
-                                </small>
-                            </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="badge 
+                            // URL immagine di default se non presente
+                            $immagine_url = $annuncio['immagine_url'] ?? 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600';
+                            ?>
+                            <div class="col-xl-4 col-lg-6 annuncio"
+                                data-title="<?php echo htmlspecialchars($annuncio['titolo']); ?>"
+                                data-facolta="<?php echo $facolta_lower; ?>" data-condizione="<?php echo $condizione_lower; ?>"
+                                data-prezzo="<?php echo $annuncio['prezzo']; ?>"
+                                data-categoria="<?php echo $categoria_lower; ?>">
+                                <div class="card h-100 border-0 shadow-sm card-annuncio">
+                                    <?php
+                                    $is_fav = in_array($annuncio['id_annuncio'], $favorites);
+                                    $heart_class = $is_fav ? 'bi-suit-heart-fill text-danger' : 'bi-suit-heart';
+                                    ?>
+                                    <button class="btn-preferiti" data-id="<?php echo $annuncio['id_annuncio']; ?>">
+                                        <i class="bi <?php echo $heart_class; ?>"></i>
+                                    </button>
+                                    <!-- Link attorno all'immagine -->
+                                    <a href="annuncio.php?id=<?php echo $annuncio['id_annuncio']; ?>"
+                                        class="img-wrapper d-block text-decoration-none">
+                                        <img src="<?php echo $immagine_url; ?>"
+                                            alt="<?php echo htmlspecialchars($annuncio['titolo']); ?>" class="w-100 h-100">
+                                    </a>
+                                    <div class="card-body">
+                                        <div class="d-flex justify-content-between align-items-start mb-2">
+                                            <h6 class="fw-bold mb-0 text-truncate">
+                                                <?php echo htmlspecialchars($annuncio['titolo']); ?>
+                                            </h6>
+                                            <span class="badge bg-primary-subtle text-primary price-badge">
+                                                €<?php echo number_format($annuncio['prezzo'], 2); ?>
+                                            </span>
+                                        </div>
+                                        <p class="small text-muted mb-2">
+                                            <?php echo htmlspecialchars(substr($annuncio['descrizione'], 0, 100) . (strlen($annuncio['descrizione']) > 100 ? '...' : '')); ?>
+                                        </p>
+                                        <div class="d-flex justify-content-between align-items-center mb-3">
+                                            <span class="badge <?php echo $classe_categoria; ?> border">
+                                                <i class="bi bi-book me-1"></i>
+                                                <?php echo htmlspecialchars($annuncio['nome_categoria']); ?>
+                                            </span>
+                                            <small class="text-muted">
+                                                <i class="bi bi-geo-alt me-1"></i>
+                                                <?php echo htmlspecialchars($annuncio['nome_facolta'] ?? 'N/A'); ?>
+                                            </small>
+                                        </div>
+                                        <div class="d-flex justify-content-between align-items-center">
+                                            <div>
+                                                <span class="badge 
                                 <?php
                                 if ($condizione_lower == 'nuovo')
                                     echo 'bg-info-subtle text-info';
@@ -636,34 +682,34 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                 else
                                     echo 'bg-secondary-subtle text-secondary';
                                 ?>">
-                                        <?php echo htmlspecialchars($annuncio['nome_condizione']); ?>
-                                    </span>
-                                    <small
-                                        class="text-muted d-block mt-1"><?php echo $tempo_pubblicazione; ?></small>
+                                                    <?php echo htmlspecialchars($annuncio['nome_condizione']); ?>
+                                                </span>
+                                                <small
+                                                    class="text-muted d-block mt-1"><?php echo $tempo_pubblicazione; ?></small>
+                                            </div>
+                                            <button class="btn btn-dark btn-sm px-3 rounded-pill aggiungi-carrello"
+                                                data-id="<?php echo $annuncio['id_annuncio']; ?>">
+                                                <i class="bi bi-cart-plus me-1"></i>Aggiungi
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                                <button class="btn btn-dark btn-sm px-3 rounded-pill aggiungi-carrello"
-                                    data-id="<?php echo $annuncio['id_annuncio']; ?>">
-                                    <i class="bi bi-cart-plus me-1"></i>Aggiungi
-                                </button>
                             </div>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="col-12 text-center py-5">
+                            <div class="mb-3">
+                                <i class="bi bi-binoculars fs-1 text-muted"></i>
+                            </div>
+                            <h5 class="text-muted">Nessun annuncio disponibile</h5>
+                            <p class="text-muted">Sii il primo a pubblicare un annuncio!</p>
+                            <a href="pubblica.php" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>Pubblica annuncio
+                            </a>
                         </div>
-                    </div>
+                    <?php endif; ?>
                 </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="col-12 text-center py-5">
-                <div class="mb-3">
-                    <i class="bi bi-binoculars fs-1 text-muted"></i>
-                </div>
-                <h5 class="text-muted">Nessun annuncio disponibile</h5>
-                <p class="text-muted">Sii il primo a pubblicare un annuncio!</p>
-                <a href="pubblica.php" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-2"></i>Pubblica annuncio
-                </a>
-            </div>
-        <?php endif; ?>
-    </div>
-</section>
+            </section>
         </div>
     </main>
 
@@ -832,54 +878,50 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         filterCondizioni.addEventListener('change', filtraAnnunci);
         filterPrezzo.addEventListener('input', filtraAnnunci);
 
-        // --- Preferiti ---
-        function aggiornaContatorePreferiti() {
-            const preferiti = JSON.parse(localStorage.getItem('mieiPreferiti')) || [];
-            const counter = document.getElementById('cart-counter');
-            if (preferiti.length > 0) {
-                counter.textContent = preferiti.length;
-                counter.classList.remove('d-none');
-            } else {
-                counter.classList.add('d-none');
-            }
-        }
+        // --- Preferiti (Server Side) ---
+        // Funzione per aggiornare il contatore NON implementata dinamicamente nell'header per ora, 
+        // ma potremmo farlo se richiesto. Al caricamento PHP lo imposta.
 
         document.querySelectorAll('.btn-preferiti').forEach(btn => {
-            const annuncioEl = btn.closest('.annuncio');
-            const id = annuncioEl.dataset.title;
-            let preferiti = JSON.parse(localStorage.getItem('mieiPreferiti')) || [];
-
-            if (preferiti.some(p => p.title === id)) {
-                btn.querySelector('i').className = 'bi bi-suit-heart-fill text-danger';
-            }
-
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 const icon = this.querySelector('i');
-                const annuncio = this.closest('.annuncio');
+                const id = this.dataset.id;
 
-                let preferitiAttuali = JSON.parse(localStorage.getItem('mieiPreferiti')) || [];
-                const annuncioData = {
-                    id: annuncio.dataset.id || annuncio.querySelector('.btn-preferiti').dataset.id,
-                    title: annuncio.dataset.title,
-                    facolta: annuncio.dataset.facolta,
-                    condizione: annuncio.dataset.condizione,
-                    prezzo: annuncio.dataset.prezzo,
-                    categoria: annuncio.dataset.categoria,
-                    img: annuncio.querySelector('img').src,
-                    desc: annuncio.querySelector('p.small').textContent
-                };
+                // Determina azione basata sullo stato attuale
+                const isAdded = icon.classList.contains('bi-suit-heart-fill');
+                const url = isAdded ? 'rimuovi_preferiti.php' : 'aggiungi_preferiti.php';
 
-                if (icon.classList.contains('bi-suit-heart')) {
-                    icon.className = 'bi bi-suit-heart-fill text-danger';
-                    preferitiAttuali.push(annuncioData);
-                } else {
-                    icon.className = 'bi bi-suit-heart';
-                    preferitiAttuali = preferitiAttuali.filter(p => p.title !== annuncioData.title);
-                }
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_annuncio: id })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Aggiorna contatore header
+                            const counter = document.getElementById('fav-counter-header');
+                            if (data.count !== undefined && counter) {
+                                counter.textContent = data.count;
+                                if (data.count > 0) counter.classList.remove('d-none');
+                                else counter.classList.add('d-none');
+                            }
 
-                localStorage.setItem('mieiPreferiti', JSON.stringify(preferitiAttuali));
-                aggiornaContatorePreferiti();
+                            if (isAdded) {
+                                icon.classList.remove('bi-suit-heart-fill', 'text-danger');
+                                icon.classList.add('bi-suit-heart');
+                                showToast("Rimosso dai preferiti.", true);
+                            } else {
+                                icon.classList.remove('bi-suit-heart');
+                                icon.classList.add('bi-suit-heart-fill', 'text-danger');
+                                showToast("Aggiunto ai preferiti!", true);
+                            }
+                        } else {
+                            showToast(data.message, false);
+                        }
+                    })
+                    .catch(err => showToast('Errore di comunicazione', false));
             });
         });
 
@@ -948,7 +990,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         document.addEventListener('DOMContentLoaded', () => {
             const temaSalvato = localStorage.getItem('temaPreferito') || 'light';
             applicaTema(temaSalvato);
-            aggiornaContatorePreferiti();
             aggiornaContatoreCarrello();
         });
     </script>
@@ -957,7 +998,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
     <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
-                <strong class="me-auto">UniMarket</strong>
+                <strong class="me-auto">UniboMarket</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body">

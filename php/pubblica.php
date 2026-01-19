@@ -42,10 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $condizione_id = intval($_POST['condizioni'] ?? 0); // Attenzione al name="condizioni"
     $facolta_id = !empty($_POST['facolta']) ? intval($_POST['facolta']) : null;
     $corso_id = !empty($_POST['corso']) ? intval($_POST['corso']) : null;
-    // Manca is_digitale nel form HTML originale, lo potremmo inferire dalla categoria o aggiungere?
-    // Per ora non lo aggiungo se non richiesto, o lo metto come hidden check?
-    // Assumiamo default 0 se non specificato
-    $is_digitale = 0;
+    // is_digitale removed as per request
+    
 
     // Validazione base
     if (empty($titolo) || empty($descrizione) || $prezzo < 0 || empty($categoria_id) || empty($condizione_id)) {
@@ -84,12 +82,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (empty($message)) {
             $venditore_id = $_SESSION['user_id'];
-            $sql = "INSERT INTO annuncio (titolo, descrizione, prezzo, categoria_id, condizione_id, is_digitale, immagine_url, venditore_id, corso_id, facolta_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            $sql = "INSERT INTO annuncio (titolo, descrizione, prezzo, categoria_id, condizione_id, immagine_url, venditore_id, corso_id, facolta_id) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($sql);
             if ($stmt) {
-                // bind_param: s=string, d=double, i=int. ATTENZIONE: is_digitale e int, condi int, categ int.
-                // Ordine: titolo(s), descr(s), prezzo(d), cat(i), cond(i), dig(i), img(s), vend(i), corso(i), fac(i)
-                $stmt->bind_param("ssdiiisiii", $titolo, $descrizione, $prezzo, $categoria_id, $condizione_id, $is_digitale, $immagine_url, $venditore_id, $corso_id, $facolta_id);
+                // bind_param: s=string, d=double, i=int.
+                $stmt->bind_param("ssdiisiii", $titolo, $descrizione, $prezzo, $categoria_id, $condizione_id, $immagine_url, $venditore_id, $corso_id, $facolta_id);
 
                 if ($stmt->execute()) {
                     $message = "Annuncio pubblicato con successo! Verrai reindirizzato alla home tra 3 secondi...";

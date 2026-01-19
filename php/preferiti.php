@@ -33,7 +33,8 @@ $sql = "SELECT
             a.immagine_url,
             a.descrizione,
             a.data_pubblicazione,
-            a.is_digitale,
+            a.data_pubblicazione,
+            -- a.is_digitale removed
             cs.nome_corso,
             f.nome_facolta,
             cp.nome_categoria,
@@ -72,7 +73,7 @@ function format_currency($amount)
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>I tuoi Preferiti</title>
+    <title>I tuoi Preferiti - UniboMarket</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <style>
@@ -259,7 +260,7 @@ function format_currency($amount)
 
     <div class="container-fluid py-4 px-lg-5">
         <?php if ($item_count > 0): ?>
-            <div class="row g-4 justify-content-center">
+            <div class="row g-4 justify-content-start">
                 <?php foreach ($favorite_items as $annuncio):
                     $categoria_lower = strtolower($annuncio['nome_categoria']);
                     $condizione_lower = strtolower($annuncio['nome_condizione']);
@@ -306,11 +307,7 @@ function format_currency($amount)
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <span class="badge <?php echo $classe_categoria; ?> border">
-                                        <?php if ($annuncio['is_digitale']): ?>
-                                            <i class="bi bi-file-earmark-text me-1"></i>
-                                        <?php else: ?>
-                                            <i class="bi bi-book me-1"></i>
-                                        <?php endif; ?>
+                                        <i class="bi bi-book me-1"></i>
                                         <?php echo htmlspecialchars($annuncio['nome_categoria']); ?>
                                     </span>
                                     <small class="text-muted">
@@ -358,7 +355,7 @@ function format_currency($amount)
     <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
-                <strong class="me-auto">UniMarket</strong>
+                <strong class="me-auto">UniboMarket</strong>
                 <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
             <div class="toast-body"></div>
