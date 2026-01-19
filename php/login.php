@@ -110,11 +110,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <input type="password" class="form-control" id="password" name="password"
                                 placeholder="********" required>
                         </div>
-
-                        <div class="d-flex justify-content-between align-items-center mb-3">
-                            <a href="#" class="text-decoration-none small">Password dimenticata?</a>
-                        </div>
-
                         <button type="submit" class="btn btn-dark w-100">Accedi</button>
                     </form>
 
