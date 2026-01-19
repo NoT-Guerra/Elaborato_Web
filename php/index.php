@@ -475,11 +475,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                         <a href="carrello.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                             <i class="bi bi-cart me-3"></i> Carrello
                         </a>
-                        <?php if ($is_logged_in): ?>
-                            <a href="miei_annunci.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
-                                <i class="bi bi-collection me-3"></i> I miei annunci
-                            </a>
-                        <?php endif; ?>
                         <hr class="my-0 opacity-10">
                         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
                             <a href="admin.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
@@ -567,33 +562,33 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 </div>
             </aside>
 
-                        <!-- Annunci -->
-<section class="col-lg-9 col-md-8">
-    <div class="row g-4" id="lista-annunci">
-        <?php if (count($annunci) > 0): ?>
-            <?php foreach ($annunci as $annuncio):
-                $categoria_lower = strtolower($annuncio['nome_categoria']);
-                $facolta_lower = strtolower($annuncio['nome_facolta'] ?? '');
-                $condizione_lower = strtolower($annuncio['nome_condizione']);
-                $classe_categoria = 'categoria-' . $categoria_lower;
+            <!-- Annunci -->
+            <section class="col-lg-9 col-md-8">
+                <div class="row g-4" id="lista-annunci">
+                    <?php if (count($annunci) > 0): ?>
+                        <?php foreach ($annunci as $annuncio):
+                            $categoria_lower = strtolower($annuncio['nome_categoria']);
+                            $facolta_lower = strtolower($annuncio['nome_facolta'] ?? '');
+                            $condizione_lower = strtolower($annuncio['nome_condizione']);
+                            $classe_categoria = 'categoria-' . $categoria_lower;
 
-                // Formatta la data
-                $data_pubblicazione = date('d/m/Y', strtotime($annuncio['data_pubblicazione']));
-                $oggi = date('Y-m-d');
-                $data_pub = date('Y-m-d', strtotime($annuncio['data_pubblicazione']));
+                            // Formatta la data
+                            $data_pubblicazione = date('d/m/Y', strtotime($annuncio['data_pubblicazione']));
+                            $oggi = date('Y-m-d');
+                            $data_pub = date('Y-m-d', strtotime($annuncio['data_pubblicazione']));
 
-                if ($data_pub == $oggi) {
-                    $tempo_pubblicazione = 'Oggi';
-                } elseif ($data_pub == date('Y-m-d', strtotime('-1 day'))) {
-                    $tempo_pubblicazione = 'Ieri';
-                } else {
-                    $differenza = (strtotime($oggi) - strtotime($data_pub)) / (60 * 60 * 24);
-                    if ($differenza < 7) {
-                        $tempo_pubblicazione = floor($differenza) . ' giorni fa';
-                    } else {
-                        $tempo_pubblicazione = $data_pubblicazione;
-                    }
-                }
+                            if ($data_pub == $oggi) {
+                                $tempo_pubblicazione = 'Oggi';
+                            } elseif ($data_pub == date('Y-m-d', strtotime('-1 day'))) {
+                                $tempo_pubblicazione = 'Ieri';
+                            } else {
+                                $differenza = (strtotime($oggi) - strtotime($data_pub)) / (60 * 60 * 24);
+                                if ($differenza < 7) {
+                                    $tempo_pubblicazione = floor($differenza) . ' giorni fa';
+                                } else {
+                                    $tempo_pubblicazione = $data_pubblicazione;
+                                }
+                            }
 
                             // URL immagine di default se non presente
                             $immagine_url = $annuncio['immagine_url'] ?? 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600';
@@ -667,64 +662,21 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                     </div>
                                 </div>
                             </div>
-                            <p class="small text-muted mb-2">
-                                <?php echo htmlspecialchars(substr($annuncio['descrizione'], 0, 100) . (strlen($annuncio['descrizione']) > 100 ? '...' : '')); ?>
-                            </p>
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="badge <?php echo $classe_categoria; ?> border">
-                                    <?php if ($annuncio['is_digitale']): ?>
-                                        <i class="bi bi-file-earmark-text me-1"></i>
-                                    <?php else: ?>
-                                        <i class="bi bi-book me-1"></i>
-                                    <?php endif; ?>
-                                    <?php echo htmlspecialchars($annuncio['nome_categoria']); ?>
-                                </span>
-                                <small class="text-muted">
-                                    <i class="bi bi-geo-alt me-1"></i>
-                                    <?php echo htmlspecialchars($annuncio['nome_facolta'] ?? 'N/A'); ?>
-                                </small>
+                        <?php endforeach; ?>
+                    <?php else: ?>
+                        <div class="col-12 text-center py-5">
+                            <div class="mb-3">
+                                <i class="bi bi-binoculars fs-1 text-muted"></i>
                             </div>
-                            <div class="d-flex justify-content-between align-items-center">
-                                <div>
-                                    <span class="badge 
-                                <?php
-                                if ($condizione_lower == 'nuovo')
-                                    echo 'bg-info-subtle text-info';
-                                elseif ($condizione_lower == 'ottimo')
-                                    echo 'bg-success-subtle text-success';
-                                elseif ($condizione_lower == 'buono')
-                                    echo 'bg-warning-subtle text-warning';
-                                else
-                                    echo 'bg-secondary-subtle text-secondary';
-                                ?>">
-                                        <?php echo htmlspecialchars($annuncio['nome_condizione']); ?>
-                                    </span>
-                                    <small
-                                        class="text-muted d-block mt-1"><?php echo $tempo_pubblicazione; ?></small>
-                                </div>
-                                <button class="btn btn-dark btn-sm px-3 rounded-pill aggiungi-carrello"
-                                    data-id="<?php echo $annuncio['id_annuncio']; ?>">
-                                    <i class="bi bi-cart-plus me-1"></i>Aggiungi
-                                </button>
-                            </div>
+                            <h5 class="text-muted">Nessun annuncio disponibile</h5>
+                            <p class="text-muted">Sii il primo a pubblicare un annuncio!</p>
+                            <a href="pubblica.php" class="btn btn-primary">
+                                <i class="bi bi-plus-circle me-2"></i>Pubblica annuncio
+                            </a>
                         </div>
-                    </div>
+                    <?php endif; ?>
                 </div>
-            <?php endforeach; ?>
-        <?php else: ?>
-            <div class="col-12 text-center py-5">
-                <div class="mb-3">
-                    <i class="bi bi-binoculars fs-1 text-muted"></i>
-                </div>
-                <h5 class="text-muted">Nessun annuncio disponibile</h5>
-                <p class="text-muted">Sii il primo a pubblicare un annuncio!</p>
-                <a href="pubblica.php" class="btn btn-primary">
-                    <i class="bi bi-plus-circle me-2"></i>Pubblica annuncio
-                </a>
-            </div>
-        <?php endif; ?>
-    </div>
-</section>
+            </section>
         </div>
     </main>
 
