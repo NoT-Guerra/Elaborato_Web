@@ -569,7 +569,6 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
                     <h5 class="fw-bold mb-3 text-start text-md-center">Link Rapidi</h5>
                     <ul class="list-unstyled text-start text-md-center p-0">
                         <li class="mb-2"><a href="#" class="text-body text-decoration-none">Home</a></li>
-                        <li class="mb-2"><a href="#" class="text-body text-decoration-none">Annunci</a></li>
                         <li class="mb-2"><a href="#" class="text-body text-decoration-none">Chi Siamo</a></li>
                         <li class="mb-2"><a href="#" class="text-body text-decoration-none">FAQ</a></li>
                     </ul>

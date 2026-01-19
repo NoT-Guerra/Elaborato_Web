@@ -34,7 +34,7 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != true) {
         <div class="container-fluid">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-3">
-                    <a href="index.html" class="btn btn-link text-body p-0">
+                    <a href="index.php" class="btn btn-link text-body p-0">
                         <i class="bi bi-arrow-left fs-4"></i>
                     </a>
                     <div>
