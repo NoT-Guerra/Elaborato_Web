@@ -16,6 +16,7 @@ CREATE TABLE utenti (
     email VARCHAR(100) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     facolta_id INT,
+    isAdmin BOOLEAN DEFAULT FALSE,
     data_registrazione DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (facolta_id) REFERENCES facolta(id_facolta)
         ON DELETE SET NULL
