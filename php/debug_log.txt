@@ -1,0 +1,48 @@
+2026-01-19 13:45:38 - Script iniziato
+2026-01-19 13:45:38 - DB Connesso
+2026-01-19 13:45:38 - Utente loggato ID: 6
+2026-01-19 13:45:38 - Raw Input: {"id_annuncio":"2"}
+2026-01-19 13:45:38 - Provo ad aggiungere annuncio ID: 2
+2026-01-19 13:45:38 - INSERT riuscito
+2026-01-19 13:45:56 - Script iniziato
+2026-01-19 13:45:56 - DB Connesso
+2026-01-19 13:45:56 - Utente loggato ID: 6
+2026-01-19 13:45:56 - Raw Input: {"id_annuncio":"3"}
+2026-01-19 13:45:56 - Provo ad aggiungere annuncio ID: 3
+2026-01-19 13:45:56 - INSERT riuscito
+2026-01-19 13:48:29 - Script iniziato
+2026-01-19 13:48:29 - DB Connesso
+2026-01-19 13:48:29 - Utente loggato ID: 6
+2026-01-19 13:48:29 - Raw Input: {"id_annuncio":"2"}
+2026-01-19 13:48:29 - Provo ad aggiungere annuncio ID: 2
+2026-01-19 13:48:29 - Prodotto già presente
+2026-01-19 13:48:35 - Script iniziato
+2026-01-19 13:48:35 - DB Connesso
+2026-01-19 13:48:35 - Utente loggato ID: 6
+2026-01-19 13:48:35 - Raw Input: {"id_annuncio":"3"}
+2026-01-19 13:48:35 - Provo ad aggiungere annuncio ID: 3
+2026-01-19 13:48:35 - INSERT riuscito
+2026-01-19 13:48:38 - Script iniziato
+2026-01-19 13:48:38 - DB Connesso
+2026-01-19 13:48:38 - Utente loggato ID: 6
+2026-01-19 13:48:38 - Raw Input: {"id_annuncio":"5"}
+2026-01-19 13:48:38 - Provo ad aggiungere annuncio ID: 5
+2026-01-19 13:48:38 - INSERT riuscito
+2026-01-19 13:50:36 - Script iniziato
+2026-01-19 13:50:36 - DB Connesso
+2026-01-19 13:50:36 - Utente loggato ID: 6
+2026-01-19 13:50:36 - Raw Input: {"id_annuncio":"3"}
+2026-01-19 13:50:36 - Provo ad aggiungere annuncio ID: 3
+2026-01-19 13:50:36 - Prodotto già presente
+2026-01-19 13:51:46 - Script iniziato
+2026-01-19 13:51:46 - DB Connesso
+2026-01-19 13:51:46 - Utente loggato ID: 1
+2026-01-19 13:51:46 - Raw Input: {"id_annuncio":"1"}
+2026-01-19 13:51:46 - Provo ad aggiungere annuncio ID: 1
+2026-01-19 13:51:46 - INSERT riuscito
+2026-01-19 13:51:49 - Script iniziato
+2026-01-19 13:51:49 - DB Connesso
+2026-01-19 13:51:49 - Utente loggato ID: 1
+2026-01-19 13:51:49 - Raw Input: {"id_annuncio":"5"}
+2026-01-19 13:51:49 - Provo ad aggiungere annuncio ID: 5
+2026-01-19 13:51:49 - INSERT riuscito

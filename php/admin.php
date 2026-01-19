@@ -2,197 +2,113 @@
 session_start();
 require_once 'config/database.php';
 
-// Array per messaggi flash
-$flash = [];
-
-// Accesso non eseguito
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
+// accesso non eseguito
+if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] != true) {
     header('Location: login.php');
     exit;
 }
 
-// Accesso eseguito ma non è admin
-if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
+// accesso eseguito ma non è admin
+if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != true) {
     header('Location: index.php');
     exit;
 }
 
-// Verifica connessione
+// Verifica che la connessione sia stata stabilita
 if (!$conn || $conn->connect_error) {
     die("Errore di connessione al database");
 }
 
-// ==========================
-// GESTIONE POST (CRUD)
-// ==========================
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    // ELIMINA UTENTE
-    if (isset($_POST['delete_user_id'])) {
-        $id = (int) $_POST['delete_user_id'];
-        $stmt = $conn->prepare("DELETE FROM utenti WHERE id_utente = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $stmt->close();
-        header('Location: admin.php');
-        exit;
-    }
-
-    // RESET PASSWORD UTENTE
-    if (isset($_POST['reset_user_id'], $_POST['new_password'])) {
-        $id = (int) $_POST['reset_user_id'];
-        $password = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
-        $stmt = $conn->prepare("UPDATE utenti SET password = ? WHERE id_utente = ?");
-        $stmt->bind_param("si", $password, $id);
-        $stmt->execute();
-        $stmt->close();
-        header('Location: admin.php');
-        exit;
-    }
-
-    // ELIMINA ANNUNCIO
-    if (isset($_POST['delete_announcement_id'])) {
-        $id = (int) $_POST['delete_announcement_id'];
-        $stmt = $conn->prepare("DELETE FROM annuncio WHERE id_annuncio = ?");
-        $stmt->bind_param("i", $id);
-        $stmt->execute();
-        $stmt->close();
-        header('Location: admin.php');
-        exit;
-    }
-
-    // AGGIUNGI MATERIA
-    if (isset($_POST['new_subject'])) {
-        $subject = trim($_POST['new_subject']);
-        if ($subject !== '') {
-            $stmt = $conn->prepare("SELECT COUNT(*) FROM corso_studio WHERE nome_corso = ?");
-            $stmt->bind_param("s", $subject);
-            $stmt->execute();
-            $stmt->bind_result($count);
-            $stmt->fetch();
-            $stmt->close();
-            if ($count == 0) {
-                $stmt = $conn->prepare("INSERT INTO corso_studio (nome_corso) VALUES (?)");
-                $stmt->bind_param("s", $subject);
-                $stmt->execute();
-                $stmt->close();
-            }
-        }
-        header('Location: admin.php');
-        exit;
-    }
-
-    // ELIMINA MATERIA
-    if (isset($_POST['delete_subject'])) {
-        $subject = trim($_POST['delete_subject']);
-        $stmt = $conn->prepare("DELETE FROM corso_studio WHERE nome_corso = ?");
-        $stmt->bind_param("s", $subject);
-        $stmt->execute();
-        $stmt->close();
-        header('Location: admin.php');
-        exit;
-    }
-
-    // AGGIUNGI FACOLTÀ
-    if (isset($_POST['new_faculty'])) {
-        $faculty = trim($_POST['new_faculty']);
-        if ($faculty !== '') {
-            $stmt = $conn->prepare("SELECT COUNT(*) FROM facolta WHERE nome_facolta = ?");
-            $stmt->bind_param("s", $faculty);
-            $stmt->execute();
-            $stmt->bind_result($count);
-            $stmt->fetch();
-            $stmt->close();
-            if ($count == 0) {
-                $stmt = $conn->prepare("INSERT INTO facolta (nome_facolta) VALUES (?)");
-                $stmt->bind_param("s", $faculty);
-                $stmt->execute();
-                $stmt->close();
-            }
-        }
-        header('Location: admin.php');
-        exit;
-    }
-
-    // ELIMINA FACOLTÀ
-    if (isset($_POST['delete_faculty'])) {
-        $faculty = trim($_POST['delete_faculty']);
-        $stmt = $conn->prepare("DELETE FROM facolta WHERE nome_facolta = ?");
-        $stmt->bind_param("s", $faculty);
-        $stmt->execute();
-        $stmt->close();
-        header('Location: admin.php');
-        exit;
-    }
-}
-
-// ==========================
-// CARICAMENTO DATI PER PAGINA
-// ==========================
-
-// STATISTICHE
+// Recupera dati dal database usando MySQLi
 $stats = ['total_users' => 0, 'active_announcements' => 0, 'completed_sales' => 0];
-$result = $conn->query("
+$users = [];
+$announcements = [];
+$subjects = [];
+$faculties = [];
+
+// Statistiche
+$query = "
     SELECT 
         (SELECT COUNT(*) FROM utenti) as total_users,
         (SELECT COUNT(*) FROM annuncio WHERE is_attivo = 1 AND is_venduto = 0) as active_announcements,
         (SELECT COUNT(*) FROM vendita) as completed_sales
-");
-if ($result && $row = $result->fetch_assoc())
+";
+$result = $conn->query($query);
+if ($result && $row = $result->fetch_assoc()) {
     $stats = $row;
+}
 if ($result)
     $result->free();
 
-// UTENTI
-$users = [];
-$result = $conn->query("
-    SELECT u.id_utente as id, u.nome as firstName, u.cognome as lastName, u.email,
-           f.nome_facolta as university
+// Utenti
+$query = "
+    SELECT 
+        u.id_utente as id,
+        u.nome as firstName,
+        u.cognome as lastName,
+        u.email,
+        f.nome_facolta as university
     FROM utenti u
     LEFT JOIN facolta f ON u.facolta_id = f.id_facolta
     ORDER BY u.nome, u.cognome
-");
-if ($result)
-    while ($row = $result->fetch_assoc())
+";
+$result = $conn->query($query);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
         $users[] = $row;
+    }
+    $result->free();
+}
 
-// ANNUNCI
-$announcements = [];
-$result = $conn->query("
-    SELECT a.id_annuncio as id, a.titolo as title, a.prezzo as price,
-           CONCAT(u.nome, ' ', LEFT(u.cognome,1), '.') as seller,
-           DATE(a.data_pubblicazione) as publishedDate,
-           cp.nome_categoria as type,
-           CASE 
-               WHEN a.is_attivo = 1 AND a.is_venduto = 0 THEN 'attivo'
-               WHEN a.is_venduto = 1 THEN 'venduto'
-               ELSE 'non attivo'
-           END as status
+// Annunci
+$query = "
+    SELECT 
+        a.id_annuncio as id,
+        a.titolo as title,
+        a.prezzo as price,
+        CONCAT(u.nome, ' ', LEFT(u.cognome, 1), '.') as seller,
+        DATE(a.data_pubblicazione) as publishedDate,
+        cp.nome_categoria as type,
+        CASE 
+            WHEN a.is_attivo = 1 AND a.is_venduto = 0 THEN 'attivo'
+            WHEN a.is_venduto = 1 THEN 'venduto'
+            ELSE 'non attivo'
+        END as status
     FROM annuncio a
     JOIN utenti u ON a.venditore_id = u.id_utente
     JOIN categoria_prodotto cp ON a.categoria_id = cp.id_categoria
     WHERE a.is_attivo = 1
     ORDER BY a.data_pubblicazione DESC
-");
-if ($result)
-    while ($row = $result->fetch_assoc())
+";
+$result = $conn->query($query);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
         $announcements[] = $row;
+    }
+    $result->free();
+}
 
-// MATERIE
-$subjects = [];
-$result = $conn->query("SELECT DISTINCT nome_corso FROM corso_studio ORDER BY nome_corso");
-if ($result)
-    while ($row = $result->fetch_assoc())
+// Materie (Corsi di studio)
+$query = "SELECT DISTINCT nome_corso FROM corso_studio ORDER BY nome_corso";
+$result = $conn->query($query);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
         $subjects[] = $row['nome_corso'];
+    }
+    $result->free();
+}
 
-// FACOLTÀ
-$faculties = [];
-$result = $conn->query("SELECT nome_facolta FROM facolta ORDER BY nome_facolta");
-if ($result)
-    while ($row = $result->fetch_assoc())
+// Facoltà
+$query = "SELECT nome_facolta FROM facolta ORDER BY nome_facolta";
+$result = $conn->query($query);
+if ($result) {
+    while ($row = $result->fetch_assoc()) {
         $faculties[] = $row['nome_facolta'];
-
+    }
+    $result->free();
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="it">
 
@@ -200,247 +116,671 @@ if ($result)
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Pannello Admin - UniMarket</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Script per applicare il tema light/dark preso da login.php -->
-    <script>
-        (function () {
-            try {
-                const tema = localStorage.getItem('temaPreferito') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                document.documentElement.setAttribute('data-bs-theme', tema);
-            } catch (e) { console.warn('Tema non caricato:', e) }
-        })();
-    </script>
+    <link rel="stylesheet" href="style/style.css">
 </head>
 
 <body>
-    <header class="sticky-top border-bottom py-3 bg-body-tertiary">
-        <div class="container-fluid d-flex align-items-center gap-3">
-            <a href="index.php" class="btn btn-link p-0 me-3 text-body-emphasis" data-bs-toggle="tooltip"
-                data-bs-placement="bottom" title="Torna alla Home">
-                <i class="bi bi-arrow-left fs-4"></i>
-            </a>
-            <div>
-                <h1 class="h4 fw-bold mb-0 text-body-emphasis">Pannello Admin</h1>
-                <p class="small mb-0 text-body-secondary">Gestisci utenti, annunci e categorie</p>
+    <!-- Header -->
+    <header class="sticky-top border-bottom py-3">
+        <div class="container-fluid">
+            <div class="d-flex align-items-center justify-content-between">
+                <div class="d-flex align-items-center gap-3">
+                    <a href="index.php" class="btn btn-link p-0">
+                        <i class="bi bi-arrow-left fs-4"></i>
+                    </a>
+                    <div>
+                        <h1 class="h4 fw-bold mb-0">Pannello Admin</h1>
+                        <p class="small mb-0">Gestisci utenti, annunci e categorie</p>
+                    </div>
+                </div>
+                <!-- Bottone tema rimosso -->
             </div>
         </div>
     </header>
 
     <main class="container-fluid py-4">
-        <!-- STATISTICHE -->
+        <!-- Statistiche -->
         <div class="row mb-4 g-3">
-            <?php
-            $cards = [
-                ['color' => 'primary', 'icon' => 'users', 'label' => 'Utenti Totali', 'value' => $stats['total_users']],
-                ['color' => 'success', 'icon' => 'file-alt', 'label' => 'Annunci Attivi', 'value' => $stats['active_announcements']],
-                ['color' => 'info', 'icon' => 'check-circle', 'label' => 'Vendite Concluse', 'value' => $stats['completed_sales']],
-            ];
-            foreach ($cards as $c): ?>
-                <div class="col-md-4">
-                    <div class="card border-0 shadow-sm h-100">
-                        <div class="card-body d-flex align-items-center">
-                            <div
-                                class="bg-<?php echo $c['color']; ?> bg-opacity-10 text-<?php echo $c['color']; ?> p-3 rounded me-3">
-                                <i class="fas fa-<?php echo $c['icon']; ?> fs-4"></i>
-                            </div>
-                            <div>
-                                <p class="small mb-1"><?php echo $c['label']; ?></p>
-                                <h3 class="mb-0 fw-bold"><?php echo $c['value']; ?></h3>
-                            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="bg-primary bg-opacity-10 text-primary p-3 rounded me-3">
+                            <i class="fas fa-users fs-4"></i>
+                        </div>
+                        <div>
+                            <p class="small mb-1">Utenti Totali</p>
+                            <h3 class="mb-0 fw-bold" id="totalUsers"><?php echo $stats['total_users'] ?? 0; ?></h3>
                         </div>
                     </div>
                 </div>
-            <?php endforeach; ?>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="bg-success bg-opacity-10 text-success p-3 rounded me-3">
+                            <i class="fas fa-file-alt fs-4"></i>
+                        </div>
+                        <div>
+                            <p class="small mb-1">Annunci Attivi</p>
+                            <h3 class="mb-0 fw-bold" id="activeAnnouncements">
+                                <?php echo $stats['active_announcements'] ?? 0; ?></h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm h-100">
+                    <div class="card-body d-flex align-items-center">
+                        <div class="bg-info bg-opacity-10 text-info p-3 rounded me-3">
+                            <i class="fas fa-check-circle fs-4"></i>
+                        </div>
+                        <div>
+                            <p class="small mb-1">Vendite Concluse</p>
+                            <h3 class="mb-0 fw-bold" id="completedSales"><?php echo $stats['completed_sales'] ?? 0; ?>
+                            </h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <!-- TABS -->
-        <ul class="nav nav-tabs mb-4">
-            <li class="nav-item"><button class="nav-link active fw-semibold" data-bs-toggle="tab"
-                    data-bs-target="#users"><i class="fas fa-users me-2"></i>Utenti</button></li>
-            <li class="nav-item"><button class="nav-link fw-semibold" data-bs-toggle="tab"
-                    data-bs-target="#announcements"><i class="fas fa-file-alt me-2"></i>Annunci</button></li>
-            <li class="nav-item"><button class="nav-link fw-semibold" data-bs-toggle="tab"
-                    data-bs-target="#categories"><i class="fas fa-layer-group me-2"></i>Categorie</button></li>
+        <!-- Tabs -->
+        <ul class="nav nav-tabs mb-4" id="adminTabs">
+            <li class="nav-item"><button class="nav-link active fw-semibold" data-bs-target="#users"
+                    data-bs-toggle="tab"><i class="fas fa-users me-2"></i>Utenti</button></li>
+            <li class="nav-item"><button class="nav-link fw-semibold" data-bs-target="#announcements"
+                    data-bs-toggle="tab"><i class="fas fa-file-alt me-2"></i>Annunci</button></li>
+            <li class="nav-item"><button class="nav-link fw-semibold" data-bs-target="#categories"
+                    data-bs-toggle="tab"><i class="fas fa-layer-group me-2"></i>Categorie</button></li>
         </ul>
-        <div class="tab-content">
 
-            <!-- UTENTI -->
+        <!-- Contenuto Tabs -->
+        <div class="tab-content">
+            <!-- Utenti -->
             <div class="tab-pane fade show active" id="users">
                 <div class="card border-0 shadow-sm">
-                    <div class="card-header border-bottom py-3 fw-bold">Gestione Utenti</div>
-                    <div class="card-body p-0 table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Nome</th>
-                                    <th>Email</th>
-                                    <th>Università</th>
-                                    <th>Azioni</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($users as $user): ?>
+                    <div class="card-header border-bottom py-3">
+                        <h5 class="card-title mb-0 fw-bold"><i class="fas fa-users me-2"></i>Gestione Utenti</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            <?php echo $user['id']; ?>
-                                        </td>
-                                        <td>
-                                            <?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?>
-                                        </td>
-                                        <td>
-                                            <?php echo htmlspecialchars($user['email']); ?>
-                                        </td>
-                                        <td>
-                                            <?php echo htmlspecialchars($user['university'] ?? 'Non specificata'); ?>
-                                        </td>
-                                        <td>
-                                            <form method="POST" class="d-inline">
-                                                <input type="hidden" name="reset_user_id"
-                                                    value="<?php echo $user['id']; ?>">
-                                                <input type="password" name="new_password" placeholder="Nuova password"
-                                                    required class="form-control d-inline-block w-auto">
-                                                <button class="btn btn-outline-primary btn-sm">Reset</button>
-                                            </form>
-                                            <form method="POST" class="d-inline"
-                                                onsubmit="return confirm('Eliminare questo utente?');">
-                                                <input type="hidden" name="delete_user_id"
-                                                    value="<?php echo $user['id']; ?>">
-                                                <button class="btn btn-outline-danger btn-sm">Elimina</button>
-                                            </form>
-                                        </td>
+                                        <th class="ps-4">ID</th>
+                                        <th>Nome</th>
+                                        <th>Email</th>
+                                        <th>Università</th>
+                                        <th class="text-end pe-4">Azioni</th>
                                     </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    <?php foreach ($users as $user): ?>
+                                        <tr>
+                                            <td class="ps-4 fw-semibold"><?php echo htmlspecialchars($user['id']); ?></td>
+                                            <td><?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?>
+                                            </td>
+                                            <td><?php echo htmlspecialchars($user['email']); ?></td>
+                                            <td><?php echo htmlspecialchars($user['university'] ?? 'Non specificata'); ?>
+                                            </td>
+                                            <td class="text-end pe-4">
+                                                <button class="btn btn-outline-primary btn-sm me-2"
+                                                    onclick="openResetPassword(<?php echo $user['id']; ?>)">
+                                                    <i class="fas fa-key me-1"></i>Reset
+                                                </button>
+                                                <button class="btn btn-outline-danger btn-sm"
+                                                    onclick="deleteUser(<?php echo $user['id']; ?>)">
+                                                    <i class="fas fa-trash-alt me-1"></i>Elimina
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- ANNUNCI -->
+            <!-- Annunci -->
             <div class="tab-pane fade" id="announcements">
                 <div class="card border-0 shadow-sm">
-                    <div class="card-header border-bottom py-3 fw-bold">Moderazione Annunci</div>
-                    <div class="card-body p-0 table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>Titolo</th>
-                                    <th>Tipo</th>
-                                    <th>Prezzo</th>
-                                    <th>Venditore</th>
-                                    <th>Data</th>
-                                    <th>Azioni</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php foreach ($announcements as $ann): ?>
+                    <div class="card-header border-bottom py-3">
+                        <h5 class="card-title mb-0 fw-bold"><i class="fas fa-file-alt me-2"></i>Moderazione Annunci</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
                                     <tr>
-                                        <td>
-                                            <?php echo htmlspecialchars($ann['title']); ?>
-                                        </td>
-                                        <td>
-                                            <?php echo htmlspecialchars($ann['type']); ?>
-                                        </td>
-                                        <td>€
-                                            <?php echo number_format($ann['price'], 2); ?>
-                                        </td>
-                                        <td>
-                                            <?php echo htmlspecialchars($ann['seller']); ?>
-                                        </td>
-                                        <td>
-                                            <?php echo htmlspecialchars($ann['publishedDate']); ?>
-                                        </td>
-                                        <td>
-                                            <form method="POST" onsubmit="return confirm('Eliminare questo annuncio?');">
-                                                <input type="hidden" name="delete_announcement_id"
-                                                    value="<?php echo $ann['id']; ?>">
-                                                <button class="btn btn-outline-danger btn-sm">Elimina</button>
-                                            </form>
-                                        </td>
+                                        <th class="ps-4">Titolo</th>
+                                        <th>Tipo</th>
+                                        <th>Prezzo</th>
+                                        <th>Venditore</th>
+                                        <th>Data</th>
+                                        <th class="text-end pe-4">Azioni</th>
                                     </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
+                                </thead>
+                                <tbody id="announcementsTableBody">
+                                    <?php foreach ($announcements as $ann): ?>
+                                        <tr>
+                                            <td class="ps-4">
+                                                <span
+                                                    class="badge <?php echo $ann['status'] === 'venduto' ? 'bg-success' : 'bg-primary'; ?> me-2">
+                                                    <?php echo $ann['status'] === 'venduto' ? 'Venduto' : 'Attivo'; ?>
+                                                </span>
+                                                <span class="text-truncate d-inline-block" style="max-width:200px"
+                                                    title="<?php echo htmlspecialchars($ann['title']); ?>">
+                                                    <?php echo htmlspecialchars($ann['title']); ?>
+                                                </span>
+                                            </td>
+                                            <td><span
+                                                    class="badge bg-secondary"><?php echo htmlspecialchars($ann['type']); ?></span>
+                                            </td>
+                                            <td class="fw-semibold">€<?php echo number_format($ann['price'], 2); ?></td>
+                                            <td><?php echo htmlspecialchars($ann['seller']); ?></td>
+                                            <td><?php echo htmlspecialchars($ann['publishedDate']); ?></td>
+                                            <td class="text-end pe-4">
+                                                <button class="btn btn-outline-danger btn-sm"
+                                                    onclick="deleteAnnouncement(<?php echo $ann['id']; ?>)">
+                                                    <i class="fas fa-trash-alt me-1"></i>Elimina
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- CATEGORIE -->
+            <!-- Categorie -->
             <div class="tab-pane fade" id="categories">
                 <div class="row g-4">
-                    <!-- MATERIE -->
                     <div class="col-lg-6">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-header border-bottom py-3 fw-bold">Gestione Materie</div>
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header border-bottom py-3">
+                                <h5 class="card-title mb-0 fw-bold"><i class="fas fa-book me-2"></i>Gestione Materie
+                                </h5>
+                            </div>
                             <div class="card-body">
-                                <form method="POST" class="d-flex mb-3">
-                                    <input type="text" name="new_subject" class="form-control me-2"
-                                        placeholder="Nuova materia" required>
-                                    <button class="btn btn-primary">Aggiungi</button>
-                                </form>
-                                <?php foreach ($subjects as $subject): ?>
-                                    <div class="d-flex justify-content-between py-1 border-bottom">
-                                        <span>
-                                            <?php echo htmlspecialchars($subject); ?>
-                                        </span>
-                                        <form method="POST" onsubmit="return confirm('Eliminare questa materia?');">
-                                            <input type="hidden" name="delete_subject"
-                                                value="<?php echo htmlspecialchars($subject); ?>">
-                                            <button class="btn btn-link text-danger p-0"><i
-                                                    class="fas fa-times"></i></button>
-                                        </form>
-                                    </div>
-                                <?php endforeach; ?>
+                                <div class="row g-2 mb-4">
+                                    <div class="col"><input type="text" class="form-control" id="newSubject"
+                                            placeholder="Nuova materia"></div>
+                                    <div class="col-auto d-flex align-items-end"><button class="btn btn-primary"
+                                            id="addSubjectBtn"><i class="fas fa-plus me-2"></i>Aggiungi</button></div>
+                                </div>
+                                <div class="scrollable-content" id="subjectsList">
+                                    <?php foreach ($subjects as $index => $subject): ?>
+                                        <div
+                                            class="category-item d-flex justify-content-between align-items-center py-2 border-bottom">
+                                            <span class="fw-medium"><?php echo htmlspecialchars($subject); ?></span>
+                                            <button class="btn btn-link text-danger p-0"
+                                                onclick="deleteSubject(<?php echo $index; ?>)">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <!-- FACOLTÀ -->
                     <div class="col-lg-6">
-                        <div class="card border-0 shadow-sm">
-                            <div class="card-header border-bottom py-3 fw-bold">Gestione Facoltà</div>
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header border-bottom py-3">
+                                <h5 class="card-title mb-0 fw-bold"><i class="fas fa-graduation-cap me-2"></i>Gestione
+                                    Facoltà</h5>
+                            </div>
                             <div class="card-body">
-                                <form method="POST" class="d-flex mb-3">
-                                    <input type="text" name="new_faculty" class="form-control me-2"
-                                        placeholder="Nuova facoltà" required>
-                                    <button class="btn btn-primary">Aggiungi</button>
-                                </form>
-                                <?php foreach ($faculties as $faculty): ?>
-                                    <div class="d-flex justify-content-between py-1 border-bottom">
-                                        <span>
-                                            <?php echo htmlspecialchars($faculty); ?>
-                                        </span>
-                                        <form method="POST" onsubmit="return confirm('Eliminare questa facoltà?');">
-                                            <input type="hidden" name="delete_faculty"
-                                                value="<?php echo htmlspecialchars($faculty); ?>">
-                                            <button class="btn btn-link text-danger p-0"><i
-                                                    class="fas fa-times"></i></button>
-                                        </form>
-                                    </div>
-                                <?php endforeach; ?>
+                                <div class="row g-2 mb-4">
+                                    <div class="col"><input type="text" class="form-control" id="newFaculty"
+                                            placeholder="Nuova facoltà"></div>
+                                    <div class="col-auto d-flex align-items-end"><button class="btn btn-primary"
+                                            id="addFacultyBtn"><i class="fas fa-plus me-2"></i>Aggiungi</button></div>
+                                </div>
+                                <div class="scrollable-content" id="facultiesList">
+                                    <?php foreach ($faculties as $index => $faculty): ?>
+                                        <div
+                                            class="category-item d-flex justify-content-between align-items-center py-2 border-bottom">
+                                            <span class="fw-medium"><?php echo htmlspecialchars($faculty); ?></span>
+                                            <button class="btn btn-link text-danger p-0"
+                                                onclick="deleteFaculty(<?php echo $index; ?>)">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    <?php endforeach; ?>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
         </div>
     </main>
 
+    <!-- Modals -->
+    <div class="modal fade" id="resetPasswordModal">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title fw-bold">Reset Password</h5><button class="btn-close"
+                        data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-3" id="resetPasswordUserInfo"></p>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Nuova Password</label>
+                        <input type="password" class="form-control" id="newPassword" placeholder="Minimo 6 caratteri"
+                            minlength="6" required>
+                        <div class="form-text">La password deve essere di almeno 6 caratteri</div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-outline-secondary" data-bs-dismiss="modal">Annulla</button>
+                    <button class="btn btn-primary" id="confirmResetBtn">Conferma Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Applica il tema al caricamento
-        (function () {
-            try {
-                const tema = localStorage.getItem('temaPreferito') ||
-                    (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-                document.documentElement.setAttribute('data-bs-theme', tema);
-            } catch (e) {
-                console.warn('Tema non caricato:', e)
+        // Passa i dati PHP a JavaScript
+        const users = <?php echo json_encode($users); ?>;
+        const announcements = <?php echo json_encode($announcements); ?>;
+        let subjects = <?php echo json_encode($subjects); ?>;
+        let faculties = <?php echo json_encode($faculties); ?>;
+        let selectedUser = null;
+
+        function init() {
+            // Carica le funzioni JavaScript
+            loadUsers();
+            loadAnnouncements();
+            loadSubjects();
+            loadFaculties();
+            updateStats();
+
+            // Aggiungi event listeners
+            document.getElementById('addSubjectBtn').addEventListener('click', addSubject);
+            document.getElementById('addFacultyBtn').addEventListener('click', addFaculty);
+            document.getElementById('confirmResetBtn').addEventListener('click', confirmReset);
+
+            // Applica il tema salvato
+            applyTheme();
+
+            // Ascolta i cambiamenti del tema da altre pagine
+            window.addEventListener('storage', function (e) {
+                if (e.key === 'temaPreferito') {
+                    applyTheme();
+                }
+            });
+        }
+
+        function applyTheme() {
+            // Leggi il tema dalle altre pagine o usa default
+            const tema = localStorage.getItem('temaPreferito') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+
+            if (tema === 'dark') {
+                document.body.classList.add('bg-dark', 'text-white');
+                document.body.classList.remove('bg-body');
+                document.documentElement.setAttribute('data-bs-theme', 'dark');
+
+                // Applica classi per header e card
+                document.querySelector('header').classList.add('bg-dark', 'border-secondary');
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.add('bg-dark', 'text-white');
+                });
+                document.querySelectorAll('.card-header').forEach(header => {
+                    header.classList.add('bg-dark', 'border-secondary');
+                });
+                document.querySelectorAll('.table').forEach(table => {
+                    table.classList.add('table-dark');
+                });
+                document.querySelectorAll('.nav-tabs .nav-link').forEach(link => {
+                    if (link.classList.contains('active')) {
+                        link.classList.add('bg-dark', 'border-dark', 'text-white');
+                    }
+                });
+                document.querySelectorAll('.btn-link').forEach(btn => {
+                    btn.classList.add('text-white');
+                });
+            } else {
+                document.body.classList.remove('bg-dark', 'text-white');
+                document.body.classList.add('bg-body');
+                document.documentElement.setAttribute('data-bs-theme', 'light');
+
+                // Ripristina classi light
+                document.querySelector('header').classList.remove('bg-dark', 'border-secondary');
+                document.querySelectorAll('.card').forEach(card => {
+                    card.classList.remove('bg-dark', 'text-white');
+                });
+                document.querySelectorAll('.card-header').forEach(header => {
+                    header.classList.remove('bg-dark', 'border-secondary');
+                });
+                document.querySelectorAll('.table').forEach(table => {
+                    table.classList.remove('table-dark');
+                });
+                document.querySelectorAll('.nav-tabs .nav-link').forEach(link => {
+                    if (link.classList.contains('active')) {
+                        link.classList.remove('bg-dark', 'border-dark', 'text-white');
+                    }
+                });
+                document.querySelectorAll('.btn-link').forEach(btn => {
+                    btn.classList.remove('text-white');
+                });
             }
-        })();
+        }
+
+        function loadUsers() {
+            const tbody = document.getElementById('usersTableBody');
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td class="ps-4 fw-semibold">${user.id}</td>
+                    <td>${user.firstName} ${user.lastName}</td>
+                    <td>${user.email}</td>
+                    <td>${user.university || 'Non specificata'}</td>
+                    <td class="text-end pe-4">
+                        <button class="btn btn-outline-primary btn-sm me-2" onclick="openResetPassword(${user.id})">
+                            <i class="fas fa-key me-1"></i>Reset
+                        </button>
+                        <button class="btn btn-outline-danger btn-sm" onclick="deleteUser(${user.id})">
+                            <i class="fas fa-trash-alt me-1"></i>Elimina
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadAnnouncements() {
+            const tbody = document.getElementById('announcementsTableBody');
+            tbody.innerHTML = announcements.map(a => `
+                <tr>
+                    <td class="ps-4">
+                        <span class="badge ${a.status === 'venduto' ? 'bg-success' : 'bg-primary'} me-2">${a.status === 'venduto' ? 'Venduto' : 'Attivo'}</span>
+                        <span class="text-truncate d-inline-block" style="max-width:200px" title="${a.title}">${a.title}</span>
+                    </td>
+                    <td><span class="badge bg-secondary">${a.type}</span></td>
+                    <td class="fw-semibold">€${parseFloat(a.price).toFixed(2)}</td>
+                    <td>${a.seller}</td>
+                    <td>${a.publishedDate}</td>
+                    <td class="text-end pe-4">
+                        <button class="btn btn-outline-danger btn-sm" onclick="deleteAnnouncement(${a.id})">
+                            <i class="fas fa-trash-alt me-1"></i>Elimina
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function loadSubjects() {
+            const container = document.getElementById('subjectsList');
+            container.innerHTML = subjects.map((s, i) => `
+                <div class="category-item d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <span class="fw-medium">${s}</span>
+                    <button class="btn btn-link text-danger p-0" onclick="deleteSubject(${i})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function loadFaculties() {
+            const container = document.getElementById('facultiesList');
+            container.innerHTML = faculties.map((f, i) => `
+                <div class="category-item d-flex justify-content-between align-items-center py-2 border-bottom">
+                    <span class="fw-medium">${f}</span>
+                    <button class="btn btn-link text-danger p-0" onclick="deleteFaculty(${i})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function updateStats() {
+            // Le statistiche sono già calcolate dal PHP e mostrate staticamente
+            // Questa funzione può essere usata per aggiornamenti in tempo reale se necessario
+        }
+
+        function addSubject() {
+            const input = document.getElementById('newSubject');
+            const subject = input.value.trim();
+            if (!subject) return alert('Inserisci il nome della materia');
+            if (subjects.includes(subject)) return alert('Materia già esistente');
+
+            // Invia richiesta AJAX per aggiungere la materia al database
+            fetch('api/add_subject.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'subject=' + encodeURIComponent(subject)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        subjects.push(subject);
+                        loadSubjects();
+                        input.value = '';
+                        showToast('Materia aggiunta');
+                    } else {
+                        alert('Errore: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Errore di connessione');
+                });
+        }
+
+        function addFaculty() {
+            const input = document.getElementById('newFaculty');
+            const faculty = input.value.trim();
+            if (!faculty) return alert('Inserisci il nome della facoltà');
+            if (faculties.includes(faculty)) return alert('Facoltà già esistente');
+
+            // Invia richiesta AJAX per aggiungere la facoltà al database
+            fetch('api/add_faculty.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'faculty=' + encodeURIComponent(faculty)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        faculties.push(faculty);
+                        loadFaculties();
+                        input.value = '';
+                        showToast('Facoltà aggiunta');
+                    } else {
+                        alert('Errore: ' + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Errore di connessione');
+                });
+        }
+
+        function confirmReset() {
+            const newPassword = document.getElementById('newPassword').value;
+            if (newPassword.length < 6) return alert('Password di almeno 6 caratteri');
+            if (selectedUser) {
+                // Invia richiesta AJAX per resettare la password
+                fetch('api/reset_password.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'user_id=' + selectedUser.id + '&new_password=' + encodeURIComponent(newPassword)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            bootstrap.Modal.getInstance(document.getElementById('resetPasswordModal')).hide();
+                            showToast(`Password aggiornata per ${selectedUser.email}`);
+                            selectedUser = null;
+                            document.getElementById('newPassword').value = '';
+                        } else {
+                            alert('Errore: ' + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Errore:', error);
+                        alert('Errore di connessione');
+                    });
+            }
+        }
+
+        function showToast(message) {
+            const toast = new bootstrap.Toast(document.createElement('div'));
+            toast._element.className = 'toast bg-success text-white';
+            toast._element.innerHTML = `<div class="toast-body">${message}</div>`;
+            document.body.appendChild(toast._element);
+            toast.show();
+            setTimeout(() => toast._element.remove(), 3000);
+        }
+
+        window.openResetPassword = function (userId) {
+            selectedUser = users.find(u => u.id == userId);
+            if (selectedUser) {
+                document.getElementById('resetPasswordUserInfo').innerHTML = `
+                    Inserisci la nuova password per <strong>${selectedUser.firstName} ${selectedUser.lastName}</strong>
+                    (<strong>${selectedUser.email}</strong>)
+                `;
+                new bootstrap.Modal(document.getElementById('resetPasswordModal')).show();
+            }
+        };
+
+        window.deleteUser = function (userId) {
+            if (confirm('Eliminare questo utente?')) {
+                // Invia richiesta AJAX per eliminare l'utente
+                fetch('api/delete_user.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'user_id=' + userId
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const index = users.findIndex(u => u.id == userId);
+                            if (index > -1) {
+                                users.splice(index, 1);
+                                loadUsers();
+                                // Aggiorna statistiche
+                                document.getElementById('totalUsers').textContent = users.length;
+                                showToast('Utente eliminato');
+                            }
+                        } else {
+                            alert('Errore: ' + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Errore:', error);
+                        alert('Errore di connessione');
+                    });
+            }
+        };
+
+        window.deleteAnnouncement = function (announcementId) {
+            if (confirm('Eliminare questo annuncio?')) {
+                // Invia richiesta AJAX per eliminare l'annuncio
+                fetch('api/delete_announcement.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'announcement_id=' + announcementId
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const index = announcements.findIndex(a => a.id == announcementId);
+                            if (index > -1) {
+                                announcements.splice(index, 1);
+                                loadAnnouncements();
+                                // Aggiorna statistiche
+                                const activeCount = announcements.filter(a => a.status === 'attivo').length;
+                                document.getElementById('activeAnnouncements').textContent = activeCount;
+                                showToast('Annuncio eliminato');
+                            }
+                        } else {
+                            alert('Errore: ' + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Errore:', error);
+                        alert('Errore di connessione');
+                    });
+            }
+        };
+
+        window.deleteSubject = function (index) {
+            const subject = subjects[index];
+            if (confirm(`Eliminare la materia "${subject}"?`)) {
+                // Invia richiesta AJAX per eliminare la materia
+                fetch('api/delete_subject.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'subject=' + encodeURIComponent(subject)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            subjects.splice(index, 1);
+                            loadSubjects();
+                            showToast('Materia rimossa');
+                        } else {
+                            alert('Errore: ' + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Errore:', error);
+                        alert('Errore di connessione');
+                    });
+            }
+        };
+
+        window.deleteFaculty = function (index) {
+            const faculty = faculties[index];
+            if (confirm(`Eliminare la facoltà "${faculty}"?`)) {
+                // Invia richiesta AJAX per eliminare la facoltà
+                fetch('api/delete_faculty.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'faculty=' + encodeURIComponent(faculty)
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            faculties.splice(index, 1);
+                            loadFaculties();
+                            showToast('Facoltà rimossa');
+                        } else {
+                            alert('Errore: ' + data.error);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Errore:', error);
+                        alert('Errore di connessione');
+                    });
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 
