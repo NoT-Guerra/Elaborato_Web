@@ -84,6 +84,19 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
     $stmt->fetch();
     $stmt->close();
 }
+
+// Check preferiti utente per colorare i cuori
+$liked_annunci = [];
+if ($is_logged_in && isset($_SESSION['user_id'])) {
+    $stmtFav = $conn->prepare("SELECT annuncio_id FROM preferiti WHERE utente_id = ?");
+    $stmtFav->bind_param("i", $_SESSION['user_id']);
+    $stmtFav->execute();
+    $resultFav = $stmtFav->get_result();
+    while ($row = $resultFav->fetch_assoc()) {
+        $liked_annunci[] = $row['annuncio_id'];
+    }
+    $stmtFav->close();
+}
 ?>
 
 <!DOCTYPE html>
@@ -231,6 +244,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         }
 
         #cart-counter,
+        #fav-counter,
         #cart-counter-header {
             position: absolute;
             top: 0;
@@ -360,7 +374,10 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     <a href="preferiti.php"
                         class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
                         <i class="bi bi-suit-heart"></i>
-                        <span id="cart-counter" class="badge rounded-pill bg-danger d-none">0</span>
+                        <span id="fav-counter"
+                            class="badge rounded-pill bg-danger <?php echo count($liked_annunci) > 0 ? '' : 'd-none'; ?>">
+                            <?php echo count($liked_annunci); ?>
+                        </span>
                     </a>
 
                     <!-- Bottone Carrello - visibile solo su schermi medi e grandi -->
@@ -583,7 +600,11 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                 data-categoria="<?php echo $categoria_lower; ?>">
                                 <div class="card h-100 border-0 shadow-sm card-annuncio">
                                     <button class="btn-preferiti" data-id="<?php echo $annuncio['id_annuncio']; ?>">
-                                        <i class="bi bi-suit-heart"></i>
+                                        <?php if (in_array($annuncio['id_annuncio'], $liked_annunci)): ?>
+                                            <i class="bi bi-suit-heart-fill text-danger"></i>
+                                        <?php else: ?>
+                                            <i class="bi bi-suit-heart"></i>
+                                        <?php endif; ?>
                                     </button>
                                     <div class="img-wrapper">
                                         <img src="<?php echo $immagine_url; ?>"
@@ -824,54 +845,59 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         filterCondizioni.addEventListener('change', filtraAnnunci);
         filterPrezzo.addEventListener('input', filtraAnnunci);
 
-        // --- Preferiti ---
-        function aggiornaContatorePreferiti() {
-            const preferiti = JSON.parse(localStorage.getItem('mieiPreferiti')) || [];
-            const counter = document.getElementById('cart-counter');
-            if (preferiti.length > 0) {
-                counter.textContent = preferiti.length;
-                counter.classList.remove('d-none');
-            } else {
-                counter.classList.add('d-none');
-            }
-        }
-
+        // --- Preferiti (Versione DB) ---
         document.querySelectorAll('.btn-preferiti').forEach(btn => {
-            const annuncioEl = btn.closest('.annuncio');
-            const id = annuncioEl.dataset.title;
-            let preferiti = JSON.parse(localStorage.getItem('mieiPreferiti')) || [];
-
-            if (preferiti.some(p => p.title === id)) {
-                btn.querySelector('i').className = 'bi bi-suit-heart-fill text-danger';
-            }
-
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
                 const icon = this.querySelector('i');
-                const annuncio = this.closest('.annuncio');
+                const idAnnuncio = this.dataset.id;
 
-                let preferitiAttuali = JSON.parse(localStorage.getItem('mieiPreferiti')) || [];
-                const annuncioData = {
-                    id: annuncio.dataset.id || annuncio.querySelector('.btn-preferiti').dataset.id,
-                    title: annuncio.dataset.title,
-                    facolta: annuncio.dataset.facolta,
-                    condizione: annuncio.dataset.condizione,
-                    prezzo: annuncio.dataset.prezzo,
-                    categoria: annuncio.dataset.categoria,
-                    img: annuncio.querySelector('img').src,
-                    desc: annuncio.querySelector('p.small').textContent
-                };
+                // Controlla se è già likado (classe fill)
+                const isLiked = icon.classList.contains('bi-suit-heart-fill');
 
-                if (icon.classList.contains('bi-suit-heart')) {
-                    icon.className = 'bi bi-suit-heart-fill text-danger';
-                    preferitiAttuali.push(annuncioData);
-                } else {
-                    icon.className = 'bi bi-suit-heart';
-                    preferitiAttuali = preferitiAttuali.filter(p => p.title !== annuncioData.title);
-                }
+                const url = isLiked ? 'rimuovi_preferiti.php' : 'aggiungi_preferiti.php';
 
-                localStorage.setItem('mieiPreferiti', JSON.stringify(preferitiAttuali));
-                aggiornaContatorePreferiti();
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_annuncio: idAnnuncio })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            // Toggle icona
+                            if (isLiked) {
+                                icon.classList.remove('bi-suit-heart-fill', 'text-danger');
+                                icon.classList.add('bi-suit-heart');
+                            } else {
+                                icon.classList.remove('bi-suit-heart');
+                                icon.classList.add('bi-suit-heart-fill', 'text-danger');
+                            }
+
+                            // Aggiorna contatore header
+                            const counter = document.getElementById('fav-counter');
+                            if (data.count !== undefined) {
+                                counter.textContent = data.count;
+                                if (data.count > 0) {
+                                    counter.classList.remove('d-none');
+                                } else {
+                                    counter.classList.add('d-none');
+                                }
+                            }
+
+                            showToast(data.message, true);
+                        } else {
+                            // Se fallisce (es. non loggato), mostra messaggio
+                            if (data.message === 'Devi essere loggato.' || data.message === 'Devi essere loggato per aggiungere ai preferiti.') {
+                                window.location.href = 'login.php';
+                            }
+                            showToast(data.message, false);
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error', err);
+                        showToast('Errore di connessione', false);
+                    });
             });
         });
 
@@ -940,7 +966,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         document.addEventListener('DOMContentLoaded', () => {
             const temaSalvato = localStorage.getItem('temaPreferito') || 'light';
             applicaTema(temaSalvato);
-            aggiornaContatorePreferiti();
+            // aggiornaContatorePreferiti(); // REMOVED: Managed by PHP/AJAX now
             aggiornaContatoreCarrello();
         });
     </script>
