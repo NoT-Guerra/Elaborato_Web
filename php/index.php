@@ -125,9 +125,14 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
             z-index: 10;
         }
 
+        .filter-btn {
+            transition: all 0.2s ease;
+        }
+
         .filter-btn.active {
             background-color: var(--bs-primary) !important;
             color: white !important;
+            border-color: var(--bs-primary) !important;
         }
 
         .price-badge {
@@ -222,6 +227,7 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
             border-radius: 50%;
         }
 
+        /* Stili per categorie */
         .categoria-libro {
             background-color: #e3f2fd !important;
             color: #1565c0 !important;
@@ -235,6 +241,63 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
         .categoria-digitale {
             background-color: #e8f5e8 !important;
             color: #2e7d32 !important;
+        }
+
+        .categoria-pdf {
+            background-color: #f8f0f0 !important;
+            color: #c62828 !important;
+        }
+
+        .categoria-materiale {
+            background-color: #fff3e0 !important;
+            color: #ef6c00 !important;
+        }
+
+        .categoria-altro {
+            background-color: #f5f5f5 !important;
+            color: #616161 !important;
+        }
+
+        /* Stili per tema scuro */
+        [data-bs-theme="dark"] .categoria-libro {
+            background-color: #1e3a5f !important;
+            color: #90caf9 !important;
+        }
+
+        [data-bs-theme="dark"] .categoria-appunti {
+            background-color: #4a1c5c !important;
+            color: #e1bee7 !important;
+        }
+
+        [data-bs-theme="dark"] .categoria-digitale {
+            background-color: #1b3a1b !important;
+            color: #a5d6a7 !important;
+        }
+
+        [data-bs-theme="dark"] .categoria-pdf {
+            background-color: #4a1c1c !important;
+            color: #ff8a80 !important;
+        }
+
+        [data-bs-theme="dark"] .categoria-materiale {
+            background-color: #5d4037 !important;
+            color: #ffcc80 !important;
+        }
+
+        [data-bs-theme="dark"] .categoria-altro {
+            background-color: #424242 !important;
+            color: #e0e0e0 !important;
+        }
+
+        /* Classe generica per categorie non specificate */
+        .badge[class*="categoria-"]:not(.categoria-libro):not(.categoria-appunti):not(.categoria-digitale):not(.categoria-pdf):not(.categoria-materiale):not(.categoria-altro) {
+            background-color: #e8e8e8 !important;
+            color: #333 !important;
+        }
+
+        [data-bs-theme="dark"] .badge[class*="categoria-"]:not(.categoria-libro):not(.categoria-appunti):not(.categoria-digitale):not(.categoria-pdf):not(.categoria-materiale):not(.categoria-altro) {
+            background-color: #4a5568 !important;
+            color: #f8f9fa !important;
         }
 
         /* --- RIMUOVI SCORRIMENTO ORIZZONTALE SU SCHERMI PICCOLI --- */
@@ -287,8 +350,7 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
                     </a>
 
                     <!-- Bottone Carrello - visibile solo su schermi medi e grandi -->
-                    <a href="carrello.php"
-                        class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
+                    <a href="carrello.php" class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
                         <i class="bi bi-cart"></i>
                         <span id="cart-counter-header" class="badge rounded-pill bg-danger d-none">0</span>
                     </a>
@@ -363,9 +425,9 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
 
             <!-- Categorie -->
             <div class="mt-3 pt-2 border-top">
-                <div class="d-flex gap-2 overflow-auto">
-                    <button class="btn btn-sm btn-primary rounded-pill px-3 filter-btn active"
-                        data-category="tutti">Tutti</button>
+                <div class="d-flex gap-2 overflow-auto" id="category-filters">
+                    <button class="btn btn-sm btn-primary rounded-pill px-3 filter-btn active" data-category="tutti"
+                        id="filter-all">Tutti</button>
                     <?php foreach ($categorie as $categoria): ?>
                         <button class="btn btn-sm btn-outline-secondary rounded-pill px-3 filter-btn"
                             data-category="<?php echo strtolower($categoria); ?>">
@@ -664,30 +726,55 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
             });
         }
 
+        // Gestione dei bottoni di filtro categorie
+        const categoryContainer = document.getElementById('category-filters');
+        const filterAllBtn = document.getElementById('filter-all');
+
+        // Event delegation per i bottoni di categoria
+        categoryContainer.addEventListener('click', function (e) {
+            if (e.target.classList.contains('filter-btn')) {
+                const clickedCategory = e.target.getAttribute('data-category');
+
+                // Rimuove le classi attive da tutti i bottoni
+                filterBtns.forEach(btn => {
+                    btn.classList.remove('active', 'btn-primary');
+                    btn.classList.add('btn-outline-secondary');
+                });
+
+                // Aggiunge le classi attive al bottone cliccato
+                e.target.classList.remove('btn-outline-secondary');
+                e.target.classList.add('active', 'btn-primary');
+
+                // Applica il filtro
+                filtraAnnunci();
+            }
+        });
+
         function resetFiltri() {
             searchInput.value = '';
             filterFacolta.value = '';
             filterCondizioni.value = '';
             filterPrezzo.value = 100;
             prezzoValore.textContent = '100€';
+
+            // Ripristina solo il bottone "Tutti" come attivo
             filterBtns.forEach(btn => {
-                btn.classList.remove('active');
-                if (btn.dataset.category === 'tutti') btn.classList.add('active');
+                btn.classList.remove('active', 'btn-primary');
+                btn.classList.add('btn-outline-secondary');
+                if (btn.dataset.category === 'tutti') {
+                    btn.classList.remove('btn-outline-secondary');
+                    btn.classList.add('active', 'btn-primary');
+                }
             });
+
             filtraAnnunci();
         }
 
+        // Listener per i filtri
         searchInput.addEventListener('input', filtraAnnunci);
         filterFacolta.addEventListener('change', filtraAnnunci);
         filterCondizioni.addEventListener('change', filtraAnnunci);
         filterPrezzo.addEventListener('input', filtraAnnunci);
-        filterBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                filterBtns.forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                filtraAnnunci();
-            });
-        });
 
         // --- Preferiti ---
         function aggiornaContatorePreferiti() {
