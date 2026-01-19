@@ -505,6 +505,10 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                         <a href="carrello.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                             <i class="bi bi-cart me-3"></i> Carrello
                         </a>
+                            <!-- Aggiungi questo link -->
+                         <a href="miei_acquisti.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                       <i class="bi bi-bag-check me-3"></i> I miei acquisti
+                      </a>
                         <?php if ($is_logged_in): ?>
                             <a href="miei_annunci.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                                 <i class="bi bi-collection me-3"></i> I miei annunci

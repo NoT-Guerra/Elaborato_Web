@@ -2,6 +2,27 @@
 // 1. Inizio sessione (deve essere la primissima cosa)
 session_start();
 
+// inizio modifica
+
+// Mostra messaggi di errore/successo
+if (isset($_SESSION['error_message'])) {
+    echo '<div class="alert alert-danger alert-dismissible fade show m-2" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>' . $_SESSION['error_message'] . '
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>';
+    unset($_SESSION['error_message']);
+}
+
+if (isset($_SESSION['success_message'])) {
+    echo '<div class="alert alert-success alert-dismissible fade show m-2" role="alert">
+            <i class="bi bi-check-circle me-2"></i>' . $_SESSION['success_message'] . '
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+          </div>';
+    unset($_SESSION['success_message']);
+}
+
+// fine modifica
+
 // --- CONFIGURAZIONE DATABASE ---
 $host = 'localhost';
 $db = 'marketplace_universitario';
@@ -137,7 +158,13 @@ function format_currency($amount)
                     <span class="fw-bold fs-5">Totale</span>
                     <span class="fw-bold fs-5"><?php echo format_currency($total); ?></span>
                 </div>
-                <button class="btn btn-primary w-100 py-3 mt-3 fw-bold">Procedi al pagamento</button>
+                <form action="processa_pagamento.php" method="POST">
+                    <!-- inizio modifica -->
+                <button type="submit" class="btn btn-primary w-100 py-3 mt-3 fw-bold">
+                <i class="bi bi-credit-card me-2"></i>Procedi al pagamento
+              </button>
+                </form>
+                <!-- fine modifica -->
             </div>
         <?php else: ?>
             <div class="text-center py-5">
