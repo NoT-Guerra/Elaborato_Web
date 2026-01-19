@@ -5,10 +5,7 @@ session_start();
 // Connessione al database
 require_once 'config/database.php';
 
-if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']) {
-    header('Location: admin.php');
-    exit;
-}
+
 
 // Query per ottenere gli annunci con le relative informazioni
 $sql = "SELECT 
@@ -76,6 +73,17 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
 
 // Verifica se l'utente è loggato
 $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
+
+// Conta articoli nel carrello
+$cart_count = 0;
+if ($is_logged_in && isset($_SESSION['user_id'])) {
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM carrello WHERE utente_id = ?");
+    $stmt->bind_param("i", $_SESSION['user_id']);
+    $stmt->execute();
+    $stmt->bind_result($cart_count);
+    $stmt->fetch();
+    $stmt->close();
+}
 ?>
 
 <!DOCTYPE html>
@@ -358,7 +366,10 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                     <!-- Bottone Carrello - visibile solo su schermi medi e grandi -->
                     <a href="carrello.php" class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
                         <i class="bi bi-cart"></i>
-                        <span id="cart-counter-header" class="badge rounded-pill bg-danger d-none">0</span>
+                        <span id="cart-counter-header"
+                            class="badge rounded-pill bg-danger <?php echo ($cart_count > 0) ? '' : 'd-none'; ?>">
+                            <?php echo $cart_count; ?>
+                        </span>
                     </a>
 
                     <?php if ($is_logged_in): ?>
@@ -416,7 +427,9 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                             <!-- Se loggato, mostra Logout e nome utente nel menu mobile -->
                             <div class="text-center mb-2">
                                 <i class="bi bi-person-circle fs-2 mb-2"></i>
-                                <h6 class="mb-0"><?php echo htmlspecialchars($_SESSION['nome'] . ' ' . $_SESSION['cognome']); ?></h6>
+                                <h6 class="mb-0">
+                                    <?php echo htmlspecialchars($_SESSION['nome'] . ' ' . $_SESSION['cognome']); ?>
+                                </h6>
                                 <small class="text-muted"><?php echo htmlspecialchars($_SESSION['email']); ?></small>
                             </div>
                             <a href="logout.php"
@@ -862,43 +875,64 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             });
         });
 
-        // --- Carrello ---
+        // --- Carrello (Versione DB) ---
         function aggiornaContatoreCarrello() {
-            const carrello = JSON.parse(localStorage.getItem('mioCarrello')) || [];
-            const counter = document.getElementById('cart-counter-header');
+            // Nota: per un badge persistente al refresh servirebbe un endpoint API che restituisce il count.
+            // Per ora lo lasciamo non implementato o potremmo implementarlo in futuro.
+        }
 
-            if (carrello.length > 0) {
-                counter.textContent = carrello.length;
-                counter.classList.remove('d-none');
+        // --- Gestione Toast ---
+        function showToast(message, isSuccess = true) {
+            let toastEl = document.getElementById('liveToast');
+            // Se non esiste (non dovrebbe accadere se l'HTML è corretto), crealo al volo o ignora
+            if (!toastEl) return;
+
+            const toastBody = toastEl.querySelector('.toast-body');
+            const toastHeader = toastEl.querySelector('.toast-header');
+
+            toastBody.textContent = message;
+
+            // Colore header in base al tipo
+            if (isSuccess) {
+                toastHeader.classList.remove('text-danger');
+                toastHeader.classList.add('text-success');
             } else {
-                counter.classList.add('d-none');
+                toastHeader.classList.remove('text-success');
+                toastHeader.classList.add('text-danger');
             }
+
+            const toast = new bootstrap.Toast(toastEl, { delay: 3000 });
+            toast.show();
         }
 
         document.querySelectorAll('.aggiungi-carrello').forEach(btn => {
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
-                const annuncio = this.closest('.annuncio');
-                const annuncioData = {
-                    id: this.dataset.id,
-                    title: annuncio.dataset.title,
-                    prezzo: annuncio.dataset.prezzo,
-                    img: annuncio.querySelector('img').src,
-                    categoria: annuncio.dataset.categoria,
-                    desc: annuncio.querySelector('p.small').textContent
-                };
+                const idAnnuncio = this.dataset.id;
 
-                let carrello = JSON.parse(localStorage.getItem('mioCarrello')) || [];
-                // Verifica se l'annuncio è già nel carrello
-                const esiste = carrello.some(item => item.id === annuncioData.id);
-                if (!esiste) {
-                    carrello.push(annuncioData);
-                    localStorage.setItem('mioCarrello', JSON.stringify(carrello));
-                    aggiornaContatoreCarrello();
-                    alert('Prodotto aggiunto al carrello!');
-                } else {
-                    alert('Questo prodotto è già nel tuo carrello!');
-                }
+                fetch('aggiungi_carrello.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ id_annuncio: idAnnuncio })
+                })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            showToast(data.message, true);
+                            // Aggiorna badge visuale
+                            const counter = document.getElementById('cart-counter-header');
+                            if (data.count !== undefined) {
+                                counter.textContent = data.count;
+                                counter.classList.remove('d-none');
+                            }
+                        } else {
+                            showToast(data.message, false);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        showToast('Errore di comunicazione con il server.', false);
+                    });
             });
         });
 
@@ -910,6 +944,19 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             aggiornaContatoreCarrello();
         });
     </script>
+
+    <!-- Toast Container -->
+    <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">UniMarket</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                Notifica
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
