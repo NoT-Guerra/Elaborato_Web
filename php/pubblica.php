@@ -1,5 +1,3 @@
-[file name]: pubblica.php
-[file content begin]
 <?php
 session_start();
 require_once 'config/database.php';
@@ -501,4 +499,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </body>
 
 </html>
-[file content end]

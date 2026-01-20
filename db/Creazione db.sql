@@ -31,7 +31,7 @@ CREATE TABLE corso_studio (
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-/* CATEGORIE PRODOTTI (rinominato da 'tipo_oggetto') */
+/* CATEGORIE PRODOTTI */
 CREATE TABLE categoria_prodotto (
     id_categoria INT AUTO_INCREMENT PRIMARY KEY,
     nome_categoria VARCHAR(50) NOT NULL UNIQUE
@@ -51,22 +51,19 @@ CREATE TABLE annuncio (
     prezzo DECIMAL(8,2) NOT NULL,
     data_pubblicazione DATETIME DEFAULT CURRENT_TIMESTAMP,
     data_modifica DATETIME ON UPDATE CURRENT_TIMESTAMP,
-    
-    -- Informazioni sul prodotto
+
     categoria_id INT NOT NULL,
     condizione_id INT NOT NULL,
     is_digitale BOOLEAN DEFAULT FALSE,
     immagine_url VARCHAR(500),
-    
-    -- Collegamenti
+
     venditore_id INT NOT NULL,
     corso_id INT,
     facolta_id INT,
-    
-    -- Stato dell'annuncio
+
     is_attivo BOOLEAN DEFAULT TRUE,
     is_venduto BOOLEAN DEFAULT FALSE,
-    
+
     FOREIGN KEY (categoria_id) REFERENCES categoria_prodotto(id_categoria),
     FOREIGN KEY (condizione_id) REFERENCES condizione_prodotto(id_condizione),
     FOREIGN KEY (venditore_id) REFERENCES utenti(id_utente)
@@ -82,12 +79,12 @@ CREATE TABLE carrello (
     id_carrello INT AUTO_INCREMENT PRIMARY KEY,
     utente_id INT NOT NULL,
     annuncio_id INT NOT NULL,
-    
+
     FOREIGN KEY (utente_id) REFERENCES utenti(id_utente)
         ON DELETE CASCADE,
     FOREIGN KEY (annuncio_id) REFERENCES annuncio(id_annuncio)
         ON DELETE CASCADE,
-        
+
     UNIQUE (utente_id, annuncio_id)
 ) ENGINE=InnoDB;
 
@@ -96,25 +93,34 @@ CREATE TABLE preferiti (
     id_preferito INT AUTO_INCREMENT PRIMARY KEY,
     utente_id INT NOT NULL,
     annuncio_id INT NOT NULL,
-    
+
     FOREIGN KEY (utente_id) REFERENCES utenti(id_utente)
         ON DELETE CASCADE,
     FOREIGN KEY (annuncio_id) REFERENCES annuncio(id_annuncio)
         ON DELETE CASCADE,
-        
+
     UNIQUE (utente_id, annuncio_id)
 ) ENGINE=InnoDB;
 
 /* VENDITE */
 CREATE TABLE vendita (
     id_vendita INT AUTO_INCREMENT PRIMARY KEY,
-    annuncio_id INT NOT NULL UNIQUE, -- Un annuncio può essere venduto una volta sola
+    annuncio_id INT NOT NULL UNIQUE, -- un annuncio può essere venduto una sola volta
     acquirente_id INT NOT NULL,
     venditore_id INT NOT NULL,
     prezzo_vendita DECIMAL(8,2) NOT NULL,
     data_vendita DATETIME DEFAULT CURRENT_TIMESTAMP,
-    
+
     FOREIGN KEY (annuncio_id) REFERENCES annuncio(id_annuncio),
     FOREIGN KEY (acquirente_id) REFERENCES utenti(id_utente),
     FOREIGN KEY (venditore_id) REFERENCES utenti(id_utente)
 ) ENGINE=InnoDB;
+
+CREATE TABLE annuncio_pdf (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    annuncio_id INT NOT NULL,
+    pdf_path VARCHAR(255) NOT NULL,
+    original_filename VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (annuncio_id) REFERENCES annuncio(id_annuncio) ON DELETE CASCADE
+);
