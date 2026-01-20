@@ -91,7 +91,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = 'Estensione file non supportata.';
                 $message_type = 'danger';
             }
-        }
+       } elseif ($is_pdf) {
+    // Se è PDF e non è stata caricata un'immagine, usa immagine di default
+    $immagine_url = "../images/pdf-default.png";
+}
+
         
         // Gestione PDF
         $pdf_path = null;
@@ -179,7 +183,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Pubblica Annuncio - UniMarket</title>
+    <title>Pubblica Annuncio - UniboMarket</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <script>
         (function () {
@@ -404,7 +408,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             });
 
-            if (count === 0) cursoSelect.options[0].text = "Nessun corso disponibile";
+            if (count === 0) corsoSelect.options[0].text = "Nessun corso disponibile";
         });
 
         // Anteprima Immagine
@@ -422,7 +426,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         };
 
-        // Gestione PDF vs Immagine
+        // Gestione PDF vs Immagine con immagine di default
         const categoriaSelect = document.getElementById('categoria');
         const pdfContainer = document.getElementById('pdf-upload-container');
         const pdfInput = document.getElementById('pdf_file');
@@ -437,13 +441,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 pdfContainer.style.display = 'block';
                 pdfInput.required = true;
                 imageContainer.style.display = 'none';
+                
+                // Mostra immagine di default per PDF
+                showDefaultPDFImage();
             } else {
                 // Se non è PDF
                 pdfContainer.style.display = 'none';
                 pdfInput.required = false;
                 imageContainer.style.display = 'block';
+                
+                // Resetta l'anteprima se non c'è immagine
+                if (!imgInput.files || imgInput.files.length === 0) {
+                    previewContainer.classList.add('d-none');
+                }
             }
         });
+
+        // Funzione per mostrare immagine di default per PDF
+        function showDefaultPDFImage() {
+            const svgImage = `data:image/svg+xml;base64,${btoa('<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24"><rect width="100%" height="100%" fill="#f8f9fa"/><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2.5L18.5 9H13V4.5zM20 20H6V4h5v7h7v9z" fill="#dc3545"/><path d="M8 15h8v2H8zm0-4h8v2H8zm0-4h3v2H8z" fill="#dc3545"/><text x="12" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#6c757d">Documento PDF</text></svg>')}`;
+            
+            previewImg.src = svgImage;
+            previewContainer.classList.remove('d-none');
+        }
 
         // Anteprima nome PDF
         pdfInput.addEventListener('change', function() {
@@ -492,6 +512,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     alert('Il file deve avere estensione .pdf');
                     return false;
                 }
+            }
+        });
+
+        // Mostra immagine di default se PDF è già selezionato al caricamento della pagina
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectedOption = categoriaSelect.options[categoriaSelect.selectedIndex];
+            const categoriaName = selectedOption.getAttribute('data-name');
+            
+            if (categoriaName === 'pdf') {
+                showDefaultPDFImage();
             }
         });
     </script>
