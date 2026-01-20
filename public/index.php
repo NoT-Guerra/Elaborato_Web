@@ -524,9 +524,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                 <i class="bi bi-shield-lock me-3"></i> Pannello Admin
                             </a>
                         <?php endif; ?>
-                        <a href="#" class="list-group-item list-group-item-action border-0 py-3 px-4">
-                            <i class="bi bi-question-circle me-3"></i> Aiuto e Supporto
-                        </a>
                     </div>
                 </div>
             </div>
@@ -740,7 +737,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                             style="width: 48px; height: 48px;">
                             <i class="bi bi-book text-white fs-3"></i>
                         </div>
-                        <h5 class="fw-bold mb-0 text-body">UniMarket</h5>
+                        <h5 class="fw-bold mb-0 text-body">UniboMarket</h5>
                     </div>
                     <div class="text-body ms-1">Il marketplace dedicato agli studenti universitari per comprare e
                         vendere libri e appunti in modo semplice e sicuro.</div>
@@ -751,15 +748,14 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     <ul class="list-unstyled text-start text-md-center p-0">
                         <li class="mb-2"><a href="#" class="text-body text-decoration-none">Home</a></li>
                         <li class="mb-2"><a href="#" class="text-body text-decoration-none">Chi Siamo</a></li>
-                        <li class="mb-2"><a href="#" class="text-body text-decoration-none">FAQ</a></li>
                     </ul>
                 </div>
 
                 <div class="col-md-4 col-12 mb-3 mb-md-0 text-md-center">
                     <h5 class="fw-bold mb-3 text-start text-md-center">Contatti</h5>
                     <ul class="list-unstyled text-start text-md-center p-0">
-                        <li class="mb-2"><i class="bi bi-envelope me-2"></i><a href="mailto:info@unimarket.com"
-                                class="text-body text-decoration-none">info@unimarket.com</a></li>
+                        <li class="mb-2"><i class="bi bi-envelope me-2"></i><a href="mailto:info@unibomarket.com"
+                                class="text-body text-decoration-none">info@unibomarket.com</a></li>
                         <li class="mb-2"><i class="bi bi-phone me-2"></i><a href="tel:+391234567890"
                                 class="text-body text-decoration-none">+39 123 4567890</a></li>
                         <li class="mb-2"><i class="bi bi-geo-alt me-2"></i>Via Cesare Pavese, 50, 47521 Cesena FC</li>
@@ -781,7 +777,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 
             <div class="row">
                 <div class="col-12 text-center small text-muted">
-                    &copy; <?php echo date('Y'); ?> UniMarket. Tutti i diritti riservati.
+                    &copy; <?php echo date('Y'); ?> UniboMarket. Tutti i diritti riservati.
                 </div>
             </div>
         </div>
