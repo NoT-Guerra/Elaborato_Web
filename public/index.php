@@ -520,7 +520,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                         <?php endif; ?>
                         <hr class="my-0 opacity-10">
                         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-                            <a href="admin/index.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                            <a href="admin/admin.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                                 <i class="bi bi-shield-lock me-3"></i> Pannello Admin
                             </a>
                         <?php endif; ?>

@@ -14,7 +14,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // 1. Query aggiornata con i nomi corretti delle colonne (id_utente)
         // Recuperiamo l'hash della password salvato nel DB
         $stmt = $conn->prepare("
-            SELECT u.id_utente, u.nome, u.cognome, u.email, u.password, f.nome_facolta
+            SELECT u.id_utente, u.nome, u.cognome, u.email, u.password, u.isAdmin, f.nome_facolta
             FROM utenti u
             LEFT JOIN facolta f ON u.facolta_id = f.id_facolta
             WHERE u.email = ?
@@ -42,8 +42,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['cognome'] = $user['cognome'];
                 $_SESSION['nome_facolta'] = $user['nome_facolta'] ?? 'Nessuna';
 
-                // ADMIN = ID 1 (riferito a id_utente)
-                $_SESSION['is_admin'] = ($user['id_utente'] == 1);
+                // ADMIN check from database column
+                $_SESSION['is_admin'] = (bool) $user['isAdmin'];
 
                 header('Location: ../index.php');
                 exit;

@@ -1,25 +1,38 @@
 <?php
 session_start();
-require __DIR__ . '/../../app/config/database.php';
+require_once __DIR__ . '/../../app/config/database.php';
 
-if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
-    die('Accesso negato');
+header('Content-Type: application/json');
+
+// Controlla se l'utente è admin
+if (!isset($_SESSION['loggedin'], $_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
+    echo json_encode(['success' => false, 'error' => 'Accesso non autorizzato']);
+    exit;
 }
 
-if (!isset($_POST['user_id']) || !is_numeric($_POST['user_id'])) {
-    die('ID non valido');
+// Controlla se il campo user_id è presente
+if (!isset($_POST['user_id'])) {
+    echo json_encode(['success' => false, 'error' => 'ID utente mancante']);
+    exit;
 }
 
-$userId = (int) $_POST['user_id'];
+$user_id = intval($_POST['user_id']);
 
-// blocca auto-eliminazione
-if ($userId === $_SESSION['user_id']) {
-    die('Non puoi eliminare te stesso');
+// Impedisci di eliminare se stessi
+if ($user_id == $_SESSION['user_id']) {
+    echo json_encode(['success' => false, 'error' => 'Non puoi eliminare il tuo stesso account da qui']);
+    exit;
 }
 
+// Elimina l'utente
 $stmt = $conn->prepare("DELETE FROM utenti WHERE id_utente = ?");
-$stmt->bind_param("i", $userId);
-$stmt->execute();
+$stmt->bind_param("i", $user_id);
 
-header('Location: index.php?deleted=1');
-exit;
+if ($stmt->execute()) {
+    $stmt->close();
+    echo json_encode(['success' => true]);
+    exit;
+} else {
+    echo json_encode(['success' => false, 'error' => 'Errore durante l\'eliminazione dell\'utente']);
+    exit;
+}
