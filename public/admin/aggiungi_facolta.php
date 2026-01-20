@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once '../config/database.php';
+require_once __DIR__ . '/../../app/config/database.php';
 
 // Controlla se l'utente è admin
 if (!isset($_SESSION['loggedin'], $_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
-    header('Location: ../index.php');
+    header('Location: index.php');
     exit;
 }
 
@@ -33,7 +33,7 @@ $stmt->bind_param("s", $faculty);
 
 if ($stmt->execute()) {
     $stmt->close();
-    header('Location: ../admin.php?msg=faculty_added');
+    header('Location: index.php?msg=faculty_added');
     exit;
 } else {
     die('Errore durante l\'aggiunta della facoltà');

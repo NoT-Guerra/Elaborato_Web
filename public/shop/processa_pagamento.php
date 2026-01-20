@@ -1,11 +1,11 @@
 <?php
 session_start();
 
-require_once 'config/database.php';
+require_once __DIR__ . '/../../app/config/database.php';
 
 // Verifica se l'utente è loggato
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    header('Location: ../auth/login.php');
     exit;
 }
 
@@ -53,7 +53,7 @@ try {
         $annuncio_id = $item['annuncio_id'];
         $venditore_id = $item['venditore_id'];
         $prezzo = $item['prezzo'];
-        
+
         // Verifica se l'annuncio è ancora disponibile (doppio controllo per sicurezza)
         $check_sql = "SELECT is_attivo, is_venduto FROM annuncio WHERE id_annuncio = ? FOR UPDATE";
         $check_stmt = $conn->prepare($check_sql);
@@ -62,11 +62,11 @@ try {
         $check_result = $check_stmt->get_result();
         $annuncio = $check_result->fetch_assoc();
         $check_stmt->close();
-        
+
         if (!$annuncio || $annuncio['is_venduto'] || !$annuncio['is_attivo']) {
             throw new Exception("L'articolo '{$item['titolo']}' non è più disponibile.");
         }
-        
+
         // 1. Registra la vendita
         $insert_vendita = "INSERT INTO vendita (annuncio_id, acquirente_id, venditore_id, prezzo_vendita) 
                            VALUES (?, ?, ?, ?)";
@@ -74,7 +74,7 @@ try {
         $stmt_vendita->bind_param("iiid", $annuncio_id, $user_id, $venditore_id, $prezzo);
         $stmt_vendita->execute();
         $stmt_vendita->close();
-        
+
         // 2. Aggiorna lo stato dell'annuncio
         // Per prodotti digitali (PDF) rimangono attivi, per gli altri no
         if (strtolower($item['nome_categoria']) === 'pdf' || $item['is_digitale'] == 1) {
@@ -84,12 +84,12 @@ try {
             // Prodotti fisici: non più disponibili
             $update_annuncio = "UPDATE annuncio SET is_venduto = 1, is_attivo = 0 WHERE id_annuncio = ?";
         }
-        
+
         $stmt_update = $conn->prepare($update_annuncio);
         $stmt_update->bind_param("i", $annuncio_id);
         $stmt_update->execute();
         $stmt_update->close();
-        
+
         // 3. Rimuovi l'articolo dal carrello di TUTTI gli utenti (non solo dell'acquirente)
         // Perché se un prodotto fisico viene venduto, non può essere nel carrello di altri
         $delete_carrello = "DELETE FROM carrello WHERE annuncio_id = ?";
@@ -97,7 +97,7 @@ try {
         $stmt_delete->bind_param("i", $annuncio_id);
         $stmt_delete->execute();
         $stmt_delete->close();
-        
+
         // 4. Rimuovi anche dai preferiti (per prodotti fisici)
         if (strtolower($item['nome_categoria']) !== 'pdf' && $item['is_digitale'] != 1) {
             $delete_preferiti = "DELETE FROM preferiti WHERE annuncio_id = ?";
@@ -107,24 +107,24 @@ try {
             $stmt_pref->close();
         }
     }
-    
+
     // 5. Conferma la transazione
     $conn->commit();
-    
+
     // Prepara i dati per la pagina di conferma
     $_SESSION['purchase_success'] = true;
     $_SESSION['purchase_items'] = $cart_items;
     $_SESSION['purchase_total'] = $total;
     $_SESSION['purchase_date'] = date('d/m/Y H:i:s');
-    
+
     // Reindirizza alla pagina di conferma
     header('Location: conferma_acquisto.php');
     exit;
-    
+
 } catch (Exception $e) {
     // Annulla la transazione in caso di errore
     $conn->rollback();
-    
+
     $_SESSION['error_message'] = "Errore durante l'acquisto: " . $e->getMessage();
     header('Location: carrello.php');
     exit;

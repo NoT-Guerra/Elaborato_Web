@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once '../config/database.php';
+require_once __DIR__ . '/../../app/config/database.php';
 
 // Controlla se l'utente è admin
 if (!isset($_SESSION['loggedin'], $_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
@@ -29,7 +29,7 @@ $stmt->bind_param("si", $hashedPassword, $userId);
 
 if ($stmt->execute()) {
     $stmt->close();
-    header('Location: ../admin.php?msg=password_reset');
+    header('Location: ../admin/index.php?msg=password_reset');
     exit;
 } else {
     die('Errore durante il reset della password');

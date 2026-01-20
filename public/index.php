@@ -3,7 +3,7 @@
 session_start();
 
 // Connessione al database
-require_once 'config/database.php';
+require_once __DIR__ . '/../app/config/database.php';
 
 
 
@@ -398,7 +398,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 <!-- Azioni -->
                 <div class="d-flex align-items-center gap-2">
                     <!-- Bottone Preferiti - visibile solo su schermi medi e grandi -->
-                    <a href="preferiti.php"
+                    <a href="user/preferiti.php"
                         class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
                         <i class="bi bi-suit-heart"></i>
                         <?php
@@ -411,7 +411,8 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     </a>
 
                     <!-- Bottone Carrello - visibile solo su schermi medi e grandi -->
-                    <a href="carrello.php" class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
+                    <a href="shop/carrello.php"
+                        class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
                         <i class="bi bi-cart"></i>
                         <span id="cart-counter-header"
                             class="badge rounded-pill bg-danger <?php echo ($cart_count > 0) ? '' : 'd-none'; ?>">
@@ -426,16 +427,16 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                 <i class="bi bi-person-circle me-1"></i>
                                 <?php echo htmlspecialchars($_SESSION['nome'] . ' ' . $_SESSION['cognome']); ?>
                             </span>
-                            <a href="logout.php" class="btn btn-outline-dark d-flex align-items-center px-3">
+                            <a href="auth/logout.php" class="btn btn-outline-dark d-flex align-items-center px-3">
                                 <i class="bi bi-box-arrow-right me-2"></i>Logout
                             </a>
                         </div>
                     <?php else: ?>
                         <!-- Se l'utente NON è loggato, mostra Login e Registrati -->
-                        <a href="login.php" class="btn btn-outline-dark d-none d-md-flex align-items-center px-3">
+                        <a href="auth/login.php" class="btn btn-outline-dark d-none d-md-flex align-items-center px-3">
                             <i class="bi bi-box-arrow-in-right me-2"></i>Login
                         </a>
-                        <a id="btn-register" href="register.php"
+                        <a id="btn-register" href="auth/register.php"
                             class="btn btn-outline-dark d-none d-md-flex align-items-center gap-2 px-2 px-sm-3">
                             <i class="bi bi-person-add"></i>
                             <span class="ms-1">Registrati</span>
@@ -443,7 +444,8 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     <?php endif; ?>
 
                     <!-- Bottone Pubblica - già responsive -->
-                    <a href="pubblica.php" class="btn btn-dark d-flex align-items-center justify-content-center px-3">
+                    <a href="shop/pubblica.php"
+                        class="btn btn-dark d-flex align-items-center justify-content-center px-3">
                         <i class="bi bi-plus-circle"></i>
                         <span class="d-none d-md-inline ms-2">Pubblica</span>
                     </a>
@@ -479,17 +481,17 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                 </h6>
                                 <small class="text-muted"><?php echo htmlspecialchars($_SESSION['email']); ?></small>
                             </div>
-                            <a href="logout.php"
+                            <a href="auth/logout.php"
                                 class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
                                 <i class="bi bi-box-arrow-right"></i> Logout
                             </a>
                         <?php else: ?>
                             <!-- Se NON loggato, mostra Login e Registrati nel menu mobile -->
-                            <a href="login.php"
+                            <a href="auth/login.php"
                                 class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
                                 <i class="bi bi-box-arrow-in-right"></i> Login
                             </a>
-                            <a href="register.php"
+                            <a href="auth/register.php"
                                 class="btn btn-outline-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
                                 <i class="bi bi-person-add"></i> Registrati
                             </a>
@@ -499,24 +501,26 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     <hr class="my-0 opacity-10">
 
                     <div class="list-group list-group-flush">
-                        <a href="preferiti.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                        <a href="user/preferiti.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                             <i class="bi bi-suit-heart me-3"></i> Preferiti
                         </a>
-                        <a href="carrello.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                        <a href="shop/carrello.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                             <i class="bi bi-cart me-3"></i> Carrello
                         </a>
-                            <!-- Aggiungi questo link -->
-                         <a href="miei_acquisti.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
-                       <i class="bi bi-bag-check me-3"></i> I miei acquisti
-                      </a>
+                        <!-- Aggiungi questo link -->
+                        <a href="user/miei_acquisti.php"
+                            class="list-group-item list-group-item-action border-0 py-3 px-4">
+                            <i class="bi bi-bag-check me-3"></i> I miei acquisti
+                        </a>
                         <?php if ($is_logged_in): ?>
-                            <a href="miei_annunci.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                            <a href="user/miei_annunci.php"
+                                class="list-group-item list-group-item-action border-0 py-3 px-4">
                                 <i class="bi bi-collection me-3"></i> I miei annunci
                             </a>
                         <?php endif; ?>
                         <hr class="my-0 opacity-10">
                         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-                            <a href="admin.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                            <a href="admin/index.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                                 <i class="bi bi-shield-lock me-3"></i> Pannello Admin
                             </a>
                         <?php endif; ?>
@@ -629,8 +633,17 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                 }
                             }
 
-                            // URL immagine di default se non presente
-                            $immagine_url = $annuncio['immagine_url'] ?? 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600';
+                            // URL immagine: dal DB (locale o remota) o default
+                            $img_db = $annuncio['immagine_url'];
+                            if (!empty($img_db)) {
+                                if (str_starts_with($img_db, 'http')) {
+                                    $immagine_url = $img_db;
+                                } else {
+                                    $immagine_url = 'assets/img/' . basename($img_db);
+                                }
+                            } else {
+                                $immagine_url = 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600';
+                            }
                             ?>
                             <div class="col-xl-4 col-lg-6 annuncio"
                                 data-title="<?php echo htmlspecialchars($annuncio['titolo']); ?>"
@@ -646,7 +659,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                         <i class="bi <?php echo $heart_class; ?>"></i>
                                     </button>
                                     <!-- Link attorno all'immagine -->
-                                    <a href="annuncio.php?id=<?php echo $annuncio['id_annuncio']; ?>"
+                                    <a href="shop/annuncio.php?id=<?php echo $annuncio['id_annuncio']; ?>"
                                         class="img-wrapper d-block text-decoration-none">
                                         <img src="<?php echo $immagine_url; ?>"
                                             alt="<?php echo htmlspecialchars($annuncio['titolo']); ?>" class="w-100 h-100">
@@ -707,7 +720,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                             </div>
                             <h5 class="text-muted">Nessun annuncio disponibile</h5>
                             <p class="text-muted">Sii il primo a pubblicare un annuncio!</p>
-                            <a href="pubblica.php" class="btn btn-primary">
+                            <a href="shop/pubblica.php" class="btn btn-primary">
                                 <i class="bi bi-plus-circle me-2"></i>Pubblica annuncio
                             </a>
                         </div>
@@ -894,7 +907,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 
                 // Determina azione basata sullo stato attuale
                 const isAdded = icon.classList.contains('bi-suit-heart-fill');
-                const url = isAdded ? 'rimuovi_preferiti.php' : 'aggiungi_preferiti.php';
+                const url = isAdded ? 'user/rimuovi_preferiti.php' : 'user/aggiungi_preferiti.php';
 
                 fetch(url, {
                     method: 'POST',
@@ -964,7 +977,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 e.preventDefault();
                 const idAnnuncio = this.dataset.id;
 
-                fetch('aggiungi_carrello.php', {
+                fetch('shop/aggiungi_carrello.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id_annuncio: idAnnuncio })

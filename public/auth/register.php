@@ -2,7 +2,7 @@
 // register.php
 
 session_start();
-require_once 'config/database.php'; // Il tuo file di configurazione del database
+require_once __DIR__ . '/../../app/config/database.php'; // Il tuo file di configurazione del database
 
 // Inizializza le variabili
 $nome = $cognome = $email = $facolta = $password = $confirm_password = '';
@@ -149,7 +149,7 @@ if ($result) {
 
         <!-- HEADER -->
         <header class="d-flex align-items-center bg-body p-3 border-bottom sticky-top">
-            <a href="index.php" class="btn btn-link text-body p-0 me-3" aria-label="Torna indietro">
+            <a href="../index.php" class="btn btn-link text-body p-0 me-3" aria-label="Torna indietro">
                 <i class="bi bi-arrow-left fs-4"></i>
             </a>
 

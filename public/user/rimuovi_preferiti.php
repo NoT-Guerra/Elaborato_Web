@@ -17,11 +17,7 @@ if ($isAjax) {
 }
 
 // --- CONFIGURAZIONE DATABASE ---
-$host = 'localhost';
-$db = 'marketplace_universitario';
-$user = 'root';
-$pass = '';
-$charset = 'utf8mb4';
+require_once __DIR__ . '/../../app/config/database.php';
 
 $response = ['success' => false, 'message' => ''];
 $redirectUrl = 'preferiti.php';
@@ -32,26 +28,11 @@ if (!isset($_SESSION['user_id'])) {
         echo json_encode(['success' => false, 'message' => 'Devi essere loggato.']);
         exit;
     } else {
-        header('Location: login.php');
+        header('Location: ../auth/login.php');
         exit;
     }
 }
 $id_utente_loggato = $_SESSION['user_id'];
-
-try {
-    $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
-} catch (\PDOException $e) {
-    if ($isAjax) {
-        echo json_encode(['success' => false, 'message' => "Database error: " . $e->getMessage()]);
-        exit;
-    } else {
-        die("Database error");
-    }
-}
 
 // --- LOGICA RIMOZIONE ---
 $id_annuncio = null;
@@ -72,16 +53,22 @@ if ($isAjax) {
 
 if ($id_annuncio) {
     try {
-        $stmt = $pdo->prepare("DELETE FROM preferiti WHERE utente_id = :u AND annuncio_id = :a");
-        $stmt->execute(['u' => $id_utente_loggato, 'a' => $id_annuncio]);
+        $stmt = $conn->prepare("DELETE FROM preferiti WHERE utente_id = ? AND annuncio_id = ?");
+        $stmt->bind_param("ii", $id_utente_loggato, $id_annuncio);
+        $stmt->execute();
+        $stmt->close();
 
         $response['success'] = true;
         $response['message'] = "Rimosso dai preferiti.";
 
         // Conta
-        $countStmt = $pdo->prepare("SELECT COUNT(*) FROM preferiti WHERE utente_id = :u");
-        $countStmt->execute(['u' => $id_utente_loggato]);
-        $response['count'] = $countStmt->fetchColumn();
+        $countStmt = $conn->prepare("SELECT COUNT(*) FROM preferiti WHERE utente_id = ?");
+        $countStmt->bind_param("i", $id_utente_loggato);
+        $countStmt->execute();
+        $countStmt->bind_result($count);
+        $countStmt->fetch();
+        $countStmt->close();
+        $response['count'] = $count;
 
     } catch (Exception $e) {
         $response['message'] = "Errore durante la rimozione.";

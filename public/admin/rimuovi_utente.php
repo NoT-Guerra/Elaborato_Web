@@ -1,6 +1,6 @@
 <?php
 session_start();
-require 'config/database.php';
+require __DIR__ . '/../../app/config/database.php';
 
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     die('Accesso negato');
@@ -21,5 +21,5 @@ $stmt = $conn->prepare("DELETE FROM utenti WHERE id_utente = ?");
 $stmt->bind_param("i", $userId);
 $stmt->execute();
 
-header('Location: admin.php?deleted=1');
+header('Location: index.php?deleted=1');
 exit;

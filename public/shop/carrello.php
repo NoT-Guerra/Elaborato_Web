@@ -2,8 +2,6 @@
 // 1. Inizio sessione (deve essere la primissima cosa)
 session_start();
 
-// inizio modifica
-
 // Mostra messaggi di errore/successo
 if (isset($_SESSION['error_message'])) {
     echo '<div class="alert alert-danger alert-dismissible fade show m-2" role="alert">
@@ -21,31 +19,13 @@ if (isset($_SESSION['success_message'])) {
     unset($_SESSION['success_message']);
 }
 
-// fine modifica
-
 // --- CONFIGURAZIONE DATABASE ---
-$host = 'localhost';
-$db = 'marketplace_universitario';
-$user = 'root';
-$pass = '';
-$charset = 'utf8mb4';
-
-try {
-    $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
-} catch (\PDOException $e) {
-    die("Errore di connessione: " . $e->getMessage());
-}
+require_once __DIR__ . '/../../app/config/database.php';
 
 // --- CONTROLLO SESSIONE E UTENTE ---
 // Verifica se l'utente è loggato. 
-// Se non lo è, per ora forziamo l'ID 1 per i tuoi test, 
-// ma ti stampo un avviso se la sessione è vuota.
 if (!isset($_SESSION['user_id'])) {
-    // NOTA: In produzione qui metteresti header('Location: login.php');
+    // NOTA: In produzione qui metteresti header('Location: ../auth/login.php');
     $id_utente_loggato = 1;
 } else {
     $id_utente_loggato = $_SESSION['user_id'];
@@ -63,22 +43,37 @@ $sql = "SELECT
         JOIN annuncio a ON c.annuncio_id = a.id_annuncio
         LEFT JOIN corso_studio cs ON a.corso_id = cs.id_corso
         LEFT JOIN facolta f ON a.facolta_id = f.id_facolta
-        WHERE c.utente_id = :utente_id";
+        WHERE c.utente_id = ?";
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute(['utente_id' => $id_utente_loggato]);
-$db_items = $stmt->fetchAll();
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $id_utente_loggato);
+$stmt->execute();
+$result = $stmt->get_result();
+$db_items = $result->fetch_all(MYSQLI_ASSOC);
+$stmt->close();
 
 // Trasformiamo i dati per il template HTML
 $cart_items = [];
 foreach ($db_items as $row) {
+    // Gestione immagine: se inizia con http usa quella, altrimenti aggiungi prefisso assets e usa basename
+    $img_db = $row['immagine_url'];
+    if (!empty($img_db)) {
+        if (str_starts_with($img_db, 'http')) {
+            $imgUrl = $img_db;
+        } else {
+            $imgUrl = '../assets/img/' . basename($img_db);
+        }
+    } else {
+        $imgUrl = 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600';
+    }
+
     $cart_items[] = [
         'id' => $row['id_annuncio'],
         'title' => $row['titolo'],
         'subtitle' => $row['nome_corso'] ?? 'Corso non specificato',
         'university' => $row['nome_facolta'] ?? 'Facoltà non specificata',
         'price' => (float) $row['prezzo'],
-        'image' => !empty($row['immagine_url']) ? $row['immagine_url'] : 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e'
+        'image' => $imgUrl,
     ];
 }
 
@@ -119,7 +114,7 @@ function format_currency($amount)
 
     <div class="container-fluid p-0">
         <header class="d-flex align-items-center bg-body m-0 p-3 border-bottom sticky-top">
-            <a href="index.php" class="btn btn-link text-body p-0 me-3"><i class="bi bi-arrow-left fs-4"></i></a>
+            <a href="../index.php" class="btn btn-link text-body p-0 me-3"><i class="bi bi-arrow-left fs-4"></i></a>
             <div>
                 <div class="fw-bold">Il tuo carrello</div>
                 <div class="text-muted small"><?php echo $item_count; ?> articolo/i</div>
@@ -159,18 +154,16 @@ function format_currency($amount)
                     <span class="fw-bold fs-5"><?php echo format_currency($total); ?></span>
                 </div>
                 <form action="processa_pagamento.php" method="POST">
-                    <!-- inizio modifica -->
-                <button type="submit" class="btn btn-primary w-100 py-3 mt-3 fw-bold">
-                <i class="bi bi-credit-card me-2"></i>Procedi al pagamento
-              </button>
+                    <button type="submit" class="btn btn-primary w-100 py-3 mt-3 fw-bold">
+                        <i class="bi bi-credit-card me-2"></i>Procedi al pagamento
+                    </button>
                 </form>
-                <!-- fine modifica -->
             </div>
         <?php else: ?>
             <div class="text-center py-5">
                 <i class="bi bi-cart3 fs-1 text-muted"></i>
                 <p class="mt-3 text-muted">Il tuo carrello è vuoto.</p>
-                <a href="index.php" class="btn btn-primary mt-3">Inizia lo shopping</a>
+                <a href="../index.php" class="btn btn-primary mt-3">Inizia lo shopping</a>
             </div>
         <?php endif; ?>
     </div>

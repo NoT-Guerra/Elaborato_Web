@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once 'config/database.php';
+require_once __DIR__ . '/../../app/config/database.php';
 
 // Verifica se l'utente è loggato
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header('Location: login.php');
+    header('Location: ../auth/login.php');
     exit;
 }
 
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $condizione_id = intval($_POST['condizioni'] ?? 0); // Attenzione al name="condizioni"
     $facolta_id = !empty($_POST['facolta']) ? intval($_POST['facolta']) : null;
     $corso_id = !empty($_POST['corso']) ? intval($_POST['corso']) : null;
-    
+
     // Per sapere se è una categoria PDF
     $categoria_nome = '';
     $is_pdf = false;
@@ -66,7 +66,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Gestione Immagine
         $immagine_url = null;
         if (isset($_FILES['immagine']) && $_FILES['immagine']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = '../images/';
+            $uploadDir = '../assets/img/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $dest_path = $uploadDir . $newFileName;
 
                 if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                    $immagine_url = "../images/" . $newFileName;
+                    $immagine_url = "assets/img/" . $newFileName;
                 } else {
                     $message = 'Errore nel caricamento immagine.';
                     $message_type = 'danger';
@@ -91,17 +91,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = 'Estensione file non supportata.';
                 $message_type = 'danger';
             }
-       } elseif ($is_pdf) {
-    // Se è PDF e non è stata caricata un'immagine, usa immagine di default
-    $immagine_url = "../images/pdf-default.png";
-}
+        } elseif ($is_pdf) {
+            // Se è PDF e non è stata caricata un'immagine, usa immagine di default
+            $immagine_url = "assets/img/pdf-default.png";
+        }
 
-        
+
         // Gestione PDF
         $pdf_path = null;
         $original_pdf_name = null;
         if ($is_pdf && isset($_FILES['pdf_file']) && $_FILES['pdf_file']['error'] === UPLOAD_ERR_OK) {
-            $uploadDir = '../pdfs/';
+            $uploadDir = '../assets/pdf/';
             if (!is_dir($uploadDir)) {
                 mkdir($uploadDir, 0755, true);
             }
@@ -110,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $fileName = $_FILES['pdf_file']['name'];
             $fileNameCmps = explode(".", $fileName);
             $fileExtension = strtolower(end($fileNameCmps));
-            
+
             // Verifica che sia un PDF
             if ($fileExtension === 'pdf') {
                 // Usa un nome univoco per il file
@@ -118,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $dest_path = $uploadDir . $newFileName;
 
                 if (move_uploaded_file($fileTmpPath, $dest_path)) {
-                    $pdf_path = "../pdfs/" . $newFileName;
+                    $pdf_path = "assets/pdf/" . $newFileName;
                     $original_pdf_name = $fileName; // Conserviamo il nome originale
                 } else {
                     $message = 'Errore nel caricamento del PDF.';
@@ -133,7 +133,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (empty($message)) {
             // Inizia transazione
             $conn->begin_transaction();
-            
+
             try {
                 $venditore_id = $_SESSION['user_id'];
                 $sql = "INSERT INTO annuncio (titolo, descrizione, prezzo, categoria_id, condizione_id, immagine_url, venditore_id, corso_id, facolta_id, is_digitale) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -145,7 +145,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     if ($stmt->execute()) {
                         $annuncio_id = $stmt->insert_id;
-                        
+
                         // Se è PDF, salva il percorso del file
                         if ($is_pdf && $pdf_path) {
                             $sql_pdf = "INSERT INTO annuncio_pdf (annuncio_id, pdf_path, original_filename) VALUES (?, ?, ?)";
@@ -156,11 +156,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             }
                             $stmt_pdf->close();
                         }
-                        
+
                         $conn->commit();
                         $message = "Annuncio pubblicato con successo! Verrai reindirizzato alla home tra 3 secondi...";
                         $message_type = "success";
-                        header("refresh:3;url=index.php");
+                        header("refresh:3;url=../index.php");
                     } else {
                         throw new Exception("Errore database: " . $stmt->error);
                     }
@@ -228,7 +228,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <header class="container-fluid bg-body border-bottom sticky-top">
         <div class="container-fluid d-flex align-items-center gap-3 p-2">
-            <a href="index.php" class="btn btn-link text-body p-0" aria-label="Torna al menu">
+            <a href="../index.php" class="btn btn-link text-body p-0" aria-label="Torna al menu">
                 <i class="bi bi-arrow-left fs-4"></i>
             </a>
             <div>
@@ -278,8 +278,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <select id="categoria" name="categoria" class="form-select" required>
                                 <option value="" selected disabled>Scegli...</option>
                                 <?php foreach ($categorie as $cat): ?>
-                                    <option value="<?php echo $cat['id_categoria']; ?>" 
-                                            data-name="<?php echo strtolower($cat['nome_categoria']); ?>">
+                                    <option value="<?php echo $cat['id_categoria']; ?>"
+                                        data-name="<?php echo strtolower($cat['nome_categoria']); ?>">
                                         <?php echo htmlspecialchars($cat['nome_categoria']); ?>
                                     </option>
                                 <?php endforeach; ?>
@@ -292,7 +292,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <option value="" selected disabled>Scegli...</option>
                                 <?php foreach ($condizioni as $cond): ?>
                                     <option value="<?php echo $cond['id_condizione']; ?>">
-                                        <?php echo htmlspecialchars($cond['nome_condizione']); ?></option>
+                                        <?php echo htmlspecialchars($cond['nome_condizione']); ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                             <div class="invalid-feedback">Seleziona le condizioni.</div>
@@ -306,7 +307,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <option value="">Tutte le facoltà</option>
                                 <?php foreach ($facolta_list as $f): ?>
                                     <option value="<?php echo $f['id_facolta']; ?>">
-                                        <?php echo htmlspecialchars($f['nome_facolta']); ?></option>
+                                        <?php echo htmlspecialchars($f['nome_facolta']); ?>
+                                    </option>
                                 <?php endforeach; ?>
                             </select>
                         </div>
@@ -331,29 +333,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label for="immagine" class="form-label">Immagine prodotto</label>
                         <input type="file" class="form-control" id="immagine" name="immagine" accept="image/*">
                         <div class="form-text">Carica una foto del prodotto (JPG, PNG).</div>
-                        
+
                         <!-- Anteprima immagine -->
                         <div id="image-preview-container" class="mt-2 d-none">
-                            <img id="image-preview" src="#" alt="Anteprima" class="img-preview" style="max-width: 100%; height: 200px;">
+                            <img id="image-preview" src="#" alt="Anteprima" class="img-preview"
+                                style="max-width: 100%; height: 200px;">
                         </div>
                     </div>
-                    
+
                     <!-- Container per upload PDF (nascosto inizialmente) -->
                     <div id="pdf-upload-container" class="mb-3" style="display: none;">
-                        <label for="pdf_file" class="form-label">Carica file PDF <span class="text-danger">*</span></label>
+                        <label for="pdf_file" class="form-label">Carica file PDF <span
+                                class="text-danger">*</span></label>
                         <input type="file" class="form-control" id="pdf_file" name="pdf_file" accept=".pdf,.PDF">
                         <div class="form-text">
                             Dimensione massima: 10MB. Il file PDF sarà disponibile per il download dopo l'acquisto.
                         </div>
-                        
+
                         <!-- Anteprima nome PDF -->
                         <div id="pdf-preview" class="mt-2"></div>
                     </div>
 
                     <div class="mt-4 d-grid gap-2">
-                        <a id="btn-annulla" href="index.php" class="btn btn-outline-secondary w-100">Annulla</a>
+                        <a id="btn-annulla" href="../index.php" class="btn btn-outline-secondary w-100">Annulla</a>
                         <!-- Pulsante Blu come richiesto -->
-                        <button id="btn-pubblica" type="submit" class="btn btn-primary w-100 fw-bold">Pubblica annuncio</button>
+                        <button id="btn-pubblica" type="submit" class="btn btn-primary w-100 fw-bold">Pubblica
+                            annuncio</button>
                     </div>
 
                 </form>
@@ -432,16 +437,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const pdfInput = document.getElementById('pdf_file');
         const imageContainer = document.getElementById('image-upload-container');
 
-        categoriaSelect.addEventListener('change', function() {
+        categoriaSelect.addEventListener('change', function () {
             const selectedOption = this.options[this.selectedIndex];
             const categoriaName = selectedOption.getAttribute('data-name');
-            
+
             if (categoriaName === 'pdf') {
                 // Se è PDF
                 pdfContainer.style.display = 'block';
                 pdfInput.required = true;
                 imageContainer.style.display = 'none';
-                
+
                 // Mostra immagine di default per PDF
                 showDefaultPDFImage();
             } else {
@@ -449,7 +454,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 pdfContainer.style.display = 'none';
                 pdfInput.required = false;
                 imageContainer.style.display = 'block';
-                
+
                 // Resetta l'anteprima se non c'è immagine
                 if (!imgInput.files || imgInput.files.length === 0) {
                     previewContainer.classList.add('d-none');
@@ -459,14 +464,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Funzione per mostrare immagine di default per PDF
         function showDefaultPDFImage() {
-            const svgImage = `data:image/svg+xml;base64,${btoa('<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24"><rect width="100%" height="100%" fill="#f8f9fa"/><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2.5L18.5 9H13V4.5zM20 20H6V4h5v7h7v9z" fill="#dc3545"/><path d="M8 15h8v2H8zm0-4h8v2H8zm0-4h3v2H8z" fill="#dc3545"/><text x="12" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#6c757d">Documento PDF</text></svg>')}`;
-            
+            const svgContent = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24"><rect width="100%" height="100%" fill="#f8f9fa"/><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2.5L18.5 9H13V4.5zM20 20H6V4h5v7h7v9z" fill="#dc3545"/><path d="M8 15h8v2H8zm0-4h8v2H8zm0-4h3v2H8z" fill="#dc3545"/><text x="12" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#6c757d">Documento PDF</text></svg>';
+            const svgImage = `data:image/svg+xml;base64,${btoa(svgContent)}`;
+
             previewImg.src = svgImage;
             previewContainer.classList.remove('d-none');
         }
 
         // Anteprima nome PDF
-        pdfInput.addEventListener('change', function() {
+        pdfInput.addEventListener('change', function () {
             const pdfPreview = document.getElementById('pdf-preview');
             if (this.files && this.files[0]) {
                 const fileName = this.files[0].name;
@@ -485,10 +491,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
 
         // Validazione form
-        document.getElementById('form-annuncio').addEventListener('submit', function(e) {
+        document.getElementById('form-annuncio').addEventListener('submit', function (e) {
             const selectedOption = categoriaSelect.options[categoriaSelect.selectedIndex];
             const categoriaName = selectedOption.getAttribute('data-name');
-            
+
             if (categoriaName === 'pdf') {
                 if (!pdfInput.files || pdfInput.files.length === 0) {
                     e.preventDefault();
@@ -496,7 +502,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     pdfInput.focus();
                     return false;
                 }
-                
+
                 // Controlla dimensione massima (10MB)
                 const maxSize = 10 * 1024 * 1024;
                 if (pdfInput.files[0].size > maxSize) {
@@ -504,7 +510,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     alert('Il file PDF non può superare 10MB.');
                     return false;
                 }
-                
+
                 // Controlla estensione
                 const fileName = pdfInput.files[0].name.toLowerCase();
                 if (!fileName.endsWith('.pdf')) {
@@ -516,10 +522,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
 
         // Mostra immagine di default se PDF è già selezionato al caricamento della pagina
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const selectedOption = categoriaSelect.options[categoriaSelect.selectedIndex];
             const categoriaName = selectedOption.getAttribute('data-name');
-            
+
             if (categoriaName === 'pdf') {
                 showDefaultPDFImage();
             }

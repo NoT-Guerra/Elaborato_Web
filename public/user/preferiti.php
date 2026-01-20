@@ -2,28 +2,14 @@
 session_start();
 
 // --- CONFIGURAZIONE DATABASE ---
-$host = 'localhost';
-$db = 'marketplace_universitario';
-$user = 'root';
-$pass = '';
-$charset = 'utf8mb4';
+require_once __DIR__ . '/../../app/config/database.php';
 
 // --- CONTROLLO UTENTE ---
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    header('Location: ../auth/login.php');
     exit;
 }
 $id_utente_loggato = $_SESSION['user_id'];
-
-try {
-    $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
-} catch (\PDOException $e) {
-    die("Errore di connessione: " . $e->getMessage());
-}
 
 // --- RECUPERO PREFERITI ---
 $sql = "SELECT 
@@ -32,7 +18,6 @@ $sql = "SELECT
             a.prezzo, 
             a.immagine_url,
             a.descrizione,
-            a.data_pubblicazione,
             a.data_pubblicazione,
             -- a.is_digitale removed
             cs.nome_corso,
@@ -45,18 +30,24 @@ $sql = "SELECT
         LEFT JOIN facolta f ON a.facolta_id = f.id_facolta
         JOIN categoria_prodotto cp ON a.categoria_id = cp.id_categoria
         JOIN condizione_prodotto cond ON a.condizione_id = cond.id_condizione
-        WHERE p.utente_id = :utente_id";
+        WHERE p.utente_id = ?";
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute(['utente_id' => $id_utente_loggato]);
-$favorite_items = $stmt->fetchAll();
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $id_utente_loggato);
+$stmt->execute();
+$result = $stmt->get_result();
+$favorite_items = $result->fetch_all(MYSQLI_ASSOC);
 $item_count = count($favorite_items);
+$stmt->close();
 
 // Conta articoli nel carrello per header
 $cart_count = 0;
-$stmtCart = $pdo->prepare("SELECT COUNT(*) FROM carrello WHERE utente_id = :u");
-$stmtCart->execute(['u' => $id_utente_loggato]);
-$cart_count = $stmtCart->fetchColumn();
+$stmtCart = $conn->prepare("SELECT COUNT(*) FROM carrello WHERE utente_id = ?");
+$stmtCart->bind_param("i", $id_utente_loggato);
+$stmtCart->execute();
+$stmtCart->bind_result($cart_count);
+$stmtCart->fetch();
+$stmtCart->close();
 
 // Conta preferiti (sarà uguale a item_count, ma lo facciamo per coerenza con index)
 $fav_count = $item_count;
@@ -76,6 +67,13 @@ function format_currency($amount)
     <title>I tuoi Preferiti - UniboMarket</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script>
+        // Gestione tema
+        (function () {
+            const tema = localStorage.getItem('temaPreferito') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-bs-theme', tema);
+        })();
+    </script>
     <style>
         .annuncio.nascosto {
             display: none !important;
@@ -229,26 +227,19 @@ function format_currency($amount)
             color: #e0e0e0 !important;
         }
     </style>
-    <script>
-        // Gestione tema
-        (function () {
-            const tema = localStorage.getItem('temaPreferito') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
-            document.documentElement.setAttribute('data-bs-theme', tema);
-        })();
-    </script>
 </head>
 
 <body class="bg-body">
 
     <!-- Header (semplificato ma coerente) -->
     <header class="d-flex align-items-center bg-body m-0 p-3 border-bottom sticky-top shadow-sm">
-        <a href="index.php" class="btn btn-link text-body p-0 me-3"><i class="bi bi-arrow-left fs-4"></i></a>
+        <a href="../index.php" class="btn btn-link text-body p-0 me-3"><i class="bi bi-arrow-left fs-4"></i></a>
         <div class="flex-grow-1">
             <div class="fw-bold fs-5">I tuoi Preferiti</div>
             <div class="text-muted small"><?php echo $item_count; ?> articolo/i salvati</div>
         </div>
 
-        <a href="carrello.php" class="btn btn-link text-body position-relative">
+        <a href="../shop/carrello.php" class="btn btn-link text-body position-relative">
             <i class="bi bi-cart fs-4"></i>
             <?php if ($cart_count > 0): ?>
                 <span id="cart-counter-header" class="badge rounded-pill bg-danger">
@@ -279,7 +270,16 @@ function format_currency($amount)
                         $tempo_pubblicazione = ($differenza < 7) ? floor($differenza) . ' giorni fa' : $data_pubblicazione;
                     }
 
-                    $immagine_url = $annuncio['immagine_url'] ?? 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e';
+                    $img_db = $annuncio['immagine_url'];
+                    if (!empty($img_db)) {
+                        if (str_starts_with($img_db, 'http')) {
+                            $immagine_url = $img_db;
+                        } else {
+                            $immagine_url = '../assets/img/' . basename($img_db);
+                        }
+                    } else {
+                        $immagine_url = 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600';
+                    }
                     ?>
                     <div class="col-xl-3 col-lg-4 col-md-6">
                         <div class="card h-100 border-0 shadow-sm card-annuncio">
@@ -346,7 +346,7 @@ function format_currency($amount)
             <div class="text-center py-5">
                 <i class="bi bi-suit-heart fs-1 text-muted"></i>
                 <p class="mt-3 text-muted">Non hai ancora aggiunto nulla ai preferiti.</p>
-                <a href="index.php" class="btn btn-primary mt-3">Esplora annunci</a>
+                <a href="../index.php" class="btn btn-primary mt-3">Esplora annunci</a>
             </div>
         <?php endif; ?>
     </div>
@@ -384,7 +384,7 @@ function format_currency($amount)
         document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
             btn.addEventListener('click', function () {
                 const id = this.dataset.id;
-                fetch('aggiungi_carrello.php', {
+                fetch('../shop/aggiungi_carrello.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ id_annuncio: id })

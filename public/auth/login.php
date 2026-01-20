@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once 'config/database.php';
+require_once __DIR__ . '/../../app/config/database.php';
 
 $error_message = '';
 
@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // ADMIN = ID 1 (riferito a id_utente)
                 $_SESSION['is_admin'] = ($user['id_utente'] == 1);
 
-                header('Location: index.php');
+                header('Location: ../index.php');
                 exit;
             } else {
                 // Per sicurezza, usiamo un messaggio generico
@@ -76,14 +76,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         })();
     </script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="/style/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 
 <body>
     <div class="container-fluid">
         <div class="row">
             <header class="p-3 border-bottom mb-2 bg-body">
-                <a href="index.php" class="text-body text-decoration-none d-flex align-items-center">
+                <a href="../index.php" class="text-body text-decoration-none d-flex align-items-center">
                     <i class="bi bi-arrow-left me-2"></i>Torna al marketplace
                 </a>
             </header>

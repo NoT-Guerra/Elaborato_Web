@@ -2,24 +2,10 @@
 session_start();
 
 // Configurazione database
-$host = 'localhost';
-$db = 'marketplace_universitario';
-$user = 'root';
-$pass = '';
-$charset = 'utf8mb4';
+require_once __DIR__ . '/../../app/config/database.php';
 
 // Check login status globally first
 $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
-
-try {
-    $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
-    $pdo = new PDO($dsn, $user, $pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
-} catch (\PDOException $e) {
-    die("Errore di connessione: " . $e->getMessage());
-}
 
 // Verifica se è stato passato l'ID annuncio
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
@@ -44,13 +30,16 @@ $sql = "SELECT
         LEFT JOIN facolta f ON a.facolta_id = f.id_facolta
         LEFT JOIN corso_studio cs ON a.corso_id = cs.id_corso
         JOIN utenti u ON a.venditore_id = u.id_utente
-        WHERE a.id_annuncio = :id 
+        WHERE a.id_annuncio = ? 
         AND a.is_attivo = 1 
         AND a.is_venduto = 0";
 
-$stmt = $pdo->prepare($sql);
-$stmt->execute(['id' => $annuncio_id]);
-$annuncio = $stmt->fetch();
+$stmt = $conn->prepare($sql);
+$stmt->bind_param("i", $annuncio_id);
+$stmt->execute();
+$result = $stmt->get_result();
+$annuncio = $result->fetch_assoc();
+$stmt->close();
 
 if (!$annuncio) {
     die("Annuncio non trovato o non disponibile.");
@@ -62,25 +51,35 @@ $data_pubblicazione = date('d/m/Y H:i', strtotime($annuncio['data_pubblicazione'
 // Conta articoli nel carrello (se l'utente è loggato)
 $cart_count = 0;
 if (isset($_SESSION['user_id'])) {
-    $countStmt = $pdo->prepare("SELECT COUNT(*) FROM carrello WHERE utente_id = :user_id");
-    $countStmt->execute(['user_id' => $_SESSION['user_id']]);
-    $cart_count = $countStmt->fetchColumn();
+    $countStmt = $conn->prepare("SELECT COUNT(*) FROM carrello WHERE utente_id = ?");
+    $countStmt->bind_param("i", $_SESSION['user_id']);
+    $countStmt->execute();
+    $countStmt->bind_result($cart_count);
+    $countStmt->fetch();
+    $countStmt->close();
 }
 
 // Verifica se è nei preferiti
 $is_favorite = false;
 if ($is_logged_in) {
-    $stmtFav = $pdo->prepare("SELECT COUNT(*) FROM preferiti WHERE utente_id = :u AND annuncio_id = :a");
-    $stmtFav->execute(['u' => $_SESSION['user_id'], 'a' => $annuncio_id]);
-    $is_favorite = $stmtFav->fetchColumn() > 0;
+    $stmtFav = $conn->prepare("SELECT COUNT(*) FROM preferiti WHERE utente_id = ? AND annuncio_id = ?");
+    $stmtFav->bind_param("ii", $_SESSION['user_id'], $annuncio_id);
+    $stmtFav->execute();
+    $stmtFav->bind_result($favCountVal);
+    $stmtFav->fetch();
+    $is_favorite = $favCountVal > 0;
+    $stmtFav->close();
 }
 
-// Gestione preferiti (conteggio totale per header)
+// Gestione preferiti (conteggio totale per header) - Nota: questo potrebbe essere ridondante se non usato nell'header qui, ma lo manteniamo per coerenza
 $fav_count = 0;
 if ($is_logged_in) {
-    $stmt = $pdo->prepare("SELECT COUNT(*) FROM preferiti WHERE utente_id = :uid");
-    $stmt->execute(['uid' => $_SESSION['user_id']]);
-    $fav_count = $stmt->fetchColumn();
+    $stmt = $conn->prepare("SELECT COUNT(*) FROM preferiti WHERE utente_id = ?");
+    $stmt->bind_param("i", $_SESSION['user_id']);
+    $stmt->execute();
+    $stmt->bind_result($fav_count);
+    $stmt->fetch();
+    $stmt->close();
 }
 ?>
 
@@ -276,7 +275,7 @@ if ($is_logged_in) {
             <div class="d-flex align-items-center justify-content-between">
                 <!-- Logo e pulsante indietro -->
                 <div class="d-flex align-items-center">
-                    <a href="index.php" class="btn btn-link text-body p-0 me-3">
+                    <a href="../index.php" class="btn btn-link text-body p-0 me-3">
                         <i class="bi bi-arrow-left fs-4"></i>
                     </a>
                     <div>
@@ -298,7 +297,7 @@ if ($is_logged_in) {
                         </div>
                     <?php else: ?>
                         <!-- Login/Registrati -->
-                        <a href="login.php" class="btn btn-outline-dark d-none d-md-flex align-items-center px-3">
+                        <a href="../auth/login.php" class="btn btn-outline-dark d-none d-md-flex align-items-center px-3">
                             <i class="bi bi-box-arrow-in-right me-2"></i>Login
                         </a>
                     <?php endif; ?>
@@ -313,8 +312,19 @@ if ($is_logged_in) {
             <div class="col-lg-7">
                 <div class="card border-0 shadow-sm">
                     <div class="card-body p-4">
-                        <img src="<?php echo !empty($annuncio['immagine_url']) ? htmlspecialchars($annuncio['immagine_url']) : 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e'; ?>"
-                            class="product-image" alt="<?php echo htmlspecialchars($annuncio['titolo']); ?>">
+                        <img src="<?php
+                        $img_db = $annuncio['immagine_url'];
+                        if (!empty($img_db)) {
+                            if (str_starts_with($img_db, 'http')) {
+                                $imgUrl = $img_db;
+                            } else {
+                                $imgUrl = '../assets/img/' . basename($img_db);
+                            }
+                        } else {
+                            $imgUrl = 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600';
+                        }
+                        echo htmlspecialchars($imgUrl); ?>" class="product-image"
+                            alt="<?php echo htmlspecialchars($annuncio['titolo']); ?>">
                     </div>
                 </div>
 
@@ -521,7 +531,7 @@ if ($is_logged_in) {
 
             // Verifica stato attuale (icona)
             const isAdded = icon.classList.contains('bi-heart-fill');
-            const url = isAdded ? 'rimuovi_preferiti.php' : 'aggiungi_preferiti.php';
+            const url = isAdded ? '../user/rimuovi_preferiti.php' : '../user/aggiungi_preferiti.php';
 
             fetch(url, {
                 method: 'POST',

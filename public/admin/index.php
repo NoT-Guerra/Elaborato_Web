@@ -1,16 +1,16 @@
 <?php
 session_start();
-require_once 'config/database.php';
+require_once __DIR__ . '/../../app/config/database.php';
 
 // accesso non eseguito
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] != true) {
-    header('Location: login.php');
+    header('Location: ../auth/login.php');
     exit;
 }
 
 // accesso eseguito ma non è admin
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != true) {
-    header('Location: index.php');
+    header('Location: ../index.php');
     exit;
 }
 
@@ -120,7 +120,7 @@ if ($result) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style/style.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         [data-bs-theme="dark"] #btn-tema {
             color: #fff !important;
@@ -247,7 +247,7 @@ if ($result) {
         <div class="container-fluid">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-3">
-                    <a href="index.php" class="btn btn-link p-0">
+                    <a href="../index.php" class="btn btn-link p-0">
                         <i class="bi bi-arrow-left fs-4"></i>
                     </a>
                     <div>
@@ -655,7 +655,7 @@ if ($result) {
             if (subjects.includes(subject)) return alert('Materia già esistente');
 
             // Invia richiesta AJAX per aggiungere la materia al database
-            fetch('api/add_subject.php', {
+            fetch('aggiungi_materia.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -686,7 +686,7 @@ if ($result) {
             if (faculties.includes(faculty)) return alert('Facoltà già esistente');
 
             // Invia richiesta AJAX per aggiungere la facoltà al database
-            fetch('api/add_faculty.php', {
+            fetch('aggiungi_facolta.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -715,7 +715,7 @@ if ($result) {
             if (newPassword.length < 6) return alert('Password di almeno 6 caratteri');
             if (selectedUser) {
                 // Invia richiesta AJAX per resettare la password
-                fetch('api/reset_password.php', {
+                fetch('../auth/reset_password.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -763,7 +763,7 @@ if ($result) {
         window.deleteUser = function (userId) {
             if (confirm('Eliminare questo utente?')) {
                 // Invia richiesta AJAX per eliminare l'utente
-                fetch('api/delete_user.php', {
+                fetch('rimuovi_utente.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
@@ -795,7 +795,7 @@ if ($result) {
         window.deleteAnnouncement = function (announcementId) {
             if (confirm('Eliminare questo annuncio?')) {
                 // Invia richiesta AJAX per eliminare l'annuncio
-                fetch('api/delete_announcement.php', {
+                fetch('rimuovi_annuncio.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',

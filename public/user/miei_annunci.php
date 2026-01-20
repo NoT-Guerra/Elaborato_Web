@@ -1,10 +1,10 @@
 <?php
 session_start();
-require_once 'config/database.php';
+require_once __DIR__ . '/../../app/config/database.php';
 
 // Controlla se l'utente è loggato
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header('Location: login.php');
+    header('Location: ../auth/login.php');
     exit;
 }
 
@@ -384,7 +384,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                         style="width: 48px; height: 48px;">
                         <i class="bi bi-book text-white fs-3"></i>
                     </div>
-                    <a href="index.php" class="btn btn-link text-body p-0 me-3"><i
+                    <a href="../index.php" class="btn btn-link text-body p-0 me-3"><i
                             class="bi bi-arrow-left fs-4"></i></a>
                     <div>
                         <h1 class="h5 fw-bold mb-0">UniboMarket</h1>
@@ -405,7 +405,8 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                     </a>
 
                     <!-- Bottone Carrello -->
-                    <a href="carrello.php" class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
+                    <a href="../shop/carrello.php"
+                        class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
                         <i class="bi bi-cart"></i>
                         <span id="cart-counter-header"
                             class="badge rounded-pill bg-danger <?php echo ($cart_count > 0) ? '' : 'd-none'; ?>">
@@ -419,13 +420,14 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                             <i class="bi bi-person-circle me-1"></i>
                             <?php echo htmlspecialchars($_SESSION['nome'] . ' ' . $_SESSION['cognome']); ?>
                         </span>
-                        <a href="logout.php" class="btn btn-outline-dark d-flex align-items-center px-3">
+                        <a href="../auth/logout.php" class="btn btn-outline-dark d-flex align-items-center px-3">
                             <i class="bi bi-box-arrow-right me-2"></i>Logout
                         </a>
                     </div>
 
                     <!-- Bottone Pubblica -->
-                    <a href="pubblica.php" class="btn btn-dark d-flex align-items-center justify-content-center px-3">
+                    <a href="../shop/pubblica.php"
+                        class="btn btn-dark d-flex align-items-center justify-content-center px-3">
                         <i class="bi bi-plus-circle"></i>
                         <span class="d-none d-md-inline ms-2">Pubblica</span>
                     </a>
@@ -459,7 +461,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                             </h6>
                             <small class="text-muted"><?php echo htmlspecialchars($_SESSION['email']); ?></small>
                         </div>
-                        <a href="logout.php"
+                        <a href="../auth/logout.php"
                             class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
                             <i class="bi bi-box-arrow-right"></i> Logout
                         </a>
@@ -471,15 +473,16 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                         <a href="preferiti.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                             <i class="bi bi-suit-heart me-3"></i> Preferiti
                         </a>
-                        <a href="carrello.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                        <a href="../shop/carrello.php"
+                            class="list-group-item list-group-item-action border-0 py-3 px-4">
                             <i class="bi bi-cart me-3"></i> Carrello
                         </a>
-                        <a href="miei_annunci.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
-                            <i class="bi bi-collection me-3"></i> I miei annunci
+                        <a href="miei_acquisti.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                            <i class="bi bi-collection me-3"></i> I miei acquisti
                         </a>
                         <hr class="my-0 opacity-10">
                         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-                            <a href="admin.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                            <a href="../admin/index.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                                 <i class="bi bi-shield-lock me-3"></i> Pannello Admin
                             </a>
                         <?php endif; ?>
@@ -526,7 +529,16 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                     $data_modifica = $annuncio['data_modifica'] ? date('d/m/Y H:i', strtotime($annuncio['data_modifica'])) : null;
 
                     // URL immagine di default
-                    $immagine_url = $annuncio['immagine_url'] ?? 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600';
+                    $img_db = $annuncio['immagine_url'];
+                    if (!empty($img_db)) {
+                        if (str_starts_with($img_db, 'http')) {
+                            $immagine_url = $img_db;
+                        } else {
+                            $immagine_url = '../assets/img/' . basename($img_db);
+                        }
+                    } else {
+                        $immagine_url = 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600';
+                    }
                     ?>
                     <div class="col-xl-3 col-lg-4 col-md-6 col-12">
                         <div class="card h-100 border-0 shadow-sm card-annuncio">
@@ -624,7 +636,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                 </div>
                 <h3 class="h4 text-muted mb-2">Nessun annuncio pubblicato</h3>
                 <p class="text-muted mb-4">Inizia a vendere i tuoi libri e appunti universitari!</p>
-                <a href="pubblica.php" class="btn btn-primary btn-lg">
+                <a href="../shop/pubblica.php" class="btn btn-primary btn-lg">
                     <i class="bi bi-plus-circle me-2"></i>Pubblica il tuo primo annuncio
                 </a>
             </div>

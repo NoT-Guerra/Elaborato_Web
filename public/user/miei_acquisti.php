@@ -2,11 +2,11 @@
 session_start();
 
 if (!isset($_SESSION['user_id'])) {
-    header('Location: login.php');
+    header('Location: ../auth/login.php');
     exit;
 }
 
-require_once 'config/database.php';
+require_once __DIR__ . '/../../app/config/database.php';
 
 $user_id = $_SESSION['user_id'];
 
@@ -46,6 +46,7 @@ $stmt->close();
 
 <!DOCTYPE html>
 <html lang="it">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -60,6 +61,7 @@ $stmt->close();
         })();
     </script>
 </head>
+
 <body class="bg-body">
 
     <!-- Header simile a index.php -->
@@ -67,7 +69,7 @@ $stmt->close();
         <div class="container-fluid p-3">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
-                    <a href="index.php" class="btn btn-link text-body p-0 me-3">
+                    <a href="../index.php" class="btn btn-link text-body p-0 me-3">
                         <i class="bi bi-arrow-left fs-4"></i>
                     </a>
                     <div>
@@ -82,30 +84,41 @@ $stmt->close();
     <main class="container-fluid py-4">
         <?php if (count($acquisti) > 0): ?>
             <div class="row g-4">
-                <?php foreach ($acquisti as $acquisto): 
+                <?php foreach ($acquisti as $acquisto):
                     $is_digitale = (strtolower($acquisto['nome_categoria']) === 'pdf' || $acquisto['is_digitale'] == 1);
                     $data_vendita = date('d/m/Y H:i', strtotime($acquisto['data_vendita']));
                     $has_pdf = !empty($acquisto['pdf_path']);
-                ?>
+                    ?>
                     <div class="col-md-6 col-lg-4">
                         <div class="card h-100 border-0 shadow-sm">
-                            <?php if (!empty($acquisto['immagine_url'])): ?>
-                                <img src="<?php echo htmlspecialchars($acquisto['immagine_url']); ?>" 
-                                     class="card-img-top" 
-                                     alt="<?php echo htmlspecialchars($acquisto['titolo']); ?>"
-                                     style="height: 200px; object-fit: cover;">
-                            <?php endif; ?>
-                            
+                            <?php
+                            // Logic for image URL
+                            $img_db = $acquisto['immagine_url'];
+                            $immagine_url = 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600';
+                            if (!empty($img_db)) {
+                                if (str_starts_with($img_db, 'http')) {
+                                    $immagine_url = $img_db;
+                                } else {
+                                    $immagine_url = '../assets/img/' . basename($img_db);
+                                }
+                            }
+                            ?>
+                            <img src="<?php echo htmlspecialchars($immagine_url); ?>" class="card-img-top"
+                                alt="<?php echo htmlspecialchars($acquisto['titolo']); ?>"
+                                style="height: 200px; object-fit: cover;">
+
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h6 class="card-title fw-bold mb-0"><?php echo htmlspecialchars($acquisto['titolo']); ?></h6>
-                                    <span class="badge bg-success">€<?php echo number_format($acquisto['prezzo_vendita'], 2); ?></span>
+                                    <h6 class="card-title fw-bold mb-0"><?php echo htmlspecialchars($acquisto['titolo']); ?>
+                                    </h6>
+                                    <span
+                                        class="badge bg-success">€<?php echo number_format($acquisto['prezzo_vendita'], 2); ?></span>
                                 </div>
-                                
+
                                 <p class="small text-muted mb-2">
                                     <?php echo htmlspecialchars(substr($acquisto['descrizione'], 0, 100)); ?>...
                                 </p>
-                                
+
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <span class="badge bg-primary">
                                         <?php echo htmlspecialchars($acquisto['nome_categoria']); ?>
@@ -114,18 +127,19 @@ $stmt->close();
                                         <?php echo htmlspecialchars($acquisto['nome_condizione']); ?>
                                     </span>
                                 </div>
-                                
+
                                 <div class="mb-3">
                                     <small class="text-muted d-block">
                                         <i class="bi bi-person me-1"></i>
-                                        Venditore: <?php echo htmlspecialchars($acquisto['venditore_nome'] . ' ' . $acquisto['venditore_cognome']); ?>
+                                        Venditore:
+                                        <?php echo htmlspecialchars($acquisto['venditore_nome'] . ' ' . $acquisto['venditore_cognome']); ?>
                                     </small>
                                     <small class="text-muted d-block">
                                         <i class="bi bi-calendar me-1"></i>
                                         Acquistato il: <?php echo $data_vendita; ?>
                                     </small>
                                 </div>
-                                
+
                                 <?php if ($is_digitale): ?>
                                     <div class="alert alert-success p-2 mb-3">
                                         <div class="d-flex align-items-center">
@@ -136,9 +150,9 @@ $stmt->close();
                                             </div>
                                         </div>
                                     </div>
-                                    
+
                                     <?php if ($has_pdf): ?>
-                                        <form action="download_pdf.php" method="POST">
+                                        <form action="../shop/download_pdf.php" method="POST">
                                             <input type="hidden" name="vendita_id" value="<?php echo $acquisto['id_vendita']; ?>">
                                             <input type="hidden" name="annuncio_id" value="<?php echo $acquisto['id_annuncio']; ?>">
                                             <button type="submit" class="btn btn-primary w-100">
@@ -147,7 +161,8 @@ $stmt->close();
                                             </button>
                                         </form>
                                     <?php else: ?>
-                                        <button class="btn btn-primary w-100" onclick="alert('PDF non disponibile. Contatta l\'assistenza.')">
+                                        <button class="btn btn-primary w-100"
+                                            onclick="alert('PDF non disponibile. Contatta l\'assistenza.')">
                                             <i class="bi bi-download me-2"></i>Scarica PDF
                                         </button>
                                     <?php endif; ?>
@@ -161,9 +176,9 @@ $stmt->close();
                                             </div>
                                         </div>
                                     </div>
-                                    
-                                    <a href="mailto:<?php echo htmlspecialchars($acquisto['venditore_email']); ?>" 
-                                       class="btn btn-outline-primary w-100">
+
+                                    <a href="mailto:<?php echo htmlspecialchars($acquisto['venditore_email']); ?>"
+                                        class="btn btn-outline-primary w-100">
                                         <i class="bi bi-envelope me-2"></i>Contatta venditore
                                     </a>
                                 <?php endif; ?>
@@ -177,7 +192,7 @@ $stmt->close();
                 <i class="bi bi-bag-x fs-1 text-muted"></i>
                 <h5 class="mt-3 text-muted">Nessun acquisto effettuato</h5>
                 <p class="text-muted">Visita il marketplace per trovare prodotti interessanti!</p>
-                <a href="index.php" class="btn btn-primary mt-2">
+                <a href="../index.php" class="btn btn-primary mt-2">
                     <i class="bi bi-shop me-2"></i>Vai allo shopping
                 </a>
             </div>
@@ -186,4 +201,5 @@ $stmt->close();
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
+
 </html>
