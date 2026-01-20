@@ -747,7 +747,8 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     <h5 class="fw-bold mb-3 text-start text-md-center">Link Rapidi</h5>
                     <ul class="list-unstyled text-start text-md-center p-0">
                         <li class="mb-2"><a href="#" class="text-body text-decoration-none">Home</a></li>
-                        <li class="mb-2"><a href="#" class="text-body text-decoration-none">Chi Siamo</a></li>
+                        <li class="mb-2"><a href="chi_siamo.php" class="text-body text-decoration-none">Chi Siamo</a>
+                        </li>
                     </ul>
                 </div>
 

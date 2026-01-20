@@ -76,10 +76,10 @@ try {
         $stmt_vendita->close();
 
         // 2. Aggiorna lo stato dell'annuncio
-        // Per prodotti digitali (PDF) rimangono attivi, per gli altri no
+        // Per prodotti digitali (PDF) rimangono attivi per altri acquisti e non sono marcati come venduti
         if (strtolower($item['nome_categoria']) === 'pdf' || $item['is_digitale'] == 1) {
-            // Prodotti digitali: marcati come venduti ma rimangono attivi per altri acquisti
-            $update_annuncio = "UPDATE annuncio SET is_venduto = 1 WHERE id_annuncio = ?";
+            // Prodotti digitali: rimangono attivi e NON marcati come venduti (per permettere altri acquisti)
+            $update_annuncio = "UPDATE annuncio SET is_venduto = 0, is_attivo = 1 WHERE id_annuncio = ?";
         } else {
             // Prodotti fisici: non più disponibili
             $update_annuncio = "UPDATE annuncio SET is_venduto = 1, is_attivo = 0 WHERE id_annuncio = ?";
@@ -90,11 +90,18 @@ try {
         $stmt_update->execute();
         $stmt_update->close();
 
-        // 3. Rimuovi l'articolo dal carrello di TUTTI gli utenti (non solo dell'acquirente)
-        // Perché se un prodotto fisico viene venduto, non può essere nel carrello di altri
-        $delete_carrello = "DELETE FROM carrello WHERE annuncio_id = ?";
-        $stmt_delete = $conn->prepare($delete_carrello);
-        $stmt_delete->bind_param("i", $annuncio_id);
+        // 3. Rimuovi l'articolo dal carrello
+        if (strtolower($item['nome_categoria']) === 'pdf' || $item['is_digitale'] == 1) {
+            // Per i prodotti digitali, rimuovi SOLO dal carrello dell'utente attuale
+            $delete_carrello = "DELETE FROM carrello WHERE annuncio_id = ? AND utente_id = ?";
+            $stmt_delete = $conn->prepare($delete_carrello);
+            $stmt_delete->bind_param("ii", $annuncio_id, $user_id);
+        } else {
+            // Per i prodotti fisici, rimuovi dal carrello di TUTTI gli utenti
+            $delete_carrello = "DELETE FROM carrello WHERE annuncio_id = ?";
+            $stmt_delete = $conn->prepare($delete_carrello);
+            $stmt_delete->bind_param("i", $annuncio_id);
+        }
         $stmt_delete->execute();
         $stmt_delete->close();
 
