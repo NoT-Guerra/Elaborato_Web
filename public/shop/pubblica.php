@@ -91,12 +91,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $message = 'Estensione file non supportata.';
                 $message_type = 'danger';
             }
+<<<<<<<< Updated upstream:public/shop/pubblica.php
         } elseif ($is_pdf) {
             // Se è PDF e non è stata caricata un'immagine, usa immagine di default
             $immagine_url = "assets/img/pdf-default.png";
         }
 
 
+========
+       } elseif ($is_pdf) {
+    // Se è PDF e non è stata caricata un'immagine, usa immagine di default
+    $immagine_url = "../images/pdf-default.png";
+}
+
+        
+>>>>>>>> Stashed changes:php/pubblica.php
         // Gestione PDF
         $pdf_path = null;
         $original_pdf_name = null;
@@ -446,7 +455,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 pdfContainer.style.display = 'block';
                 pdfInput.required = true;
                 imageContainer.style.display = 'none';
+<<<<<<<< Updated upstream:public/shop/pubblica.php
 
+========
+                
+>>>>>>>> Stashed changes:php/pubblica.php
                 // Mostra immagine di default per PDF
                 showDefaultPDFImage();
             } else {
@@ -454,7 +467,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 pdfContainer.style.display = 'none';
                 pdfInput.required = false;
                 imageContainer.style.display = 'block';
+<<<<<<<< Updated upstream:public/shop/pubblica.php
 
+========
+                
+>>>>>>>> Stashed changes:php/pubblica.php
                 // Resetta l'anteprima se non c'è immagine
                 if (!imgInput.files || imgInput.files.length === 0) {
                     previewContainer.classList.add('d-none');
@@ -464,9 +481,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Funzione per mostrare immagine di default per PDF
         function showDefaultPDFImage() {
+<<<<<<<< Updated upstream:public/shop/pubblica.php
             const svgContent = '<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24"><rect width="100%" height="100%" fill="#f8f9fa"/><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2.5L18.5 9H13V4.5zM20 20H6V4h5v7h7v9z" fill="#dc3545"/><path d="M8 15h8v2H8zm0-4h8v2H8zm0-4h3v2H8z" fill="#dc3545"/><text x="12" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#6c757d">Documento PDF</text></svg>';
             const svgImage = `data:image/svg+xml;base64,${btoa(svgContent)}`;
 
+========
+            const svgImage = `data:image/svg+xml;base64,${btoa('<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 24 24"><rect width="100%" height="100%" fill="#f8f9fa"/><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm-1 2.5L18.5 9H13V4.5zM20 20H6V4h5v7h7v9z" fill="#dc3545"/><path d="M8 15h8v2H8zm0-4h8v2H8zm0-4h3v2H8z" fill="#dc3545"/><text x="12" y="170" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#6c757d">Documento PDF</text></svg>')}`;
+            
+>>>>>>>> Stashed changes:php/pubblica.php
             previewImg.src = svgImage;
             previewContainer.classList.remove('d-none');
         }
@@ -522,10 +544,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         });
 
         // Mostra immagine di default se PDF è già selezionato al caricamento della pagina
+<<<<<<<< Updated upstream:public/shop/pubblica.php
         document.addEventListener('DOMContentLoaded', function () {
             const selectedOption = categoriaSelect.options[categoriaSelect.selectedIndex];
             const categoriaName = selectedOption.getAttribute('data-name');
 
+========
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectedOption = categoriaSelect.options[categoriaSelect.selectedIndex];
+            const categoriaName = selectedOption.getAttribute('data-name');
+            
+>>>>>>>> Stashed changes:php/pubblica.php
             if (categoriaName === 'pdf') {
                 showDefaultPDFImage();
             }
