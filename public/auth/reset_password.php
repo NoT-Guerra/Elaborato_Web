@@ -10,14 +10,14 @@ if (!isset($_SESSION['loggedin'], $_SESSION['is_admin']) || $_SESSION['is_admin'
 
 // Controlla input
 if (!isset($_POST['user_id'], $_POST['new_password']) || !is_numeric($_POST['user_id'])) {
-    die('Dati non validi');
+    die(json_encode(['success' => false, 'error' => 'Dati non validi']));
 }
 
 $userId = (int) $_POST['user_id'];
 $newPassword = trim($_POST['new_password']);
 
 if (strlen($newPassword) < 6) {
-    die('La password deve essere di almeno 6 caratteri');
+    die(json_encode(['success' => false, 'error' => 'La password deve essere di almeno 6 caratteri']));
 }
 
 // Hash della password
@@ -29,8 +29,8 @@ $stmt->bind_param("si", $hashedPassword, $userId);
 
 if ($stmt->execute()) {
     $stmt->close();
-    header('Location: ../admin/admin.php?msg=password_reset');
+    echo json_encode(['success' => true]);
     exit;
 } else {
-    die('Errore durante il reset della password');
+    die(json_encode(['success' => false, 'error' => 'Errore durante il reset della password']));
 }
