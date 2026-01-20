@@ -15,7 +15,7 @@ if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != true) {
 }
 
 // Verifica che la connessione sia stata stabilita
-if (!$conn || $conn->connect_error) {
+if (!isset($conn) || !($conn instanceof mysqli) || $conn->connect_error) {
     die("Errore di connessione al database");
 }
 
@@ -99,11 +99,11 @@ if ($result) {
 }
 
 // Facoltà
-$query = "SELECT nome_facolta FROM facolta ORDER BY nome_facolta";
+$query = "SELECT id_facolta, nome_facolta FROM facolta ORDER BY nome_facolta";
 $result = $conn->query($query);
 if ($result) {
     while ($row = $result->fetch_assoc()) {
-        $faculties[] = $row['nome_facolta'];
+        $faculties[] = $row;
     }
     $result->free();
 }
@@ -127,39 +127,32 @@ if ($result) {
             border-color: #fff !important;
         }
 
-        /* Dark Mode Improvements */
         [data-bs-theme="dark"] body {
             background-color: #1a202c !important;
-            /* Darker background */
             color: #e2e8f0;
         }
 
         [data-bs-theme="dark"] .card {
             background-color: #2d3748 !important;
-            /* Lighter than body */
             border-color: #4a5568 !important;
         }
 
-        /* Opaque Header in Light Mode */
         header.sticky-top {
             background-color: #fff;
         }
 
         [data-bs-theme="dark"] header.sticky-top {
             background-color: #1a202c;
-            /* Match dark body bg */
         }
 
         [data-bs-theme="dark"] .table,
         [data-bs-theme="dark"] .table> :not(caption)>*>* {
             background-color: #2d3748 !important;
-            /* Force uniform background everywhere */
             color: #e2e8f0 !important;
         }
 
         [data-bs-theme="dark"] .table-hover tbody tr:hover>* {
             background-color: #2d3748 !important;
-            /* Disable hover color change */
             color: #fff !important;
         }
 
@@ -167,7 +160,6 @@ if ($result) {
             border-color: #4a5568 !important;
         }
 
-        /* Responsive Table/Card Layout */
         @media (max-width: 768px) {
             .table-responsive-stack thead {
                 display: none;
@@ -186,11 +178,8 @@ if ($result) {
 
             [data-bs-theme="dark"] .table-responsive-stack tr {
                 border-color: #718096;
-                /* Lighter border for better visibility */
                 background-color: #2d3748;
-                /* Card background in dark mode */
                 box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-                /* Stronger shadow */
             }
 
             .table-responsive-stack td {
@@ -199,9 +188,7 @@ if ($result) {
                 align-items: center;
                 border: none;
                 padding: 0.75rem 0;
-                /* Slightly more padding */
                 width: 100%;
-                /* Ensure full width */
             }
 
             .table-responsive-stack td::before {
@@ -211,32 +198,39 @@ if ($result) {
                 color: var(--bs-secondary);
                 text-align: left;
                 flex-shrink: 0;
-                /* Prevent label wrapping issues */
             }
 
             [data-bs-theme="dark"] .table-responsive-stack td::before {
                 color: #cbd5e0 !important;
-                /* Lighter text for labels in dark mode */
             }
 
             .table-responsive-stack td.td-actions {
                 justify-content: center;
-                /* Center buttons */
                 margin-top: 1rem;
                 padding-top: 1rem;
                 border-top: 1px solid #dee2e6;
                 gap: 15px;
-                /* More space between buttons */
             }
 
             [data-bs-theme="dark"] .table-responsive-stack td.td-actions {
                 border-top: 1px solid #718096 !important;
-                /* Lighter border separator */
             }
 
             .table-responsive-stack td.td-actions::before {
                 display: none;
             }
+        }
+
+        .scrollable-content {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1055;
         }
     </style>
 </head>
@@ -438,10 +432,25 @@ if ($result) {
                             </div>
                             <div class="card-body">
                                 <div class="row g-2 mb-4">
-                                    <div class="col"><input type="text" class="form-control" id="newSubject"
-                                            placeholder="Nuova materia"></div>
-                                    <div class="col-auto d-flex align-items-end"><button class="btn btn-primary"
-                                            id="addSubjectBtn"><i class="fas fa-plus me-2"></i>Aggiungi</button></div>
+                                    <div class="col-md-5">
+                                        <input type="text" class="form-control" id="newSubject"
+                                            placeholder="Nuova materia">
+                                    </div>
+                                    <div class="col-md-5">
+                                        <select class="form-select" id="subjectFaculty">
+                                            <option value="" selected disabled>Seleziona Facoltà</option>
+                                            <?php foreach ($faculties as $f): ?>
+                                                <option value="<?php echo $f['id_facolta']; ?>">
+                                                    <?php echo htmlspecialchars($f['nome_facolta']); ?>
+                                                </option>
+                                            <?php endforeach; ?>
+                                        </select>
+                                    </div>
+                                    <div class="col-auto d-flex align-items-end">
+                                        <button class="btn btn-primary" id="addSubjectBtn">
+                                            <i class="fas fa-plus me-2"></i>Aggiungi
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="scrollable-content" id="subjectsList">
                                     <?php foreach ($subjects as $index => $subject): ?>
@@ -449,7 +458,7 @@ if ($result) {
                                             class="category-item d-flex justify-content-between align-items-center py-2 border-bottom">
                                             <span class="fw-medium"><?php echo htmlspecialchars($subject); ?></span>
                                             <button class="btn btn-link text-danger p-0"
-                                                onclick="deleteSubject(<?php echo $index; ?>)">
+                                                onclick="deleteSubject('<?php echo addslashes(htmlspecialchars($subject, ENT_QUOTES)); ?>')">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </div>
@@ -472,12 +481,13 @@ if ($result) {
                                             id="addFacultyBtn"><i class="fas fa-plus me-2"></i>Aggiungi</button></div>
                                 </div>
                                 <div class="scrollable-content" id="facultiesList">
-                                    <?php foreach ($faculties as $index => $faculty): ?>
+                                    <?php foreach ($faculties as $faculty): ?>
                                         <div
                                             class="category-item d-flex justify-content-between align-items-center py-2 border-bottom">
-                                            <span class="fw-medium"><?php echo htmlspecialchars($faculty); ?></span>
+                                            <span
+                                                class="fw-medium"><?php echo htmlspecialchars($faculty['nome_facolta']); ?></span>
                                             <button class="btn btn-link text-danger p-0"
-                                                onclick="deleteFaculty(<?php echo $index; ?>)">
+                                                onclick="deleteFaculty('<?php echo addslashes(htmlspecialchars($faculty['nome_facolta'], ENT_QUOTES)); ?>')">
                                                 <i class="fas fa-times"></i>
                                             </button>
                                         </div>
@@ -527,19 +537,17 @@ if ($result) {
         let selectedUser = null;
 
         function init() {
-            // Carica le funzioni JavaScript
             loadUsers();
             loadAnnouncements();
             loadSubjects();
             loadFaculties();
-            updateStats();
 
-            // Aggiungi event listeners
+            // Event listeners
             document.getElementById('addSubjectBtn').addEventListener('click', addSubject);
             document.getElementById('addFacultyBtn').addEventListener('click', addFaculty);
             document.getElementById('confirmResetBtn').addEventListener('click', confirmReset);
 
-            // Listener bottone tema
+            // Tema
             const btnTema = document.getElementById('btn-tema');
             if (btnTema) {
                 btnTema.addEventListener('click', () => {
@@ -549,10 +557,7 @@ if ($result) {
                 });
             }
 
-            // Applica il tema salvato
             applyTheme();
-
-            // Ascolta i cambiamenti del tema da altre pagine
             window.addEventListener('storage', function (e) {
                 if (e.key === 'temaPreferito') {
                     applyTheme();
@@ -561,8 +566,8 @@ if ($result) {
         }
 
         function applyTheme() {
-            // Leggi il tema dalle altre pagine o usa default
-            const tema = localStorage.getItem('temaPreferito') || (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            const tema = localStorage.getItem('temaPreferito') ||
+                (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
 
             const iconaLuna = document.getElementById('icona-luna');
             const iconaSole = document.getElementById('icona-sole');
@@ -624,7 +629,7 @@ if ($result) {
             container.innerHTML = subjects.map((s, i) => `
                 <div class="category-item d-flex justify-content-between align-items-center py-2 border-bottom">
                     <span class="fw-medium">${s}</span>
-                    <button class="btn btn-link text-danger p-0" onclick="deleteSubject(${i})">
+                    <button class="btn btn-link text-danger p-0" onclick="deleteSubject('${s.replace(/'/g, "\\'")}')">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
@@ -635,37 +640,34 @@ if ($result) {
             const container = document.getElementById('facultiesList');
             container.innerHTML = faculties.map((f, i) => `
                 <div class="category-item d-flex justify-content-between align-items-center py-2 border-bottom">
-                    <span class="fw-medium">${f}</span>
-                    <button class="btn btn-link text-danger p-0" onclick="deleteFaculty(${i})">
+                    <span class="fw-medium">${f.nome_facolta}</span>
+                    <button class="btn btn-link text-danger p-0" onclick="deleteFaculty('${f.nome_facolta.replace(/'/g, "\\'")}')">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
             `).join('');
         }
 
-        function updateStats() {
-            // Le statistiche sono già calcolate dal PHP e mostrate staticamente
-            // Questa funzione può essere usata per aggiornamenti in tempo reale se necessario
-        }
-
         function addSubject() {
             const input = document.getElementById('newSubject');
             const subject = input.value.trim();
-            if (!subject) return alert('Inserisci il nome della materia');
-            if (subjects.includes(subject)) return alert('Materia già esistente');
+            const facultySelect = document.getElementById('subjectFaculty');
+            const facultyId = facultySelect.value;
 
-            // Invia richiesta AJAX per aggiungere la materia al database
+            if (!subject) return alert('Inserisci il nome della materia');
+            if (!facultyId) return alert('Seleziona una facoltà');
+
             fetch('aggiungi_materia.php', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
                 },
-                body: 'subject=' + encodeURIComponent(subject)
+                body: `subject=${encodeURIComponent(subject)}&faculty_id=${facultyId}`
             })
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        subjects.push(subject);
+                        subjects.push(data.subject);
                         loadSubjects();
                         input.value = '';
                         showToast('Materia aggiunta');
@@ -683,9 +685,8 @@ if ($result) {
             const input = document.getElementById('newFaculty');
             const faculty = input.value.trim();
             if (!faculty) return alert('Inserisci il nome della facoltà');
-            if (faculties.includes(faculty)) return alert('Facoltà già esistente');
+            if (faculties.some(f => f.nome_facolta === faculty)) return alert('Facoltà già esistente');
 
-            // Invia richiesta AJAX per aggiungere la facoltà al database
             fetch('aggiungi_facolta.php', {
                 method: 'POST',
                 headers: {
@@ -696,10 +697,14 @@ if ($result) {
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        faculties.push(faculty);
+                        faculties.push({ id_facolta: data.id, nome_facolta: data.faculty });
                         loadFaculties();
                         input.value = '';
                         showToast('Facoltà aggiunta');
+                        // Aggiorna anche il dropdown delle materie
+                        const facultySelect = document.getElementById('subjectFaculty');
+                        const option = new Option(data.faculty, data.id);
+                        facultySelect.add(option);
                     } else {
                         alert('Errore: ' + data.error);
                     }
@@ -714,7 +719,6 @@ if ($result) {
             const newPassword = document.getElementById('newPassword').value;
             if (newPassword.length < 6) return alert('Password di almeno 6 caratteri');
             if (selectedUser) {
-                // Invia richiesta AJAX per resettare la password
                 fetch('../auth/reset_password.php', {
                     method: 'POST',
                     headers: {
@@ -741,12 +745,34 @@ if ($result) {
         }
 
         function showToast(message) {
-            const toast = new bootstrap.Toast(document.createElement('div'));
-            toast._element.className = 'toast bg-success text-white';
-            toast._element.innerHTML = `<div class="toast-body">${message}</div>`;
-            document.body.appendChild(toast._element);
-            toast.show();
-            setTimeout(() => toast._element.remove(), 3000);
+            // Rimuovi toast esistenti
+            const existingToasts = document.querySelectorAll('.toast');
+            existingToasts.forEach(toast => toast.remove());
+
+            const toast = document.createElement('div');
+            toast.className = 'toast bg-success text-white';
+            toast.innerHTML = `
+                <div class="toast-body d-flex justify-content-between align-items-center">
+                    <span>${message}</span>
+                    <button type="button" class="btn-close btn-close-white ms-3" onclick="this.closest('.toast').remove()"></button>
+                </div>
+            `;
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 3000);
+        }
+
+        function updateStats() {
+            // Aggiorna statistiche utenti
+            document.getElementById('totalUsers').textContent = users.length;
+
+            // Aggiorna statistiche annunci attivi
+            const activeCount = announcements.filter(a => a.status === 'attivo').length;
+            document.getElementById('activeAnnouncements').textContent = activeCount;
         }
 
         window.openResetPassword = function (userId) {
@@ -762,7 +788,6 @@ if ($result) {
 
         window.deleteUser = function (userId) {
             if (confirm('Eliminare questo utente?')) {
-                // Invia richiesta AJAX per eliminare l'utente
                 fetch('rimuovi_utente.php', {
                     method: 'POST',
                     headers: {
@@ -777,8 +802,7 @@ if ($result) {
                             if (index > -1) {
                                 users.splice(index, 1);
                                 loadUsers();
-                                // Aggiorna statistiche
-                                document.getElementById('totalUsers').textContent = users.length;
+                                updateStats();
                                 showToast('Utente eliminato');
                             }
                         } else {
@@ -794,7 +818,6 @@ if ($result) {
 
         window.deleteAnnouncement = function (announcementId) {
             if (confirm('Eliminare questo annuncio?')) {
-                // Invia richiesta AJAX per eliminare l'annuncio
                 fetch('rimuovi_annuncio.php', {
                     method: 'POST',
                     headers: {
@@ -809,9 +832,7 @@ if ($result) {
                             if (index > -1) {
                                 announcements.splice(index, 1);
                                 loadAnnouncements();
-                                // Aggiorna statistiche
-                                const activeCount = announcements.filter(a => a.status === 'attivo').length;
-                                document.getElementById('activeAnnouncements').textContent = activeCount;
+                                updateStats();
                                 showToast('Annuncio eliminato');
                             }
                         } else {
@@ -825,23 +846,24 @@ if ($result) {
             }
         };
 
-        window.deleteSubject = function (index) {
-            const subject = subjects[index];
-            if (confirm(`Eliminare la materia "${subject}"?`)) {
-                // Invia richiesta AJAX per eliminare la materia
-                fetch('api/delete_subject.php', {
+        window.deleteSubject = function (subjectName) {
+            if (confirm(`Eliminare la materia "${subjectName}"?`)) {
+                fetch('rimuovi_materia.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: 'subject=' + encodeURIComponent(subject)
+                    body: 'subject=' + encodeURIComponent(subjectName)
                 })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            subjects.splice(index, 1);
-                            loadSubjects();
-                            showToast('Materia rimossa');
+                            const index = subjects.indexOf(subjectName);
+                            if (index > -1) {
+                                subjects.splice(index, 1);
+                                loadSubjects();
+                                showToast('Materia rimossa');
+                            }
                         } else {
                             alert('Errore: ' + data.error);
                         }
@@ -853,23 +875,24 @@ if ($result) {
             }
         };
 
-        window.deleteFaculty = function (index) {
-            const faculty = faculties[index];
-            if (confirm(`Eliminare la facoltà "${faculty}"?`)) {
-                // Invia richiesta AJAX per eliminare la facoltà
-                fetch('api/delete_faculty.php', {
+        window.deleteFaculty = function (facultyName) {
+            if (confirm(`Eliminare la facoltà "${facultyName}"?`)) {
+                fetch('rimuovi_facolta.php', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },
-                    body: 'faculty=' + encodeURIComponent(faculty)
+                    body: 'faculty=' + encodeURIComponent(facultyName)
                 })
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            faculties.splice(index, 1);
-                            loadFaculties();
-                            showToast('Facoltà rimossa');
+                            const index = faculties.findIndex(f => f.nome_facolta === facultyName);
+                            if (index > -1) {
+                                faculties.splice(index, 1);
+                                loadFaculties();
+                                showToast('Facoltà rimossa');
+                            }
                         } else {
                             alert('Errore: ' + data.error);
                         }

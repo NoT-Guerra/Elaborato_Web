@@ -26,13 +26,13 @@ INSERT INTO condizione_prodotto (nome_condizione) VALUES
 -- 4. POPOLAMENTO UTENTI 
 INSERT INTO utenti (nome, cognome, email, password, facolta_id, isAdmin) VALUES 
 ('Marco', 'Bianchi', 'marco.bianchi@university.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, TRUE),
-('Giulia', 'Rossi', 'giulia.rossi@university.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2, FALSE),
-('Luca', 'Verdi', 'luca.verdi@university.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, FALSE),
-('Anna', 'Ferrari', 'anna.ferrari@university.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3, FALSE),
-('Paolo', 'Russo', 'paolo.russo@university.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 4, FALSE),
-('Sofia', 'Romano', 'sofia.romano@university.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 5, FALSE),
-('Francesco', 'Gallo', 'francesco.gallo@university.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 7, FALSE),
-('Elena', 'Conti', 'elena.conti@university.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 8, FALSE);
+('Giulia', 'Rossi', 'giulia.rossi@studio.unibo.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 2, FALSE),
+('Luca', 'Verdi', 'luca.verdi@studio.unibo.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 1, FALSE),
+('Anna', 'Ferrari', 'anna.ferrari@studio.unibo.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 3, FALSE),
+('Paolo', 'Russo', 'paolo.russo@studio.unibo.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 4, FALSE),
+('Sofia', 'Romano', 'sofia.romano@studio.unibo.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 5, FALSE),
+('Francesco', 'Gallo', 'francesco.gallo@studio.unibo.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 7, FALSE),
+('Elena', 'Conti', 'elena.conti@studio.unibo.it', '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', 8, FALSE);
 
 -- 5. POPOLAMENTO CORSI DI STUDIO 
 INSERT INTO corso_studio (nome_corso, facolta_id) VALUES 

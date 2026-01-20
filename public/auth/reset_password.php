@@ -29,7 +29,7 @@ $stmt->bind_param("si", $hashedPassword, $userId);
 
 if ($stmt->execute()) {
     $stmt->close();
-    header('Location: ../admin/index.php?msg=password_reset');
+    header('Location: ../admin/admin.php?msg=password_reset');
     exit;
 } else {
     die('Errore durante il reset della password');
