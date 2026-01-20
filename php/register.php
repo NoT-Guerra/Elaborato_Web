@@ -149,7 +149,7 @@ if ($result) {
 
         <!-- HEADER -->
         <header class="d-flex align-items-center bg-body p-3 border-bottom sticky-top">
-            <a href="index.html" class="btn btn-link text-body p-0 me-3" aria-label="Torna indietro">
+            <a href="index.php" class="btn btn-link text-body p-0 me-3" aria-label="Torna indietro">
                 <i class="bi bi-arrow-left fs-4"></i>
             </a>
 
@@ -300,8 +300,8 @@ if ($result) {
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
+        
         function togglePasswords(btn) {
             const password = document.getElementById("password");
             const confirm = document.getElementById("confirmPassword");
