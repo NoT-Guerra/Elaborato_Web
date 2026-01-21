@@ -75,7 +75,8 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 
         [data-bs-theme="dark"] .feature-icon {
             background-color: rgba(13, 110, 253, 0.2);
-            color: #60a5fa;
+            color: #90caf9;
+            /* Migliore contrasto su sfondo scuro */
         }
 
         #cart-counter-header {
@@ -98,7 +99,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 <a href="index.php" class="d-flex align-items-center text-decoration-none text-body">
                     <div class="bg-primary rounded-3 d-flex align-items-center justify-content-center me-3"
                         style="width: 40px; height: 40px;">
-                        <i class="bi bi-book text-white fs-4"></i>
+                        <span class="bi bi-book text-white fs-4" aria-hidden="true"></span>
                     </div>
                     <h1 class="h5 fw-bold mb-0">UniboMarket</h1>
                 </a>
@@ -135,30 +136,30 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         <div class="row g-4 mb-5">
             <div class="col-md-4">
                 <div class="card h-100 p-4">
-                    <div class="feature-icon">
-                        <i class="bi bi-shop"></i>
+                    <div class="feature-icon" aria-hidden="true">
+                        <span class="bi bi-shop"></span>
                     </div>
-                    <h4 class="fw-bold">Commercio Circolare</h4>
+                    <h3 class="fw-bold h4">Commercio Circolare</h3>
                     <p class="text-muted">Dai una seconda vita ai tuoi libri. Vendere il materiale che non usi più aiuta
                         altri studenti a risparmiare e riduce gli sprechi.</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card h-100 p-4">
-                    <div class="feature-icon">
-                        <i class="bi bi-file-earmark-pdf"></i>
+                    <div class="feature-icon" aria-hidden="true">
+                        <span class="bi bi-file-earmark-pdf"></span>
                     </div>
-                    <h4 class="fw-bold">Risorse Digitali</h4>
+                    <h3 class="fw-bold h4">Risorse Digitali</h3>
                     <p class="text-muted">Accesso immediato a PDF e appunti digitali. Acquista e scarica istantaneamente
                         il materiale per iniziare subito a studiare.</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="card h-100 p-4">
-                    <div class="feature-icon">
-                        <i class="bi bi-shield-check"></i>
+                    <div class="feature-icon" aria-hidden="true">
+                        <span class="bi bi-shield-check"></span>
                     </div>
-                    <h4 class="fw-bold">Sicurezza Studenti</h4>
+                    <h3 class="fw-bold h4">Sicurezza Studenti</h3>
                     <p class="text-muted">Una piattaforma pensata per la comunità Unibo. Transazioni trasparenti e
                         gestione semplificata degli annunci.</p>
                 </div>
@@ -170,7 +171,8 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         <div class="row align-items-center">
             <div class="col-lg-6 mb-4 mb-lg-0">
                 <img src="https://images.unsplash.com/photo-1523240795612-9a054b0db644?auto=format&fit=crop&w=800"
-                    alt="Studenti" class="img-fluid rounded-4 shadow">
+                    alt="Gruppo di studenti universitari che collaborano seduti a un tavolo"
+                    class="img-fluid rounded-4 shadow">
             </div>
             <div class="col-lg-6 ps-lg-5">
                 <h3 class="fw-bold mb-4">La Nostra Missione</h3>
