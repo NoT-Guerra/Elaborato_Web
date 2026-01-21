@@ -358,7 +358,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="row g-3 mb-3">
                         <div class="col-6 col-md-4">
                             <label for="prezzo" class="form-label required">Prezzo (€)</label>
-                            <input type="number" class="form-control" id="prezzo" name="prezzo" min="0" step="0.50"
+                            <input type="number" class="form-control" id="prezzo" name="prezzo" min="0" step="0.01"
                                 required placeholder="0.00">
                             <div class="invalid-feedback">Inserisci un prezzo valido.</div>
                         </div>
