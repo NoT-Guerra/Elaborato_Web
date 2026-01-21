@@ -92,18 +92,22 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 </head>
 
 <body>
-    <!-- Header (Simple version, consistent with index.php) -->
     <header class="sticky-top bg-body border-bottom shadow-sm">
-        <div class="container py-2">
+        <div class="container-fluid p-2 p-sm-3">
             <div class="d-flex align-items-center justify-content-between">
+                <!-- Logo -->
                 <a href="index.php" class="d-flex align-items-center text-decoration-none text-body">
-                    <div class="bg-primary rounded-3 d-flex align-items-center justify-content-center me-3"
-                        style="width: 40px; height: 40px;">
-                        <span class="bi bi-book text-white fs-4" aria-hidden="true"></span>
+                    <div class="bg-primary rounded-3 d-flex align-items-center justify-content-center me-2 me-sm-3"
+                        style="width: 48px; height: 48px;">
+                        <span class="bi bi-book text-white fs-3" aria-hidden="true"></span>
                     </div>
-                    <h1 class="h5 fw-bold mb-0">UniboMarket</h1>
+                    <div>
+                        <h1 class="h5 fw-bold mb-0">UniboMarket</h1>
+                        <p class="text-muted small mb-0 d-none d-md-block">Marketplace per studenti</p>
+                    </div>
                 </a>
-                <div class="d-flex align-items-center gap-3">
+
+                <div class="d-flex align-items-center gap-2">
                     <a href="index.php" class="btn btn-outline-primary btn-sm rounded-pill px-3">Torna alla Home</a>
                 </div>
             </div>
