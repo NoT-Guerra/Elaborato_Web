@@ -23,13 +23,44 @@ if (isset($_GET['elimina']) && is_numeric($_GET['elimina'])) {
     $check_stmt->close();
 
     if ($venditore_id == $user_id) {
-        // Elimina l'annuncio
-        $delete_stmt = $conn->prepare("DELETE FROM annuncio WHERE id_annuncio = ?");
-        $delete_stmt->bind_param("i", $annuncio_id);
-        $delete_stmt->execute();
-        $delete_stmt->close();
+        $conn->begin_transaction();
+        try {
+            // 1. Elimina dalla tabella vendita
+            $stmt_v = $conn->prepare("DELETE FROM vendita WHERE annuncio_id = ?");
+            $stmt_v->bind_param("i", $annuncio_id);
+            $stmt_v->execute();
+            $stmt_v->close();
 
-        $success_message = "Annuncio eliminato con successo!";
+            // 2. Elimina dai preferiti
+            $stmt_p = $conn->prepare("DELETE FROM preferiti WHERE annuncio_id = ?");
+            $stmt_p->bind_param("i", $annuncio_id);
+            $stmt_p->execute();
+            $stmt_p->close();
+
+            // 3. Elimina dal carrello
+            $stmt_c = $conn->prepare("DELETE FROM carrello WHERE annuncio_id = ?");
+            $stmt_c->bind_param("i", $annuncio_id);
+            $stmt_c->execute();
+            $stmt_c->close();
+
+            // 4. Elimina PDF associati
+            $stmt_pdf = $conn->prepare("DELETE FROM annuncio_pdf WHERE annuncio_id = ?");
+            $stmt_pdf->bind_param("i", $annuncio_id);
+            $stmt_pdf->execute();
+            $stmt_pdf->close();
+
+            // 5. Elimina l'annuncio
+            $delete_stmt = $conn->prepare("DELETE FROM annuncio WHERE id_annuncio = ?");
+            $delete_stmt->bind_param("i", $annuncio_id);
+            $delete_stmt->execute();
+            $delete_stmt->close();
+
+            $conn->commit();
+            $success_message = "Annuncio eliminato con successo!";
+        } catch (Exception $e) {
+            $conn->rollback();
+            $error_message = "Errore durante l'eliminazione: " . $e->getMessage();
+        }
     } else {
         $error_message = "Non hai i permessi per eliminare questo annuncio.";
     }
