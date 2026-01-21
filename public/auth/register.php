@@ -283,7 +283,7 @@ if ($result) {
                         </div>
 
                         <!-- Submit Button -->
-                        <button type="submit" class="btn btn-primary w-100 py-2 fw-bold">
+                        <button type="submit" class="btn btn-outline-primary w-100 py-2 fw-bold">
                             Registrati
                         </button>
 
@@ -300,8 +300,9 @@ if ($result) {
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js">
-        
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
         function togglePasswords(btn) {
             const password = document.getElementById("password");
             const confirm = document.getElementById("confirmPassword");
@@ -319,10 +320,9 @@ if ($result) {
         // Tema
         (function () {
             try {
-                const tema = localStorage.getItem('temaPreferito') ||
-                    (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+                const tema = localStorage.getItem('temaPreferito') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
                 document.documentElement.setAttribute('data-bs-theme', tema);
-            } catch (e) { }
+            } catch (e) { console.error('Errore tema:', e); }
         })();
     </script>
 </body>

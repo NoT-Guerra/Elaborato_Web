@@ -71,7 +71,70 @@ unset($_SESSION['purchase_date']);
                 font-size: 12pt;
             }
         }
+
+        /* --- DARK MODE OVERRIDES --- */
+        [data-bs-theme="dark"] body {
+            background-color: #1a202c;
+            color: #f8f9fa;
+        }
+
+        [data-bs-theme="dark"] .card {
+            background-color: #2d3748;
+            border-color: #4a5568;
+        }
+
+        [data-bs-theme="dark"] .card-header {
+            background-color: transparent !important;
+            color: #f8f9fa;
+        }
+
+        [data-bs-theme="dark"] .success-icon {
+            background-color: rgba(40, 167, 69, 0.2);
+        }
+
+        [data-bs-theme="dark"] .success-icon i,
+        [data-bs-theme="dark"] .text-success {
+            color: #4ade80 !important;
+        }
+
+        [data-bs-theme="dark"] .receipt-item {
+            border-bottom-color: #4a5568;
+        }
+
+        [data-bs-theme="dark"] .digital-badge {
+            background-color: rgba(13, 110, 253, 0.2);
+            color: #90caf9;
+        }
+
+        [data-bs-theme="dark"] .text-muted {
+            color: #a0aec0 !important;
+        }
+
+        [data-bs-theme="dark"] .btn-outline-primary {
+            color: #90caf9;
+            border-color: #90caf9;
+        }
+
+        [data-bs-theme="dark"] .btn-outline-primary:hover {
+            background-color: #90caf9;
+            color: #1a202c;
+        }
+
+        [data-bs-theme="dark"] .btn-outline-secondary {
+            color: #cbd5e0;
+            border-color: #cbd5e0;
+        }
+
+        [data-bs-theme="dark"] .btn-outline-secondary:hover {
+            background-color: #cbd5e0;
+            color: #1a202c;
+        }
     </style>
+    <script>
+        // Carica il tema dal localStorage prima del rendering per evitare flash di luce
+        const temaSalvato = localStorage.getItem('temaPreferito') || 'light';
+        document.documentElement.setAttribute('data-bs-theme', temaSalvato);
+    </script>
 </head>
 
 <body>

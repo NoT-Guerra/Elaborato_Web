@@ -453,7 +453,7 @@ if ($result) {
                                 <h3 class="h5 card-title mb-0 fw-bold"><span class="fas fa-book me-2"
                                         aria-hidden="true"></span>Gestione Materie</h3>
                             </div>
-                            drum: <div class="card-body">
+                            <div class="card-body">
                                 <div class="row g-2 mb-4">
                                     <div class="col-md-5">
                                         <label for="newSubject" class="visually-hidden">Nuova materia</label>
@@ -499,7 +499,7 @@ if ($result) {
                                 <h3 class="h5 card-title mb-0 fw-bold"><span class="fas fa-graduation-cap me-2"
                                         aria-hidden="true"></span>Gestione Facoltà</h3>
                             </div>
-                            drum: <div class="card-body">
+                            <div class="card-body">
                                 <div class="row g-2 mb-4">
                                     <div class="col">
                                         <label for="newFaculty" class="visually-hidden">Nuova facoltà</label>

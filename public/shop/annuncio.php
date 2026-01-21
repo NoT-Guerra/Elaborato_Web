@@ -441,10 +441,11 @@ if ($is_logged_in) {
                                 <button class="btn btn-outline-custom-white btn-lg py-3 btn-preferiti"
                                     data-id="<?php echo $annuncio['id_annuncio']; ?>">
                                     <?php if ($is_favorite): ?>
-                                        <span class="bi bi-heart-fill me-2 text-danger" aria-hidden="true"></span>Rimuovi
+                                        <span class="bi bi-suit-heart-fill me-2 text-danger"
+                                            aria-hidden="true"></span>Rimuovi
                                         dai preferiti
                                     <?php else: ?>
-                                        <span class="bi bi-heart me-2" aria-hidden="true"></span>Aggiungi ai preferiti
+                                        <span class="bi bi-suit-heart me-2" aria-hidden="true"></span>Aggiungi ai preferiti
                                     <?php endif; ?>
                                 </button>
                             </div>
