@@ -56,7 +56,7 @@ unset($_SESSION['purchase_date']);
 
         .digital-badge {
             background: #e3f2fd;
-            color: #0d6efd;
+            color: #06357a;
             padding: 3px 10px;
             border-radius: 20px;
             font-size: 0.8rem;
@@ -81,7 +81,7 @@ unset($_SESSION['purchase_date']);
                 <!-- Header -->
                 <div class="text-center mb-5">
                     <div class="success-icon mb-3">
-                        <i class="bi bi-check-circle-fill"></i>
+                        <span class="bi bi-check-circle-fill" aria-hidden="true"></span>
                     </div>
                     <h1 class="fw-bold text-success">Acquisto Confermato!</h1>
                     <p class="text-muted">Grazie per il tuo acquisto. Riceverai una email di conferma con i dettagli.
@@ -91,37 +91,39 @@ unset($_SESSION['purchase_date']);
                 <!-- Riepilogo acquisto -->
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header bg-white border-0 pt-4">
-                        <h4 class="fw-bold mb-0">
-                            <i class="bi bi-receipt me-2"></i>Riepilogo Ordine
-                        </h4>
+                        <h2 class="h4 fw-bold mb-0">
+                            <span class="bi bi-receipt me-2" aria-hidden="true"></span>Riepilogo Ordine
+                        </h2>
                         <small class="text-muted">Ordine effettuato il <?php echo $date; ?></small>
                     </div>
                     <div class="card-body">
                         <!-- Lista prodotti -->
                         <div class="mb-4">
-                            <h6 class="fw-bold mb-3">Prodotti acquistati:</h6>
+                            <h3 class="h6 fw-bold mb-3">Prodotti acquistati:</h3>
                             <?php foreach ($items as $item): ?>
                                 <div class="receipt-item">
                                     <div class="d-flex justify-content-between align-items-start">
                                         <div>
-                                            <h6 class="fw-bold mb-1"><?php echo htmlspecialchars($item['titolo']); ?></h6>
+                                            <h4 class="fw-bold mb-1 h6"><?php echo htmlspecialchars($item['titolo']); ?>
+                                            </h4>
                                             <div class="d-flex align-items-center gap-2 mb-2">
                                                 <span
                                                     class="badge bg-primary"><?php echo htmlspecialchars($item['nome_categoria']); ?></span>
                                                 <?php if (strtolower($item['nome_categoria']) === 'pdf' || $item['is_digitale'] == 1): ?>
                                                     <span class="digital-badge">
-                                                        <i class="bi bi-cloud-download me-1"></i>Digitale
+                                                        <span class="bi bi-cloud-download me-1"
+                                                            aria-hidden="true"></span>Digitale
                                                     </span>
                                                 <?php endif; ?>
                                             </div>
                                             <?php if (strtolower($item['nome_categoria']) === 'pdf' || $item['is_digitale'] == 1): ?>
                                                 <small class="text-success">
-                                                    <i class="bi bi-info-circle me-1"></i>
+                                                    <span class="bi bi-info-circle me-1" aria-hidden="true"></span>
                                                     Questo prodotto digitale è disponibile per il download nel tuo profilo.
                                                 </small>
                                             <?php else: ?>
                                                 <small class="text-muted">
-                                                    <i class="bi bi-info-circle me-1"></i>
+                                                    <span class="bi bi-info-circle me-1" aria-hidden="true"></span>
                                                     Il venditore ti contatterà per concordare la consegna.
                                                 </small>
                                             <?php endif; ?>
@@ -137,11 +139,12 @@ unset($_SESSION['purchase_date']);
                         <!-- Totale -->
                         <div class="border-top pt-3">
                             <div class="d-flex justify-content-between align-items-center">
-                                <h5 class="fw-bold mb-0">Totale pagato:</h5>
-                                <h4 class="fw-bold text-success mb-0">€<?php echo number_format($total, 2); ?></h4>
+                                <h3 class="h5 fw-bold mb-0">Totale pagato:</h3>
+                                <span
+                                    class="h4 fw-bold text-success mb-0">€<?php echo number_format($total, 2); ?></span>
                             </div>
                             <small class="text-muted d-block mt-2">
-                                <i class="bi bi-shield-check me-1"></i>
+                                <span class="bi bi-shield-check me-1" aria-hidden="true"></span>
                                 Pagamento sicuro elaborato con successo
                             </small>
                         </div>
@@ -151,13 +154,13 @@ unset($_SESSION['purchase_date']);
                 <!-- Azioni -->
                 <div class="d-grid gap-3 d-md-flex justify-content-md-center no-print">
                     <a href="../index.php" class="btn btn-outline-primary px-4">
-                        <i class="bi bi-house me-2"></i>Torna alla Home
+                        <span class="bi bi-house me-2" aria-hidden="true"></span>Torna alla Home
                     </a>
                     <a href="../user/miei_acquisti.php" class="btn btn-primary px-4">
-                        <i class="bi bi-bag-check me-2"></i>Vedi i miei acquisti
+                        <span class="bi bi-bag-check me-2" aria-hidden="true"></span>Vedi i miei acquisti
                     </a>
                     <button onclick="window.print()" class="btn btn-outline-secondary px-4">
-                        <i class="bi bi-printer me-2"></i>Stampa ricevuta
+                        <span class="bi bi-printer me-2" aria-hidden="true"></span>Stampa ricevuta
                     </button>
                 </div>
 
@@ -175,9 +178,9 @@ unset($_SESSION['purchase_date']);
                 <?php if ($has_digital): ?>
                     <div class="alert alert-info mt-4">
                         <div class="d-flex align-items-center">
-                            <i class="bi bi-cloud-download fs-4 me-3"></i>
+                            <span class="bi bi-cloud-download fs-4 me-3" aria-hidden="true"></span>
                             <div>
-                                <h6 class="fw-bold mb-1">Prodotti digitali acquistati</h6>
+                                <h3 class="h6 fw-bold mb-1">Prodotti digitali acquistati</h3>
                                 <p class="mb-0">I tuoi file digitali (PDF) sono disponibili nella sezione <a
                                         href="../user/miei_acquisti.php" class="fw-bold">"I miei acquisti"</a> del tuo
                                     profilo. Puoi scaricarli in qualsiasi momento.</p>
@@ -200,9 +203,9 @@ unset($_SESSION['purchase_date']);
                 <?php if ($has_physical): ?>
                     <div class="alert alert-warning mt-3">
                         <div class="d-flex align-items-center">
-                            <i class="bi bi-truck fs-4 me-3"></i>
+                            <span class="bi bi-truck fs-4 me-3" aria-hidden="true"></span>
                             <div>
-                                <h6 class="fw-bold mb-1">Prodotti fisici</h6>
+                                <h3 class="h6 fw-bold mb-1">Prodotti fisici</h3>
                                 <p class="mb-0">Per i prodotti fisici, il venditore ti contatterà tramite email entro 48 ore
                                     per concordare le modalità di consegna. Assicurati di controllare la tua casella di
                                     posta.</p>

@@ -382,10 +382,10 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                 <div class="d-flex align-items-center">
                     <div class="bg-primary rounded-3 d-flex align-items-center justify-content-center me-2 me-sm-3"
                         style="width: 48px; height: 48px;">
-                        <i class="bi bi-book text-white fs-3"></i>
+                        <span class="bi bi-book text-white fs-3" aria-hidden="true"></span>
                     </div>
-                    <a href="../index.php" class="btn btn-link text-body p-0 me-3"><i
-                            class="bi bi-arrow-left fs-4"></i></a>
+                    <a href="../index.php" class="btn btn-link text-body p-0 me-3" aria-label="Torna alla Home"><span
+                            class="bi bi-arrow-left fs-4" aria-hidden="true"></span></a>
                     <div>
                         <h1 class="h5 fw-bold mb-0">UniboMarket</h1>
                         <p class="text-muted small mb-0 d-none d-md-block">I miei annunci</p>
@@ -395,9 +395,9 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                 <!-- Azioni -->
                 <div class="d-flex align-items-center gap-2">
                     <!-- Bottone Preferiti -->
-                    <a href="preferiti.php"
-                        class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
-                        <i class="bi bi-suit-heart"></i>
+                    <a href="preferiti.php" class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex"
+                        aria-label="Vai ai preferiti">
+                        <span class="bi bi-suit-heart" aria-hidden="true"></span>
                         <span id="fav-counter-header"
                             class="badge rounded-pill bg-danger <?php echo ($fav_count > 0) ? '' : 'd-none'; ?>">
                             <?php echo $fav_count; ?>
@@ -406,8 +406,9 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
 
                     <!-- Bottone Carrello -->
                     <a href="../shop/carrello.php"
-                        class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
-                        <i class="bi bi-cart"></i>
+                        class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex"
+                        aria-label="Vai al carrello">
+                        <span class="bi bi-cart" aria-hidden="true"></span>
                         <span id="cart-counter-header"
                             class="badge rounded-pill bg-danger <?php echo ($cart_count > 0) ? '' : 'd-none'; ?>">
                             <?php echo $cart_count; ?>
@@ -417,31 +418,32 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                     <!-- Nome utente e Logout -->
                     <div class="d-none d-md-flex align-items-center">
                         <span class="me-3 text-muted">
-                            <i class="bi bi-person-circle me-1"></i>
+                            <span class="bi bi-person-circle me-1" aria-hidden="true"></span>
                             <?php echo htmlspecialchars($_SESSION['nome'] . ' ' . $_SESSION['cognome']); ?>
                         </span>
-                        <a href="../auth/logout.php" class="btn btn-outline-dark d-flex align-items-center px-3">
-                            <i class="bi bi-box-arrow-right me-2"></i>Logout
+                        <a href="../auth/logout.php" class="btn btn-outline-dark d-flex align-items-center px-3"
+                            aria-label="Logout">
+                            <span class="bi bi-box-arrow-right me-2" aria-hidden="true"></span>Logout
                         </a>
                     </div>
 
                     <!-- Bottone Pubblica -->
                     <a href="../shop/pubblica.php"
                         class="btn btn-dark d-flex align-items-center justify-content-center px-3">
-                        <i class="bi bi-plus-circle"></i>
+                        <span class="bi bi-plus-circle" aria-hidden="true"></span>
                         <span class="d-none d-md-inline ms-2">Pubblica</span>
                     </a>
 
                     <!-- Bottone Tema -->
-                    <button id="btn-tema" class="btn btn-outline-secondary">
-                        <i id="icona-luna" class="bi bi-moon"></i>
-                        <i id="icona-sole" class="bi bi-sun d-none"></i>
+                    <button id="btn-tema" class="btn btn-outline-secondary" aria-label="Cambia tema">
+                        <span id="icona-luna" class="bi bi-moon" aria-hidden="true"></span>
+                        <span id="icona-sole" class="bi bi-sun d-none" aria-hidden="true"></span>
                     </button>
 
                     <!-- Bottone menu a tendina -->
                     <button class="btn btn-link text-body p-0 ms-2" type="button" data-bs-toggle="offcanvas"
-                        data-bs-target="#menuMobile">
-                        <i class="bi bi-list fs-2"></i>
+                        data-bs-target="#menuMobile" aria-label="Menu navigazione">
+                        <span class="bi bi-list fs-2" aria-hidden="true"></span>
                     </button>
                 </div>
             </div>
@@ -449,21 +451,21 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             <!-- Menù a tendina -->
             <div class="offcanvas offcanvas-end" tabindex="-1" id="menuMobile" aria-labelledby="menuMobileLabel">
                 <div class="offcanvas-header border-bottom">
-                    <h5 class="offcanvas-title fw-bold" id="menuMobileLabel">UniboMarket</h5>
+                    <h2 class="offcanvas-title h5 fw-bold" id="menuMobileLabel">UniboMarket</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body p-0">
                     <div class="p-3 d-grid gap-2">
                         <div class="text-center mb-2">
-                            <i class="bi bi-person-circle fs-2 mb-2"></i>
-                            <h6 class="mb-0">
+                            <span class="bi bi-person-circle fs-2 mb-2" aria-hidden="true"></span>
+                            <h3 class="h6 mb-0">
                                 <?php echo htmlspecialchars($_SESSION['nome'] . ' ' . $_SESSION['cognome']); ?>
-                            </h6>
+                            </h3>
                             <small class="text-muted"><?php echo htmlspecialchars($_SESSION['email']); ?></small>
                         </div>
                         <a href="../auth/logout.php"
                             class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
-                            <i class="bi bi-box-arrow-right"></i> Logout
+                            <span class="bi bi-box-arrow-right" aria-hidden="true"></span> Logout
                         </a>
                     </div>
 
@@ -471,23 +473,23 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
 
                     <div class="list-group list-group-flush">
                         <a href="preferiti.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
-                            <i class="bi bi-suit-heart me-3"></i> Preferiti
+                            <span class="bi bi-suit-heart me-3" aria-hidden="true"></span> Preferiti
                         </a>
                         <a href="../shop/carrello.php"
                             class="list-group-item list-group-item-action border-0 py-3 px-4">
-                            <i class="bi bi-cart me-3"></i> Carrello
+                            <span class="bi bi-cart me-3" aria-hidden="true"></span> Carrello
                         </a>
                         <a href="miei_acquisti.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
-                            <i class="bi bi-collection me-3"></i> I miei acquisti
+                            <span class="bi bi-collection me-3" aria-hidden="true"></span> I miei acquisti
                         </a>
                         <hr class="my-0 opacity-10">
                         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
                             <a href="../admin/index.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
-                                <i class="bi bi-shield-lock me-3"></i> Pannello Admin
+                                <span class="bi bi-shield-lock me-3" aria-hidden="true"></span> Pannello Admin
                             </a>
                         <?php endif; ?>
                         <a href="#" class="list-group-item list-group-item-action border-0 py-3 px-4">
-                            <i class="bi bi-question-circle me-3"></i> Aiuto e Supporto
+                            <span class="bi bi-question-circle me-3" aria-hidden="true"></span> Aiuto e Supporto
                         </a>
                     </div>
                 </div>
@@ -512,7 +514,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
         <?php endif; ?>
 
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="h3 fw-bold">I miei annunci</h1>
+            <h2 class="h3 fw-bold">I miei annunci</h2>
             <div>
                 <span class="badge bg-primary rounded-pill"><?php echo count($annunci); ?> annunci</span>
             </div>
@@ -557,9 +559,12 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                             <div class="action-buttons">
                                 <button class="btn-action"
                                     onclick="confirmDelete(<?php echo $annuncio['id_annuncio']; ?>, '<?php echo htmlspecialchars(addslashes($annuncio['titolo'])); ?>')"
-                                    title="Elimina annuncio" <?php echo $annuncio['is_venduto'] ? 'disabled' : ''; ?>>
-                                    <i
-                                        class="bi bi-trash <?php echo $annuncio['is_venduto'] ? 'text-muted' : 'text-danger'; ?>"></i>
+                                    title="Elimina annuncio" <?php echo $annuncio['is_venduto'] ? 'disabled' : ''; ?>
+                                    aria-label="Elimina annuncio">
+
+                                    <span
+                                        class="bi bi-trash <?php echo $annuncio['is_venduto'] ? 'text-muted' : 'text-danger'; ?>"
+                                        aria-hidden="true"></span>
                                 </button>
 
                             </div>
@@ -573,9 +578,9 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                             <!-- Contenuto -->
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h6 class="fw-bold mb-0 text-truncate">
+                                    <h3 class="h6 fw-bold mb-0 text-truncate">
                                         <?php echo htmlspecialchars($annuncio['titolo']); ?>
-                                    </h6>
+                                    </h3>
                                     <span class="badge bg-primary-subtle text-primary price-badge">
                                         €<?php echo number_format($annuncio['prezzo'], 2); ?>
                                     </span>
@@ -589,7 +594,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                                 <!-- Informazioni -->
                                 <div class="mb-3">
                                     <span class="badge <?php echo $classe_categoria; ?> border me-2">
-                                        <i class="bi bi-book me-1"></i>
+                                        <span class="bi bi-book me-1" aria-hidden="true"></span>
                                         <?php echo htmlspecialchars($annuncio['nome_categoria']); ?>
                                     </span>
                                     <span class="badge bg-info-subtle text-info">
@@ -599,12 +604,12 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
 
                                 <div class="d-flex justify-content-between align-items-center mb-2">
                                     <small class="text-muted">
-                                        <i class="bi bi-geo-alt me-1"></i>
+                                        <span class="bi bi-geo-alt me-1" aria-hidden="true"></span>
                                         <?php echo htmlspecialchars($annuncio['nome_facolta'] ?? 'N/A'); ?>
                                     </small>
                                     <?php if ($annuncio['nome_corso']): ?>
                                         <small class="text-muted">
-                                            <i class="bi bi-journal me-1"></i>
+                                            <span class="bi bi-journal me-1" aria-hidden="true"></span>
                                             <?php echo htmlspecialchars($annuncio['nome_corso']); ?>
                                         </small>
                                     <?php endif; ?>
@@ -613,12 +618,12 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                                 <!-- Date -->
                                 <div class="border-top pt-2">
                                     <small class="text-muted d-block">
-                                        <i class="bi bi-calendar me-1"></i>
+                                        <span class="bi bi-calendar me-1" aria-hidden="true"></span>
                                         Pubblicato: <?php echo $data_pubblicazione; ?>
                                     </small>
                                     <?php if ($data_modifica): ?>
                                         <small class="text-muted d-block">
-                                            <i class="bi bi-pencil me-1"></i>
+                                            <span class="bi bi-pencil me-1" aria-hidden="true"></span>
                                             Modificato: <?php echo $data_modifica; ?>
                                         </small>
                                     <?php endif; ?>
@@ -632,12 +637,12 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             <!-- Stato vuoto -->
             <div class="empty-state text-center">
                 <div class="mb-3">
-                    <i class="bi bi-collection empty-state-icon text-muted"></i>
+                    <span class="bi bi-collection empty-state-icon text-muted" aria-hidden="true"></span>
                 </div>
                 <h3 class="h4 text-muted mb-2">Nessun annuncio pubblicato</h3>
                 <p class="text-muted mb-4">Inizia a vendere i tuoi libri e appunti universitari!</p>
                 <a href="../shop/pubblica.php" class="btn btn-primary btn-lg">
-                    <i class="bi bi-plus-circle me-2"></i>Pubblica il tuo primo annuncio
+                    <span class="bi bi-plus-circle me-2" aria-hidden="true"></span>Pubblica il tuo primo annuncio
                 </a>
             </div>
         <?php endif; ?>
@@ -648,7 +653,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="deleteModalLabel">Conferma eliminazione</h5>
+                    <h2 class="modal-title h5" id="deleteModalLabel">Conferma eliminazione</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">

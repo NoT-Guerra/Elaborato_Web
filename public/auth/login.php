@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="row">
             <header class="p-3 border-bottom mb-2 bg-body">
                 <a href="../index.php" class="text-body text-decoration-none d-flex align-items-center">
-                    <i class="bi bi-arrow-left me-2"></i>Torna al marketplace
+                    <span class="bi bi-arrow-left me-2" aria-hidden="true"></span>Torna al marketplace
                 </a>
             </header>
         </div>

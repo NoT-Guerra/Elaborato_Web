@@ -69,8 +69,8 @@ $stmt->close();
         <div class="container-fluid p-3">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center">
-                    <a href="../index.php" class="btn btn-link text-body p-0 me-3">
-                        <i class="bi bi-arrow-left fs-4"></i>
+                    <a href="../index.php" class="btn btn-link text-body p-0 me-3" aria-label="Torna alla Home">
+                        <span class="bi bi-arrow-left fs-4" aria-hidden="true"></span>
                     </a>
                     <div>
                         <h1 class="h5 fw-bold mb-0">I miei acquisti</h1>
@@ -109,8 +109,8 @@ $stmt->close();
 
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
-                                    <h6 class="card-title fw-bold mb-0"><?php echo htmlspecialchars($acquisto['titolo']); ?>
-                                    </h6>
+                                    <h2 class="card-title h6 fw-bold mb-0"><?php echo htmlspecialchars($acquisto['titolo']); ?>
+                                    </h2>
                                     <span
                                         class="badge bg-success">€<?php echo number_format($acquisto['prezzo_vendita'], 2); ?></span>
                                 </div>
@@ -130,12 +130,12 @@ $stmt->close();
 
                                 <div class="mb-3">
                                     <small class="text-muted d-block">
-                                        <i class="bi bi-person me-1"></i>
+                                        <span class="bi bi-person me-1" aria-hidden="true"></span>
                                         Venditore:
                                         <?php echo htmlspecialchars($acquisto['venditore_nome'] . ' ' . $acquisto['venditore_cognome']); ?>
                                     </small>
                                     <small class="text-muted d-block">
-                                        <i class="bi bi-calendar me-1"></i>
+                                        <span class="bi bi-calendar me-1" aria-hidden="true"></span>
                                         Acquistato il: <?php echo $data_vendita; ?>
                                     </small>
                                 </div>
@@ -143,7 +143,7 @@ $stmt->close();
                                 <?php if ($is_digitale): ?>
                                     <div class="alert alert-success p-2 mb-3">
                                         <div class="d-flex align-items-center">
-                                            <i class="bi bi-cloud-download fs-5 me-2"></i>
+                                            <span class="bi bi-cloud-download fs-5 me-2" aria-hidden="true"></span>
                                             <div>
                                                 <small class="fw-bold d-block">Prodotto digitale</small>
                                                 <small>Disponibile per il download</small>
@@ -156,20 +156,20 @@ $stmt->close();
                                             <input type="hidden" name="vendita_id" value="<?php echo $acquisto['id_vendita']; ?>">
                                             <input type="hidden" name="annuncio_id" value="<?php echo $acquisto['id_annuncio']; ?>">
                                             <button type="submit" class="btn btn-primary w-100">
-                                                <i class="bi bi-download me-2"></i>
+                                                <span class="bi bi-download me-2" aria-hidden="true"></span>
                                                 Scarica "<?php echo htmlspecialchars($acquisto['original_filename']); ?>"
                                             </button>
                                         </form>
                                     <?php else: ?>
                                         <button class="btn btn-primary w-100"
                                             onclick="alert('PDF non disponibile. Contatta l\'assistenza.')">
-                                            <i class="bi bi-download me-2"></i>Scarica PDF
+                                            <span class="bi bi-download me-2" aria-hidden="true"></span>Scarica PDF
                                         </button>
                                     <?php endif; ?>
                                 <?php else: ?>
                                     <div class="alert alert-info p-2">
                                         <div class="d-flex align-items-center">
-                                            <i class="bi bi-truck fs-5 me-2"></i>
+                                            <span class="bi bi-truck fs-5 me-2" aria-hidden="true"></span>
                                             <div>
                                                 <small class="fw-bold d-block">Prodotto fisico</small>
                                                 <small>Contatta il venditore per la consegna</small>
@@ -179,7 +179,7 @@ $stmt->close();
 
                                     <a href="mailto:<?php echo htmlspecialchars($acquisto['venditore_email']); ?>"
                                         class="btn btn-outline-primary w-100">
-                                        <i class="bi bi-envelope me-2"></i>Contatta venditore
+                                        <span class="bi bi-envelope me-2" aria-hidden="true"></span>Contatta venditore
                                     </a>
                                 <?php endif; ?>
                             </div>
@@ -189,11 +189,11 @@ $stmt->close();
             </div>
         <?php else: ?>
             <div class="text-center py-5">
-                <i class="bi bi-bag-x fs-1 text-muted"></i>
-                <h5 class="mt-3 text-muted">Nessun acquisto effettuato</h5>
+                <span class="bi bi-bag-x fs-1 text-muted" aria-hidden="true"></span>
+                <h2 class="mt-3 text-muted h5">Nessun acquisto effettuato</h2>
                 <p class="text-muted">Visita il marketplace per trovare prodotti interessanti!</p>
                 <a href="../index.php" class="btn btn-primary mt-2">
-                    <i class="bi bi-shop me-2"></i>Vai allo shopping
+                    <span class="bi bi-shop me-2" aria-hidden="true"></span>Vai allo shopping
                 </a>
             </div>
         <?php endif; ?>

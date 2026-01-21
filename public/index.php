@@ -1,13 +1,9 @@
 <?php
-// Inizia la sessione
 session_start();
-
-// Connessione al database
+//Connessione al database
 require_once __DIR__ . '/../app/config/database.php';
 
-
-
-// Query per ottenere gli annunci con le relative informazioni
+//Query per ottenere gli annunci con le relative informazioni
 $sql = "SELECT 
                 a.id_annuncio,
                 a.titolo,
@@ -15,7 +11,6 @@ $sql = "SELECT
                 a.prezzo,
                 a.data_pubblicazione,
                 a.data_pubblicazione,
-                -- a.is_digitale removed
                 a.immagine_url,
                 a.is_attivo,
                 a.is_venduto,
@@ -158,9 +153,10 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         }
 
         .filter-btn.active {
-            background-color: var(--bs-primary) !important;
+            background-color: #0a58ca !important;
+            /* Accessible Blue */
             color: white !important;
-            border-color: var(--bs-primary) !important;
+            border-color: #0a58ca !important;
         }
 
         .price-badge {
@@ -269,32 +265,32 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         /* Stili per categorie */
         .categoria-libro {
             background-color: #e3f2fd !important;
-            color: #1565c0 !important;
+            color: #0d47a1 !important;
         }
 
         .categoria-appunti {
             background-color: #f3e5f5 !important;
-            color: #7b1fa2 !important;
+            color: #4a148c !important;
         }
 
         .categoria-digitale {
             background-color: #e8f5e8 !important;
-            color: #2e7d32 !important;
+            color: #1b5e20 !important;
         }
 
         .categoria-pdf {
             background-color: #f8f0f0 !important;
-            color: #c62828 !important;
+            color: #b71c1c !important;
         }
 
         .categoria-materiale {
             background-color: #fff3e0 !important;
-            color: #ef6c00 !important;
+            color: #e65100 !important;
         }
 
         .categoria-altro {
             background-color: #f5f5f5 !important;
-            color: #616161 !important;
+            color: #212121 !important;
         }
 
         /* Stili per tema scuro */
@@ -387,7 +383,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 <div class="d-flex align-items-center">
                     <div class="bg-primary rounded-3 d-flex align-items-center justify-content-center me-2 me-sm-3"
                         style="width: 48px; height: 48px;">
-                        <i class="bi bi-book text-white fs-3"></i>
+                        <span class="bi bi-book text-white fs-3" aria-hidden="true"></span>
                     </div>
                     <div>
                         <h1 class="h5 fw-bold mb-0">UniboMarket</h1>
@@ -398,9 +394,11 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 <!-- Azioni -->
                 <div class="d-flex align-items-center gap-2">
                     <!-- Bottone Preferiti - visibile solo su schermi medi e grandi -->
+                    <!-- Bottone Preferiti - visibile solo su schermi medi e grandi -->
                     <a href="user/preferiti.php"
-                        class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
-                        <i class="bi bi-suit-heart"></i>
+                        class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex"
+                        aria-label="Vai ai preferiti">
+                        <span class="bi bi-suit-heart"></span>
                         <?php
                         $fav_count = count($favorites);
                         ?>
@@ -412,8 +410,9 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 
                     <!-- Bottone Carrello - visibile solo su schermi medi e grandi -->
                     <a href="shop/carrello.php"
-                        class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex">
-                        <i class="bi bi-cart"></i>
+                        class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex"
+                        aria-label="Vai al carrello">
+                        <span class="bi bi-cart"></span>
                         <span id="cart-counter-header"
                             class="badge rounded-pill bg-danger <?php echo ($cart_count > 0) ? '' : 'd-none'; ?>">
                             <?php echo $cart_count; ?>
@@ -424,21 +423,21 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                         <!-- Se l'utente è loggato, mostra Logout e Nome utente -->
                         <div class="d-none d-md-flex align-items-center">
                             <span class="me-3 text-muted">
-                                <i class="bi bi-person-circle me-1"></i>
+                                <span class="bi bi-person-circle me-1"></span>
                                 <?php echo htmlspecialchars($_SESSION['nome'] . ' ' . $_SESSION['cognome']); ?>
                             </span>
                             <a href="auth/logout.php" class="btn btn-outline-dark d-flex align-items-center px-3">
-                                <i class="bi bi-box-arrow-right me-2"></i>Logout
+                                <span class="bi bi-box-arrow-right me-2"></span>Logout
                             </a>
                         </div>
                     <?php else: ?>
                         <!-- Se l'utente NON è loggato, mostra Login e Registrati -->
                         <a href="auth/login.php" class="btn btn-outline-dark d-none d-md-flex align-items-center px-3">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                            <span class="bi bi-box-arrow-in-right me-2"></span>Login
                         </a>
                         <a id="btn-register" href="auth/register.php"
                             class="btn btn-outline-dark d-none d-md-flex align-items-center gap-2 px-2 px-sm-3">
-                            <i class="bi bi-person-add"></i>
+                            <span class="bi bi-person-add"></span>
                             <span class="ms-1">Registrati</span>
                         </a>
                     <?php endif; ?>
@@ -446,20 +445,21 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     <!-- Bottone Pubblica - già responsive -->
                     <a href="shop/pubblica.php"
                         class="btn btn-dark d-flex align-items-center justify-content-center px-3">
-                        <i class="bi bi-plus-circle"></i>
+                        <span class="bi bi-plus-circle"></span>
                         <span class="d-none d-md-inline ms-2">Pubblica</span>
                     </a>
 
                     <!-- Bottone Tema - rimane sempre visibile -->
-                    <button id="btn-tema" class="btn btn-outline-secondary">
-                        <i id="icona-luna" class="bi bi-moon"></i>
-                        <i id="icona-sole" class="bi bi-sun d-none"></i>
+                    <!-- Bottone Tema - rimane sempre visibile -->
+                    <button id="btn-tema" class="btn btn-outline-secondary" aria-label="Cambia tema">
+                        <span id="icona-luna" class="bi bi-moon"></span>
+                        <span id="icona-sole" class="bi bi-sun d-none"></span>
                     </button>
 
                     <!-- Bottone menu a tendina - rimane sempre visibile -->
                     <button class="btn btn-link text-body p-0 ms-2" type="button" data-bs-toggle="offcanvas"
-                        data-bs-target="#menuMobile">
-                        <i class="bi bi-list fs-2"></i>
+                        data-bs-target="#menuMobile" aria-label="Menu navigazione">
+                        <span class="bi bi-list fs-2"></span>
                     </button>
                 </div>
             </div>
@@ -467,7 +467,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             <!-- Menù a tendina -->
             <div class="offcanvas offcanvas-end" tabindex="-1" id="menuMobile" aria-labelledby="menuMobileLabel">
                 <div class="offcanvas-header border-bottom">
-                    <h5 class="offcanvas-title fw-bold" id="menuMobileLabel">UniboMarket</h5>
+                    <h2 class="offcanvas-title h5 fw-bold" id="menuMobileLabel">UniboMarket</h2>
                     <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body p-0">
@@ -475,25 +475,25 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                         <?php if ($is_logged_in): ?>
                             <!-- Se loggato, mostra Logout e nome utente nel menu mobile -->
                             <div class="text-center mb-2">
-                                <i class="bi bi-person-circle fs-2 mb-2"></i>
-                                <h6 class="mb-0">
+                                <span class="bi bi-person-circle fs-2 mb-2"></span>
+                                <h3 class="h6 mb-0">
                                     <?php echo htmlspecialchars($_SESSION['nome'] . ' ' . $_SESSION['cognome']); ?>
-                                </h6>
+                                </h3>
                                 <small class="text-muted"><?php echo htmlspecialchars($_SESSION['email']); ?></small>
                             </div>
                             <a href="auth/logout.php"
                                 class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
-                                <i class="bi bi-box-arrow-right"></i> Logout
+                                <span class="bi bi-box-arrow-right"></span> Logout
                             </a>
                         <?php else: ?>
                             <!-- Se NON loggato, mostra Login e Registrati nel menu mobile -->
                             <a href="auth/login.php"
                                 class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
-                                <i class="bi bi-box-arrow-in-right"></i> Login
+                                <span class="bi bi-box-arrow-in-right"></span> Login
                             </a>
                             <a href="auth/register.php"
                                 class="btn btn-outline-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
-                                <i class="bi bi-person-add"></i> Registrati
+                                <span class="bi bi-person-add"></span> Registrati
                             </a>
                         <?php endif; ?>
                     </div>
@@ -502,26 +502,26 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 
                     <div class="list-group list-group-flush">
                         <a href="user/preferiti.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
-                            <i class="bi bi-suit-heart me-3"></i> Preferiti
+                            <span class="bi bi-suit-heart me-3"></span> Preferiti
                         </a>
                         <a href="shop/carrello.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
-                            <i class="bi bi-cart me-3"></i> Carrello
+                            <span class="bi bi-cart me-3"></span> Carrello
                         </a>
                         <!-- Aggiungi questo link -->
                         <a href="user/miei_acquisti.php"
                             class="list-group-item list-group-item-action border-0 py-3 px-4">
-                            <i class="bi bi-bag-check me-3"></i> I miei acquisti
+                            <span class="bi bi-bag-check me-3"></span> I miei acquisti
                         </a>
                         <?php if ($is_logged_in): ?>
                             <a href="user/miei_annunci.php"
                                 class="list-group-item list-group-item-action border-0 py-3 px-4">
-                                <i class="bi bi-collection me-3"></i> I miei annunci
+                                <span class="bi bi-collection me-3"></span> I miei annunci
                             </a>
                         <?php endif; ?>
                         <hr class="my-0 opacity-10">
                         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
                             <a href="admin/admin.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
-                                <i class="bi bi-shield-lock me-3"></i> Pannello Admin
+                                <span class="bi bi-shield-lock me-3"></span> Pannello Admin
                             </a>
                         <?php endif; ?>
                     </div>
@@ -545,7 +545,8 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             <!-- Ricerca -->
             <div class="mt-3">
                 <div class="input-group">
-                    <span class="input-group-text bg-transparent"><i class="bi bi-search"></i></span>
+                    <span class="input-group-text bg-transparent"><span class="bi bi-search"></span></span>
+                    <label for="searchInput" class="visually-hidden">Cerca libri o appunti</label>
                     <input type="text" id="searchInput" class="form-control" placeholder="Cerca libri o appunti...">
                 </div>
             </div>
@@ -558,10 +559,10 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             <aside class="col-lg-3 col-md-4">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
-                        <h6 class="fw-bold mb-3"><i class="bi bi-funnel me-2"></i>Filtri</h6>
+                        <h2 class="h6 fw-bold mb-3"><span class="bi bi-funnel me-2"></span>Filtri</h2>
 
                         <div class="mb-3">
-                            <label class="form-label small fw-semibold">Facoltà</label>
+                            <label for="filterFacolta" class="form-label small fw-semibold">Facoltà</label>
                             <select id="filterFacolta" class="form-select form-select-sm">
                                 <option value="">Tutte le facoltà</option>
                                 <?php foreach ($facolta_list as $facolta): ?>
@@ -573,7 +574,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label small fw-semibold">Condizione</label>
+                            <label for="filterCondizioni" class="form-label small fw-semibold">Condizione</label>
                             <select id="filterCondizioni" class="form-select form-select-sm">
                                 <option value="">Tutte le condizioni</option>
                                 <?php foreach ($condizioni_list as $condizione): ?>
@@ -585,8 +586,8 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                         </div>
 
                         <div class="mb-3">
-                            <label class="form-label small fw-semibold">Prezzo max: <span id="prezzoValore"
-                                    class="text-primary">100€</span></label>
+                            <label for="filterPrezzo" class="form-label small fw-semibold">Prezzo max: <span
+                                    id="prezzoValore" class="text-primary">100€</span></label>
                             <input type="range" id="filterPrezzo" class="form-range" min="0" max="150" step="5"
                                 value="100">
                             <div class="d-flex justify-content-between small text-muted">
@@ -596,7 +597,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                         </div>
 
                         <button class="btn btn-outline-secondary w-100 mt-2" onclick="resetFiltri()">
-                            <i class="bi bi-arrow-clockwise me-2"></i>Reset filtri
+                            <span class="bi bi-arrow-clockwise me-2"></span>Reset filtri
                         </button>
                     </div>
                 </div>
@@ -604,6 +605,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 
             <!-- Annunci -->
             <section class="col-lg-9 col-md-8">
+                <h2 class="visually-hidden">Lista Annunci</h2>
                 <div class="row g-4" id="lista-annunci">
                     <?php if (count($annunci) > 0): ?>
                         <?php foreach ($annunci as $annuncio):
@@ -652,8 +654,9 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                     $is_fav = in_array($annuncio['id_annuncio'], $favorites);
                                     $heart_class = $is_fav ? 'bi-suit-heart-fill text-danger' : 'bi-suit-heart';
                                     ?>
-                                    <button class="btn-preferiti" data-id="<?php echo $annuncio['id_annuncio']; ?>">
-                                        <i class="bi <?php echo $heart_class; ?>"></i>
+                                    <button class="btn-preferiti" data-id="<?php echo $annuncio['id_annuncio']; ?>"
+                                        aria-label="<?php echo $is_fav ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'; ?>">
+                                        <span class="bi <?php echo $heart_class; ?>" aria-hidden="true"></span>
                                     </button>
                                     <!-- Link attorno all'immagine -->
                                     <a href="shop/annuncio.php?id=<?php echo $annuncio['id_annuncio']; ?>"
@@ -663,10 +666,10 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                     </a>
                                     <div class="card-body">
                                         <div class="d-flex justify-content-between align-items-start mb-2">
-                                            <h6 class="fw-bold mb-0 text-truncate">
+                                            <h3 class="h6 fw-bold mb-0 text-truncate">
                                                 <?php echo htmlspecialchars($annuncio['titolo']); ?>
-                                            </h6>
-                                            <span class="badge bg-primary-subtle text-primary price-badge">
+                                            </h3>
+                                            <span class="badge bg-primary-subtle text-primary-emphasis price-badge">
                                                 €<?php echo number_format($annuncio['prezzo'], 2); ?>
                                             </span>
                                         </div>
@@ -675,11 +678,11 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                         </p>
                                         <div class="d-flex justify-content-between align-items-center mb-3">
                                             <span class="badge <?php echo $classe_categoria; ?> border">
-                                                <i class="bi bi-book me-1"></i>
+                                                <span class="bi bi-book me-1"></span>
                                                 <?php echo htmlspecialchars($annuncio['nome_categoria']); ?>
                                             </span>
                                             <small class="text-muted">
-                                                <i class="bi bi-geo-alt me-1"></i>
+                                                <span class="bi bi-geo-alt me-1"></span>
                                                 <?php echo htmlspecialchars($annuncio['nome_facolta'] ?? 'N/A'); ?>
                                             </small>
                                         </div>
@@ -703,7 +706,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                             </div>
                                             <button class="btn btn-dark btn-sm px-3 rounded-pill aggiungi-carrello"
                                                 data-id="<?php echo $annuncio['id_annuncio']; ?>">
-                                                <i class="bi bi-cart-plus me-1"></i>Aggiungi
+                                                <span class="bi bi-cart-plus me-1"></span>Aggiungi
                                             </button>
                                         </div>
                                     </div>
@@ -713,12 +716,12 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     <?php else: ?>
                         <div class="col-12 text-center py-5">
                             <div class="mb-3">
-                                <i class="bi bi-binoculars fs-1 text-muted"></i>
+                                <span class="bi bi-binoculars fs-1 text-muted"></span>
                             </div>
-                            <h5 class="text-muted">Nessun annuncio disponibile</h5>
+                            <h3 class="h5 text-muted">Nessun annuncio disponibile</h3>
                             <p class="text-muted">Sii il primo a pubblicare un annuncio!</p>
                             <a href="shop/pubblica.php" class="btn btn-primary">
-                                <i class="bi bi-plus-circle me-2"></i>Pubblica annuncio
+                                <span class="bi bi-plus-circle me-2"></span>Pubblica annuncio
                             </a>
                         </div>
                     <?php endif; ?>
@@ -735,16 +738,16 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     <div class="d-flex align-items-center mb-2">
                         <div class="bg-primary rounded-3 d-flex align-items-center justify-content-center me-2 me-sm-3"
                             style="width: 48px; height: 48px;">
-                            <i class="bi bi-book text-white fs-3"></i>
+                            <span class="bi bi-book text-white fs-3" aria-hidden="true"></span>
                         </div>
-                        <h5 class="fw-bold mb-0 text-body">UniboMarket</h5>
+                        <h2 class="h5 fw-bold mb-0 text-body">UniboMarket</h2>
                     </div>
                     <div class="text-body ms-1">Il marketplace dedicato agli studenti universitari per comprare e
                         vendere libri e appunti in modo semplice e sicuro.</div>
                 </div>
 
                 <div class="col-md-4 col-12 mb-3 mb-md-0 text-md-center">
-                    <h5 class="fw-bold mb-3 text-start text-md-center">Link Rapidi</h5>
+                    <h2 class="h5 fw-bold mb-3 text-start text-md-center">Link Rapidi</h2>
                     <ul class="list-unstyled text-start text-md-center p-0">
                         <li class="mb-2"><a href="#" class="text-body text-decoration-none">Home</a></li>
                         <li class="mb-2"><a href="chi_siamo.php" class="text-body text-decoration-none">Chi Siamo</a>
@@ -753,23 +756,27 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 </div>
 
                 <div class="col-md-4 col-12 mb-3 mb-md-0 text-md-center">
-                    <h5 class="fw-bold mb-3 text-start text-md-center">Contatti</h5>
+                    <h2 class="h5 fw-bold mb-3 text-start text-md-center">Contatti</h2>
                     <ul class="list-unstyled text-start text-md-center p-0">
-                        <li class="mb-2"><i class="bi bi-envelope me-2"></i><a href="mailto:info@unibomarket.com"
+                        <li class="mb-2"><span class="bi bi-envelope me-2"></span><a href="mailto:info@unibomarket.com"
                                 class="text-body text-decoration-none">info@unibomarket.com</a></li>
-                        <li class="mb-2"><i class="bi bi-phone me-2"></i><a href="tel:+391234567890"
+                        <li class="mb-2"><span class="bi bi-phone me-2"></span><a href="tel:+391234567890"
                                 class="text-body text-decoration-none">+39 123 4567890</a></li>
-                        <li class="mb-2"><i class="bi bi-geo-alt me-2"></i>Via Cesare Pavese, 50, 47521 Cesena FC</li>
+                        <li class="mb-2"><span class="bi bi-geo-alt me-2"></span>Via Cesare Pavese, 50, 47521 Cesena FC
+                        </li>
                     </ul>
                 </div>
 
                 <div class="col-md-4 col-12 mb-3 mb-md-0 text-md-center">
-                    <h5 class="fw-bold mb-3 text-center text-md-center">Seguici</h5>
+                    <h2 class="h5 fw-bold mb-3 text-center text-md-center">Seguici</h2>
                     <div class="d-flex justify-content-center gap-3">
-                        <a href="#" class="text-body fs-4"><i class="bi bi-facebook"></i></a>
-                        <a href="#" class="text-body fs-4"><i class="bi bi-instagram"></i></a>
-                        <a href="#" class="text-body fs-4"><i class="bi bi-twitter"></i></a>
-                        <a href="#" class="text-body fs-4"><i class="bi bi-linkedin"></i></a>
+                        <a href="#" class="text-body fs-4" aria-label="Facebook"><span
+                                class="bi bi-facebook"></span></a>
+                        <a href="#" class="text-body fs-4" aria-label="Instagram"><span
+                                class="bi bi-instagram"></span></a>
+                        <a href="#" class="text-body fs-4" aria-label="Twitter"><span class="bi bi-twitter"></span></a>
+                        <a href="#" class="text-body fs-4" aria-label="LinkedIn"><span
+                                class="bi bi-linkedin"></span></a>
                     </div>
                 </div>
             </div>
@@ -925,10 +932,12 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                             if (isAdded) {
                                 icon.classList.remove('bi-suit-heart-fill', 'text-danger');
                                 icon.classList.add('bi-suit-heart');
+                                this.setAttribute('aria-label', 'Aggiungi ai preferiti');
                                 showToast("Rimosso dai preferiti.", true);
                             } else {
                                 icon.classList.remove('bi-suit-heart');
                                 icon.classList.add('bi-suit-heart-fill', 'text-danger');
+                                this.setAttribute('aria-label', 'Rimuovi dai preferiti');
                                 showToast("Aggiunto ai preferiti!", true);
                             }
                         } else {

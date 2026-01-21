@@ -237,38 +237,39 @@ if ($result) {
 
 <body>
     <!-- Header -->
-    <header class="sticky-top border-bottom py-3">
+    <header class="sticky-top border-bottom py-3" role="banner">
         <div class="container-fluid">
             <div class="d-flex align-items-center justify-content-between">
                 <div class="d-flex align-items-center gap-3">
-                    <a href="../index.php" class="btn btn-link p-0">
-                        <i class="bi bi-arrow-left fs-4"></i>
+                    <a href="../index.php" class="btn btn-link p-0" aria-label="Torna alla Home">
+                        <span class="bi bi-arrow-left fs-4" aria-hidden="true"></span>
                     </a>
                     <div>
                         <h1 class="h4 fw-bold mb-0">Pannello Admin</h1>
                         <p class="small mb-0">Gestisci utenti, annunci e categorie</p>
                     </div>
                 </div>
-                <button id="btn-tema" class="btn btn-outline-secondary">
-                    <i id="icona-luna" class="bi bi-moon"></i>
-                    <i id="icona-sole" class="bi bi-sun d-none"></i>
+                <button id="btn-tema" class="btn btn-outline-secondary" aria-label="Cambia tema">
+                    <span id="icona-luna" class="bi bi-moon" aria-hidden="true"></span>
+                    <span id="icona-sole" class="bi bi-sun d-none" aria-hidden="true"></span>
                 </button>
             </div>
         </div>
     </header>
 
-    <main class="container-fluid py-4">
+    <main id="main-content" class="container-fluid py-4" role="main">
+        <h2 class="visually-hidden">Statistiche e Gestione Marketplace</h2>
         <!-- Statistiche -->
         <div class="row mb-4 g-3">
             <div class="col-12 col-md-4">
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body d-flex align-items-center">
                         <div class="bg-primary bg-opacity-10 text-primary p-3 rounded me-3">
-                            <i class="fas fa-users fs-4"></i>
+                            <span class="fas fa-users fs-4" aria-hidden="true"></span>
                         </div>
                         <div>
                             <p class="small mb-1">Utenti Totali</p>
-                            <h3 class="mb-0 fw-bold" id="totalUsers"><?php echo $stats['total_users'] ?? 0; ?></h3>
+                            <h3 class="h4 mb-0 fw-bold" id="totalUsers"><?php echo $stats['total_users'] ?? 0; ?></h3>
                         </div>
                     </div>
                 </div>
@@ -277,11 +278,11 @@ if ($result) {
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body d-flex align-items-center">
                         <div class="bg-success bg-opacity-10 text-success p-3 rounded me-3">
-                            <i class="fas fa-file-alt fs-4"></i>
+                            <span class="fas fa-file-alt fs-4" aria-hidden="true"></span>
                         </div>
                         <div>
                             <p class="small mb-1">Annunci Attivi</p>
-                            <h3 class="mb-0 fw-bold" id="activeAnnouncements">
+                            <h3 class="h4 mb-0 fw-bold" id="activeAnnouncements">
                                 <?php echo $stats['active_announcements'] ?? 0; ?>
                             </h3>
                         </div>
@@ -292,11 +293,12 @@ if ($result) {
                 <div class="card border-0 shadow-sm h-100">
                     <div class="card-body d-flex align-items-center">
                         <div class="bg-info bg-opacity-10 text-info p-3 rounded me-3">
-                            <i class="fas fa-check-circle fs-4"></i>
+                            <span class="fas fa-check-circle fs-4" aria-hidden="true"></span>
                         </div>
                         <div>
                             <p class="small mb-1">Vendite Concluse</p>
-                            <h3 class="mb-0 fw-bold" id="completedSales"><?php echo $stats['completed_sales'] ?? 0; ?>
+                            <h3 class="h4 mb-0 fw-bold" id="completedSales">
+                                <?php echo $stats['completed_sales'] ?? 0; ?>
                             </h3>
                         </div>
                     </div>
@@ -305,33 +307,47 @@ if ($result) {
         </div>
 
         <!-- Tabs -->
-        <ul class="nav nav-tabs mb-4" id="adminTabs">
-            <li class="nav-item"><button class="nav-link active fw-semibold" data-bs-target="#users"
-                    data-bs-toggle="tab"><i class="fas fa-users me-2"></i>Utenti</button></li>
-            <li class="nav-item"><button class="nav-link fw-semibold" data-bs-target="#announcements"
-                    data-bs-toggle="tab"><i class="fas fa-file-alt me-2"></i>Annunci</button></li>
-            <li class="nav-item"><button class="nav-link fw-semibold" data-bs-target="#categories"
-                    data-bs-toggle="tab"><i class="fas fa-layer-group me-2"></i>Categorie</button></li>
+        <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active fw-semibold" id="users-tab" data-bs-target="#users" data-bs-toggle="tab"
+                    role="tab" aria-controls="users" aria-selected="true">
+                    <span class="fas fa-users me-2" aria-hidden="true"></span>Utenti
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-semibold" id="announcements-tab" data-bs-target="#announcements"
+                    data-bs-toggle="tab" role="tab" aria-controls="announcements" aria-selected="false">
+                    <span class="fas fa-file-alt me-2" aria-hidden="true"></span>Annunci
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link fw-semibold" id="categories-tab" data-bs-target="#categories"
+                    data-bs-toggle="tab" role="tab" aria-controls="categories" aria-selected="false">
+                    <span class="fas fa-layer-group me-2" aria-hidden="true"></span>Categorie
+                </button>
+            </li>
         </ul>
 
         <!-- Contenuto Tabs -->
         <div class="tab-content">
             <!-- Utenti -->
-            <div class="tab-pane fade show active" id="users">
+            <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header border-bottom py-3">
-                        <h5 class="card-title mb-0 fw-bold"><i class="fas fa-users me-2"></i>Gestione Utenti</h5>
+                        <h3 class="h5 card-title mb-0 fw-bold"><span class="fas fa-users me-2"
+                                aria-hidden="true"></span>Gestione Utenti</h3>
                     </div>
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0 table-responsive-stack">
-                                <thead>
+                            <table class="table table-hover mb-0 table-responsive-stack" aria-labelledby="users-title">
+                                <caption class="visually-hidden">Lista degli utenti registrati</caption>
+                                <thead id="users-title">
                                     <tr>
-                                        <th class="ps-4">ID</th>
-                                        <th>Nome</th>
-                                        <th>Email</th>
-                                        <th>Università</th>
-                                        <th class="text-end pe-4">Azioni</th>
+                                        <th scope="col" class="ps-4">ID</th>
+                                        <th scope="col">Nome</th>
+                                        <th scope="col">Email</th>
+                                        <th scope="col">Università</th>
+                                        <th scope="col" class="text-end pe-4">Azioni</th>
                                     </tr>
                                 </thead>
                                 <tbody id="usersTableBody">
@@ -349,12 +365,14 @@ if ($result) {
                                             </td>
                                             <td data-label="Azioni" class="text-end pe-4 td-actions">
                                                 <button class="btn btn-outline-primary btn-sm me-2"
-                                                    onclick="openResetPassword(<?php echo $user['id']; ?>)">
-                                                    <i class="fas fa-key me-1"></i>Reset
+                                                    onclick="openResetPassword(<?php echo $user['id']; ?>)"
+                                                    aria-label="Reset password per <?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?>">
+                                                    <span class="fas fa-key me-1" aria-hidden="true"></span>Reset
                                                 </button>
                                                 <button class="btn btn-outline-danger btn-sm"
-                                                    onclick="deleteUser(<?php echo $user['id']; ?>)">
-                                                    <i class="fas fa-trash-alt me-1"></i>Elimina
+                                                    onclick="deleteUser(<?php echo $user['id']; ?>)"
+                                                    aria-label="Elimina utente <?php echo htmlspecialchars($user['firstName'] . ' ' . $user['lastName']); ?>">
+                                                    <span class="fas fa-trash-alt me-1" aria-hidden="true"></span>Elimina
                                                 </button>
                                             </td>
                                         </tr>
@@ -367,22 +385,26 @@ if ($result) {
             </div>
 
             <!-- Annunci -->
-            <div class="tab-pane fade" id="announcements">
+            <div class="tab-pane fade" id="announcements" role="tabpanel" aria-labelledby="announcements-tab">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header border-bottom py-3">
-                        <h5 class="card-title mb-0 fw-bold"><i class="fas fa-file-alt me-2"></i>Moderazione Annunci</h5>
+                        <h3 class="h5 card-title mb-0 fw-bold"><span class="fas fa-file-alt me-2"
+                                aria-hidden="true"></span>Moderazione Annunci</h3>
                     </div>
+                    <!-- Announcements Table accessibility improvement -->
                     <div class="card-body p-0">
                         <div class="table-responsive">
-                            <table class="table table-hover mb-0 table-responsive-stack">
-                                <thead>
+                            <table class="table table-hover mb-0 table-responsive-stack"
+                                aria-labelledby="announcements-title">
+                                <caption class="visually-hidden">Lista degli annunci</caption>
+                                <thead id="announcements-title">
                                     <tr>
-                                        <th class="ps-4">Titolo</th>
-                                        <th>Tipo</th>
-                                        <th>Prezzo</th>
-                                        <th>Venditore</th>
-                                        <th>Data</th>
-                                        <th class="text-end pe-4">Azioni</th>
+                                        <th scope="col" class="ps-4">Titolo</th>
+                                        <th scope="col">Tipo</th>
+                                        <th scope="col">Prezzo</th>
+                                        <th scope="col">Venditore</th>
+                                        <th scope="col">Data</th>
+                                        <th scope="col" class="text-end pe-4">Azioni</th>
                                     </tr>
                                 </thead>
                                 <tbody id="announcementsTableBody">
@@ -408,8 +430,9 @@ if ($result) {
                                             </td>
                                             <td data-label="Azioni" class="text-end pe-4 td-actions">
                                                 <button class="btn btn-outline-danger btn-sm"
-                                                    onclick="deleteAnnouncement(<?php echo $ann['id']; ?>)">
-                                                    <i class="fas fa-trash-alt me-1"></i>Elimina
+                                                    onclick="deleteAnnouncement(<?php echo $ann['id']; ?>)"
+                                                    aria-label="Elimina annuncio: <?php echo htmlspecialchars($ann['title']); ?>">
+                                                    <span class="fas fa-trash-alt me-1" aria-hidden="true"></span>Elimina
                                                 </button>
                                             </td>
                                         </tr>
@@ -422,21 +445,23 @@ if ($result) {
             </div>
 
             <!-- Categorie -->
-            <div class="tab-pane fade" id="categories">
+            <div class="tab-pane fade" id="categories" role="tabpanel" aria-labelledby="categories-tab">
                 <div class="row g-4">
                     <div class="col-lg-6">
                         <div class="card border-0 shadow-sm h-100">
                             <div class="card-header border-bottom py-3">
-                                <h5 class="card-title mb-0 fw-bold"><i class="fas fa-book me-2"></i>Gestione Materie
-                                </h5>
+                                <h3 class="h5 card-title mb-0 fw-bold"><span class="fas fa-book me-2"
+                                        aria-hidden="true"></span>Gestione Materie</h3>
                             </div>
-                            <div class="card-body">
+                            drum: <div class="card-body">
                                 <div class="row g-2 mb-4">
                                     <div class="col-md-5">
+                                        <label for="newSubject" class="visually-hidden">Nuova materia</label>
                                         <input type="text" class="form-control" id="newSubject"
                                             placeholder="Nuova materia">
                                     </div>
                                     <div class="col-md-5">
+                                        <label for="subjectFaculty" class="visually-hidden">Seleziona Facoltà</label>
                                         <select class="form-select" id="subjectFaculty">
                                             <option value="" selected disabled>Seleziona Facoltà</option>
                                             <?php foreach ($faculties as $f): ?>
@@ -448,7 +473,7 @@ if ($result) {
                                     </div>
                                     <div class="col-auto d-flex align-items-end">
                                         <button class="btn btn-primary" id="addSubjectBtn">
-                                            <i class="fas fa-plus me-2"></i>Aggiungi
+                                            <span class="fas fa-plus me-2" aria-hidden="true"></span>Aggiungi
                                         </button>
                                     </div>
                                 </div>
@@ -458,8 +483,9 @@ if ($result) {
                                             class="category-item d-flex justify-content-between align-items-center py-2 border-bottom">
                                             <span class="fw-medium"><?php echo htmlspecialchars($subject); ?></span>
                                             <button class="btn btn-link text-danger p-0"
-                                                onclick="deleteSubject('<?php echo addslashes(htmlspecialchars($subject, ENT_QUOTES)); ?>')">
-                                                <i class="fas fa-times"></i>
+                                                onclick="deleteSubject('<?php echo addslashes(htmlspecialchars($subject, ENT_QUOTES)); ?>')"
+                                                aria-label="Elimina materia <?php echo htmlspecialchars($subject); ?>">
+                                                <span class="fas fa-times" aria-hidden="true"></span>
                                             </button>
                                         </div>
                                     <?php endforeach; ?>
@@ -470,15 +496,21 @@ if ($result) {
                     <div class="col-lg-6">
                         <div class="card border-0 shadow-sm h-100">
                             <div class="card-header border-bottom py-3">
-                                <h5 class="card-title mb-0 fw-bold"><i class="fas fa-graduation-cap me-2"></i>Gestione
-                                    Facoltà</h5>
+                                <h3 class="h5 card-title mb-0 fw-bold"><span class="fas fa-graduation-cap me-2"
+                                        aria-hidden="true"></span>Gestione Facoltà</h3>
                             </div>
-                            <div class="card-body">
+                            drum: <div class="card-body">
                                 <div class="row g-2 mb-4">
-                                    <div class="col"><input type="text" class="form-control" id="newFaculty"
-                                            placeholder="Nuova facoltà"></div>
-                                    <div class="col-auto d-flex align-items-end"><button class="btn btn-primary"
-                                            id="addFacultyBtn"><i class="fas fa-plus me-2"></i>Aggiungi</button></div>
+                                    <div class="col">
+                                        <label for="newFaculty" class="visually-hidden">Nuova facoltà</label>
+                                        <input type="text" class="form-control" id="newFaculty"
+                                            placeholder="Nuova facoltà">
+                                    </div>
+                                    <div class="col-auto d-flex align-items-end">
+                                        <button class="btn btn-primary" id="addFacultyBtn">
+                                            <span class="fas fa-plus me-2" aria-hidden="true"></span>Aggiungi
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="scrollable-content" id="facultiesList">
                                     <?php foreach ($faculties as $faculty): ?>
@@ -487,8 +519,9 @@ if ($result) {
                                             <span
                                                 class="fw-medium"><?php echo htmlspecialchars($faculty['nome_facolta']); ?></span>
                                             <button class="btn btn-link text-danger p-0"
-                                                onclick="deleteFaculty('<?php echo addslashes(htmlspecialchars($faculty['nome_facolta'], ENT_QUOTES)); ?>')">
-                                                <i class="fas fa-times"></i>
+                                                onclick="deleteFaculty('<?php echo addslashes(htmlspecialchars($faculty['nome_facolta'], ENT_QUOTES)); ?>')"
+                                                aria-label="Elimina facoltà <?php echo htmlspecialchars($faculty['nome_facolta']); ?>">
+                                                <span class="fas fa-times" aria-hidden="true"></span>
                                             </button>
                                         </div>
                                     <?php endforeach; ?>
@@ -506,16 +539,16 @@ if ($result) {
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title fw-bold">Reset Password</h5><button class="btn-close"
+                    <h4 class="modal-title h5 fw-bold">Reset Password</h4><button class="btn-close"
                         data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
                     <p class="mb-3" id="resetPasswordUserInfo"></p>
                     <div class="mb-3">
-                        <label class="form-label fw-semibold">Nuova Password</label>
+                        <label for="newPassword" class="form-label fw-semibold">Nuova Password</label>
                         <input type="password" class="form-control" id="newPassword" placeholder="Minimo 6 caratteri"
                             minlength="6" required>
-                        <div class="form-text">La password deve essere di almeno 6 caratteri</div>
+                        <div id="passwordHelp" class="form-text">La password deve essere di almeno 6 caratteri</div>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -592,11 +625,11 @@ if ($result) {
                     <td data-label="Email">${user.email}</td>
                     <td data-label="Università">${user.university || 'Non specificata'}</td>
                     <td data-label="Azioni" class="text-end pe-4 td-actions">
-                        <button class="btn btn-outline-primary btn-sm me-2" onclick="openResetPassword(${user.id})">
-                            <i class="fas fa-key me-1"></i>Reset
+                        <button class="btn btn-outline-primary btn-sm me-2" onclick="openResetPassword(${user.id})" aria-label="Reset password per ${user.firstName} ${user.lastName}">
+                            <span class="fas fa-key me-1" aria-hidden="true"></span>Reset
                         </button>
-                        <button class="btn btn-outline-danger btn-sm" onclick="deleteUser(${user.id})">
-                            <i class="fas fa-trash-alt me-1"></i>Elimina
+                        <button class="btn btn-outline-danger btn-sm" onclick="deleteUser(${user.id})" aria-label="Elimina utente ${user.firstName} ${user.lastName}">
+                            <span class="fas fa-trash-alt me-1" aria-hidden="true"></span>Elimina
                         </button>
                     </td>
                 </tr>
@@ -608,16 +641,18 @@ if ($result) {
             tbody.innerHTML = announcements.map(a => `
                 <tr>
                     <td data-label="Titolo" class="ps-4">
-                        <span class="badge ${a.status === 'venduto' ? 'bg-success' : 'bg-primary'} me-2">${a.status === 'venduto' ? 'Venduto' : 'Attivo'}</span>
+                        <span class="badge ${a.status === 'venduto' ? 'bg-success' : 'bg-primary'} me-2">
+                            <span class="visually-hidden">Stato:</span>${a.status === 'venduto' ? 'Venduto' : 'Attivo'}
+                        </span>
                         <span class="text-truncate d-inline-block" style="max-width:200px" title="${a.title}">${a.title}</span>
                     </td>
-                    <td data-label="Tipo"><span class="badge bg-secondary">${a.type}</span></td>
+                    <td data-label="Tipo"><span class="badge bg-secondary"><span class="visually-hidden">Tipo:</span>${a.type}</span></td>
                     <td data-label="Prezzo" class="fw-semibold">€${parseFloat(a.price).toFixed(2)}</td>
                     <td data-label="Venditore">${a.seller}</td>
                     <td data-label="Data">${a.publishedDate}</td>
                     <td data-label="Azioni" class="text-end pe-4 td-actions">
-                        <button class="btn btn-outline-danger btn-sm" onclick="deleteAnnouncement(${a.id})">
-                            <i class="fas fa-trash-alt me-1"></i>Elimina
+                        <button class="btn btn-outline-danger btn-sm" onclick="deleteAnnouncement(${a.id})" aria-label="Elimina annuncio: ${a.title}">
+                            <span class="fas fa-trash-alt me-1" aria-hidden="true"></span>Elimina
                         </button>
                     </td>
                 </tr>
@@ -629,8 +664,8 @@ if ($result) {
             container.innerHTML = subjects.map((s, i) => `
                 <div class="category-item d-flex justify-content-between align-items-center py-2 border-bottom">
                     <span class="fw-medium">${s}</span>
-                    <button class="btn btn-link text-danger p-0" onclick="deleteSubject('${s.replace(/'/g, "\\'")}')">
-                        <i class="fas fa-times"></i>
+                    <button class="btn btn-link text-danger p-0" onclick="deleteSubject('${s.replace(/'/g, "\\'")}')" aria-label="Elimina materia ${s}">
+                        <span class="fas fa-times" aria-hidden="true"></span>
                     </button>
                 </div>
             `).join('');
@@ -641,8 +676,8 @@ if ($result) {
             container.innerHTML = faculties.map((f, i) => `
                 <div class="category-item d-flex justify-content-between align-items-center py-2 border-bottom">
                     <span class="fw-medium">${f.nome_facolta}</span>
-                    <button class="btn btn-link text-danger p-0" onclick="deleteFaculty('${f.nome_facolta.replace(/'/g, "\\'")}')">
-                        <i class="fas fa-times"></i>
+                    <button class="btn btn-link text-danger p-0" onclick="deleteFaculty('${f.nome_facolta.replace(/'/g, "\\'")}')" aria-label="Elimina facoltà ${f.nome_facolta}">
+                        <span class="fas fa-times" aria-hidden="true"></span>
                     </button>
                 </div>
             `).join('');
