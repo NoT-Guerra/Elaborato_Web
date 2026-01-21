@@ -275,8 +275,8 @@ if ($is_logged_in) {
             <div class="d-flex align-items-center justify-content-between">
                 <!-- Logo e pulsante indietro -->
                 <div class="d-flex align-items-center">
-                    <a href="../index.php" class="btn btn-link text-body p-0 me-3">
-                        <i class="bi bi-arrow-left fs-4"></i>
+                    <a href="../index.php" class="btn btn-link text-body p-0 me-3" aria-label="Torna indietro">
+                        <span class="bi bi-arrow-left fs-4" aria-hidden="true"></span>
                     </a>
                     <div>
                         <h1 class="h5 fw-bold mb-0">UniboMarket</h1>
@@ -291,14 +291,14 @@ if ($is_logged_in) {
                         <!-- Profilo -->
                         <div class="d-none d-md-flex align-items-center">
                             <span class="me-3 text-muted">
-                                <i class="bi bi-person-circle me-1"></i>
+                                <span class="bi bi-person-circle me-1" aria-hidden="true"></span>
                                 <?php echo htmlspecialchars($_SESSION['nome'] . ' ' . $_SESSION['cognome']); ?>
                             </span>
                         </div>
                     <?php else: ?>
                         <!-- Login/Registrati -->
                         <a href="../auth/login.php" class="btn btn-outline-dark d-none d-md-flex align-items-center px-3">
-                            <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                            <span class="bi bi-box-arrow-in-right me-2" aria-hidden="true"></span>Login
                         </a>
                     <?php endif; ?>
                 </div>
@@ -331,7 +331,7 @@ if ($is_logged_in) {
                 <!-- Descrizione -->
                 <div class="card border-0 shadow-sm mt-4">
                     <div class="card-body p-4">
-                        <h5 class="fw-bold mb-3">Descrizione</h5>
+                        <h2 class="h5 fw-bold mb-3">Descrizione</h2>
                         <div class="description-box">
                             <?php echo nl2br(htmlspecialchars($annuncio['descrizione'])); ?>
                         </div>
@@ -349,7 +349,7 @@ if ($is_logged_in) {
                                 <div>
                                     <span
                                         class="badge badge-custom categoria-<?php echo strtolower($annuncio['nome_categoria']); ?> mb-2">
-                                        <i class="bi bi-book me-1"></i>
+                                        <span class="bi bi-book me-1" aria-hidden="true"></span>
                                         <?php echo htmlspecialchars($annuncio['nome_categoria']); ?>
                                     </span>
                                     <h2 class="h4 fw-bold"><?php echo htmlspecialchars($annuncio['titolo']); ?></h2>
@@ -366,7 +366,7 @@ if ($is_logged_in) {
 
                             <!-- Dettagli -->
                             <div class="mb-4">
-                                <h6 class="fw-bold mb-3">Dettagli prodotto</h6>
+                                <h3 class="h6 fw-bold mb-3">Dettagli prodotto</h3>
                                 <div class="row">
                                     <div class="col-6 mb-3">
                                         <div class="text-muted small">Condizione</div>
@@ -415,10 +415,10 @@ if ($is_logged_in) {
 
                             <!-- Venditore -->
                             <div class="seller-info mb-4">
-                                <h6 class="fw-bold mb-3">Informazioni venditore</h6>
+                                <h3 class="h6 fw-bold mb-3">Informazioni venditore</h3>
                                 <div class="d-flex align-items-center mb-3">
                                     <div class="me-3">
-                                        <i class="bi bi-person-circle fs-2"></i>
+                                        <span class="bi bi-person-circle fs-2" aria-hidden="true"></span>
                                     </div>
                                     <div>
                                         <div class="fw-bold">
@@ -435,15 +435,16 @@ if ($is_logged_in) {
                             <div class="d-grid gap-3">
                                 <button class="btn btn-primary btn-lg py-3 fw-bold aggiungi-carrello"
                                     data-id="<?php echo $annuncio['id_annuncio']; ?>">
-                                    <i class="bi bi-cart-plus me-2"></i>Aggiungi al carrello
+                                    <span class="bi bi-cart-plus me-2" aria-hidden="true"></span>Aggiungi al carrello
                                 </button>
 
                                 <button class="btn btn-outline-custom-white btn-lg py-3 btn-preferiti"
                                     data-id="<?php echo $annuncio['id_annuncio']; ?>">
                                     <?php if ($is_favorite): ?>
-                                        <i class="bi bi-heart-fill me-2 text-danger"></i>Rimuovi dai preferiti
+                                        <span class="bi bi-heart-fill me-2 text-danger" aria-hidden="true"></span>Rimuovi
+                                        dai preferiti
                                     <?php else: ?>
-                                        <i class="bi bi-heart me-2"></i>Aggiungi ai preferiti
+                                        <span class="bi bi-heart me-2" aria-hidden="true"></span>Aggiungi ai preferiti
                                     <?php endif; ?>
                                 </button>
                             </div>
@@ -552,11 +553,11 @@ if ($is_logged_in) {
 
                         if (isAdded) {
                             icon.className = 'bi bi-heart me-2';
-                            btn.innerHTML = '<i class="bi bi-heart me-2"></i>Aggiungi ai preferiti';
+                            btn.innerHTML = '<span class="bi bi-heart me-2" aria-hidden="true"></span>Aggiungi ai preferiti';
                             showToast('Rimosso dai preferiti.', true);
                         } else {
                             icon.className = 'bi bi-heart-fill me-2 text-danger';
-                            btn.innerHTML = '<i class="bi bi-heart-fill me-2 text-danger"></i>Rimuovi dai preferiti';
+                            btn.innerHTML = '<span class="bi bi-heart-fill me-2 text-danger" aria-hidden="true"></span>Rimuovi dai preferiti';
                             showToast('Aggiunto ai preferiti!', true);
                         }
                     } else {

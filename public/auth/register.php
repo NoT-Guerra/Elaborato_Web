@@ -150,12 +150,12 @@ if ($result) {
         <!-- HEADER -->
         <header class="d-flex align-items-center bg-body p-3 border-bottom sticky-top">
             <a href="../index.php" class="btn btn-link text-body p-0 me-3" aria-label="Torna indietro">
-                <i class="bi bi-arrow-left fs-4"></i>
+                <span class="bi bi-arrow-left fs-4" aria-hidden="true"></span>
             </a>
 
             <div class="d-flex align-items-center">
                 <span class="bg-primary p-2 rounded-3 me-3 fs-5">
-                    <i class="bi bi-person-plus-fill text-white"></i>
+                    <span class="bi bi-person-plus-fill text-white" aria-hidden="true"></span>
                 </span>
                 <div>
                     <div class="fw-bold">Registrati</div>
@@ -171,7 +171,7 @@ if ($result) {
                     
                     <?php if ($success): ?>
                         <div class="success-message text-center">
-                            <i class="bi bi-check-circle-fill me-2"></i>
+                            <span class="bi bi-check-circle-fill me-2" aria-hidden="true"></span>
                             <strong>Registrazione completata con successo!</strong>
                             <p class="mb-0 mt-2">Verrai reindirizzato alla pagina di login tra 3 secondi...</p>
                             <a href="login.php" class="btn btn-sm btn-outline-success mt-2">Vai al login ora</a>
@@ -189,18 +189,18 @@ if ($result) {
                         <!-- Nome e Cognome -->
                         <div class="row g-3 mb-3">
                             <div class="col-6">
-                                <label class="form-label">Nome</label>
+                                <label for="nome" class="form-label">Nome</label>
                                 <input type="text" class="form-control <?php echo isset($errors['nome']) ? 'is-invalid' : ''; ?>" 
-                                       name="nome" placeholder="Mario" 
+                                       id="nome" name="nome" placeholder="Mario" 
                                        value="<?php echo htmlspecialchars($nome); ?>" required>
                                 <?php if (isset($errors['nome'])): ?>
                                     <div class="error-message"><?php echo htmlspecialchars($errors['nome']); ?></div>
                                 <?php endif; ?>
                             </div>
                             <div class="col-6">
-                                <label class="form-label">Cognome</label>
+                                <label for="cognome" class="form-label">Cognome</label>
                                 <input type="text" class="form-control <?php echo isset($errors['cognome']) ? 'is-invalid' : ''; ?>" 
-                                       name="cognome" placeholder="Rossi" 
+                                       id="cognome" name="cognome" placeholder="Rossi" 
                                        value="<?php echo htmlspecialchars($cognome); ?>" required>
                                 <?php if (isset($errors['cognome'])): ?>
                                     <div class="error-message"><?php echo htmlspecialchars($errors['cognome']); ?></div>
@@ -210,9 +210,9 @@ if ($result) {
 
                         <!-- Email -->
                         <div class="mb-3">
-                            <label class="form-label">Email istituzionale</label>
+                            <label for="email" class="form-label">Email istituzionale</label>
                             <input type="email" class="form-control <?php echo isset($errors['email']) ? 'is-invalid' : ''; ?>" 
-                                   name="email" placeholder="nome.cognome@studio.unibo.it" 
+                                   id="email" name="email" placeholder="nome.cognome@studio.unibo.it" 
                                    value="<?php echo htmlspecialchars($email); ?>" required>
                             <?php if (isset($errors['email'])): ?>
                                 <div class="error-message"><?php echo htmlspecialchars($errors['email']); ?></div>
@@ -222,9 +222,9 @@ if ($result) {
 
                         <!-- Facoltà -->
                         <div class="mb-3">
-                            <label class="form-label">Facoltà</label>
+                            <label for="facolta" class="form-label">Facoltà</label>
                             <select class="form-select <?php echo isset($errors['facolta']) ? 'is-invalid' : ''; ?>" 
-                                    name="facolta" required>
+                                    id="facolta" name="facolta" required>
                                 <option value="" selected disabled>Seleziona facoltà</option>
                                 <?php foreach ($facolta_list as $facolta_item): ?>
                                     <option value="<?php echo $facolta_item['id_facolta']; ?>" 
@@ -243,13 +243,13 @@ if ($result) {
 
                         <!-- Password -->
                         <div class="mb-3">
-                            <label class="form-label">Password</label>
+                            <label for="password" class="form-label">Password</label>
                             <div class="input-group">
                                 <input type="password" id="password" 
                                        class="form-control <?php echo isset($errors['password']) ? 'is-invalid' : ''; ?>" 
                                        name="password" placeholder="••••••••" required>
-                                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswords(this)">
-                                    <i class="bi bi-eye"></i>
+                                <button class="btn btn-outline-secondary" type="button" onclick="togglePasswords(this)" aria-label="Mostra/nascondi password">
+                                    <span class="bi bi-eye" aria-hidden="true"></span>
                                 </button>
                             </div>
                             <?php if (isset($errors['password'])): ?>
@@ -260,7 +260,7 @@ if ($result) {
 
                         <!-- Conferma Password -->
                         <div class="mb-3">
-                            <label class="form-label">Conferma password</label>
+                            <label for="confirmPassword" class="form-label">Conferma password</label>
                             <input type="password" id="confirmPassword" 
                                    class="form-control <?php echo isset($errors['confirm_password']) ? 'is-invalid' : ''; ?>" 
                                    name="confirm_password" placeholder="••••••••" required>
@@ -305,7 +305,7 @@ if ($result) {
         function togglePasswords(btn) {
             const password = document.getElementById("password");
             const confirm = document.getElementById("confirmPassword");
-            const icon = btn.querySelector("i");
+            const icon = btn.querySelector("span.bi");
 
             const show = password.type === "password";
 
