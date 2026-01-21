@@ -906,7 +906,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         document.querySelectorAll('.btn-preferiti').forEach(btn => {
             btn.addEventListener('click', function (e) {
                 e.preventDefault();
-                const icon = this.querySelector('i');
+                const icon = this.querySelector('span.bi');
                 const id = this.dataset.id;
 
                 // Determina azione basata sullo stato attuale

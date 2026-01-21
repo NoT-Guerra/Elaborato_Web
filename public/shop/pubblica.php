@@ -593,7 +593,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 pdfPreview.innerHTML = `
                     <div class="alert alert-info p-2">
-                        <i class="bi bi-file-pdf me-2"></i>
+                        <span class="bi bi-file-pdf me-2" aria-hidden="true"></span>
                         <strong>${fileName}</strong> (${fileSize} MB)
                         <br>
                         <small class="text-muted">Il file sarà disponibile per il download dopo l'acquisto</small>

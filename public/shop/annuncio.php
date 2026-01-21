@@ -528,7 +528,7 @@ if ($is_logged_in) {
             e.preventDefault();
             const id = '<?php echo $annuncio_id; ?>';
             const btn = this;
-            const icon = btn.querySelector('i');
+            const icon = btn.querySelector('span.bi');
 
             // Verifica stato attuale (icona)
             const isAdded = icon.classList.contains('bi-heart-fill');
