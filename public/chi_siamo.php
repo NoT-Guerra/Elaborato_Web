@@ -190,7 +190,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 </p>
                 <div class="d-grid gap-2 d-md-flex">
                     <a href="shop/pubblica.php" class="btn btn-primary px-4 py-2 rounded-pill">Inizia a Vendere</a>
-                    <a href="index.php" class="btn btn-outline-dark px-4 py-2 rounded-pill">Sfoglia Annunci</a>
+                    <a href="index.php" class="btn btn-outline-primary px-4 py-2 rounded-pill">Sfoglia Annunci</a>
                 </div>
             </div>
         </div>
