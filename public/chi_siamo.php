@@ -103,13 +103,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     <h1 class="h5 fw-bold mb-0">UniboMarket</h1>
                 </a>
                 <div class="d-flex align-items-center gap-3">
-                    <a href="shop/carrello.php" class="btn btn-link text-body p-2 position-relative">
-                        <i class="bi bi-cart fs-5"></i>
-                        <span id="cart-counter-header"
-                            class="badge rounded-pill bg-danger <?php echo ($cart_count > 0) ? '' : 'd-none'; ?>">
-                            <?php echo $cart_count; ?>
-                        </span>
-                    </a>
                     <a href="index.php" class="btn btn-outline-primary btn-sm rounded-pill px-3">Torna alla Home</a>
                 </div>
             </div>
