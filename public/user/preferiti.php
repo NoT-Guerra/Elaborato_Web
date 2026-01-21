@@ -226,6 +226,31 @@ function format_currency($amount)
             background-color: #424242 !important;
             color: #e0e0e0 !important;
         }
+
+        /* Accessibilità: Contrasto elevato per i badge */
+        .categoria-libro {
+            color: #0d47a1 !important;
+        }
+
+        .categoria-appunti {
+            color: #4a148c !important;
+        }
+
+        .categoria-digitale {
+            color: #1b5e20 !important;
+        }
+
+        .categoria-pdf {
+            color: #b71c1c !important;
+        }
+
+        .categoria-materiale {
+            color: #e65100 !important;
+        }
+
+        .categoria-altro {
+            color: #212121 !important;
+        }
     </style>
 </head>
 
@@ -233,14 +258,15 @@ function format_currency($amount)
 
     <!-- Header (semplificato ma coerente) -->
     <header class="d-flex align-items-center bg-body m-0 p-3 border-bottom sticky-top shadow-sm">
-        <a href="../index.php" class="btn btn-link text-body p-0 me-3"><i class="bi bi-arrow-left fs-4"></i></a>
+        <a href="../index.php" class="btn btn-link text-body p-0 me-3" aria-label="Torna alla Home"><span
+                class="bi bi-arrow-left fs-4" aria-hidden="true"></span></a>
         <div class="flex-grow-1">
             <div class="fw-bold fs-5">I tuoi Preferiti</div>
             <div class="text-muted small"><?php echo $item_count; ?> articolo/i salvati</div>
         </div>
 
-        <a href="../shop/carrello.php" class="btn btn-link text-body position-relative">
-            <i class="bi bi-cart fs-4"></i>
+        <a href="../shop/carrello.php" class="btn btn-link text-body position-relative" aria-label="Vai al carrello">
+            <span class="bi bi-cart fs-4" aria-hidden="true"></span>
             <?php if ($cart_count > 0): ?>
                 <span id="cart-counter-header" class="badge rounded-pill bg-danger">
                     <?php echo $cart_count; ?>
@@ -285,8 +311,8 @@ function format_currency($amount)
                         <div class="card h-100 border-0 shadow-sm card-annuncio">
                             <!-- Bottone Rimuovi preferiti -->
                             <button class="btn-preferiti remove-fav-btn" data-id="<?php echo $annuncio['id_annuncio']; ?>"
-                                title="Rimuovi dai preferiti">
-                                <i class="bi bi-x-lg text-danger"></i>
+                                aria-label="Rimuovi dai preferiti">
+                                <span class="bi bi-x-lg text-danger" aria-hidden="true"></span>
                             </button>
 
                             <div class="img-wrapper">
@@ -298,7 +324,7 @@ function format_currency($amount)
                                     <h6 class="fw-bold mb-0 text-truncate" style="max-width: 70%;">
                                         <?php echo htmlspecialchars($annuncio['titolo']); ?>
                                     </h6>
-                                    <span class="badge bg-primary-subtle text-primary price-badge">
+                                    <span class="badge bg-primary-subtle text-primary-emphasis price-badge">
                                         <?php echo format_currency($annuncio['prezzo']); ?>
                                     </span>
                                 </div>
@@ -307,11 +333,11 @@ function format_currency($amount)
                                 </p>
                                 <div class="d-flex justify-content-between align-items-center mb-3">
                                     <span class="badge <?php echo $classe_categoria; ?> border">
-                                        <i class="bi bi-book me-1"></i>
+                                        <span class="bi bi-book me-1"></span>
                                         <?php echo htmlspecialchars($annuncio['nome_categoria']); ?>
                                     </span>
                                     <small class="text-muted">
-                                        <i class="bi bi-geo-alt me-1"></i>
+                                        <span class="bi bi-geo-alt me-1"></span>
                                         <?php echo htmlspecialchars($annuncio['nome_facolta'] ?? 'N/A'); ?>
                                     </small>
                                 </div>
@@ -334,7 +360,7 @@ function format_currency($amount)
                                     </div>
                                     <button class="btn btn-dark btn-sm px-3 rounded-pill add-to-cart-btn"
                                         data-id="<?php echo $annuncio['id_annuncio']; ?>">
-                                        <i class="bi bi-cart-plus me-1"></i>Aggiungi
+                                        <span class="bi bi-cart-plus me-1"></span>Aggiungi
                                     </button>
                                 </div>
                             </div>
@@ -344,7 +370,7 @@ function format_currency($amount)
             </div>
         <?php else: ?>
             <div class="text-center py-5">
-                <i class="bi bi-suit-heart fs-1 text-muted"></i>
+                <span class="bi bi-suit-heart fs-1 text-muted" aria-hidden="true"></span>
                 <p class="mt-3 text-muted">Non hai ancora aggiunto nulla ai preferiti.</p>
                 <a href="../index.php" class="btn btn-primary mt-3">Esplora annunci</a>
             </div>

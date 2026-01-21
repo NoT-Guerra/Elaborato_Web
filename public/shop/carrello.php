@@ -5,16 +5,16 @@ session_start();
 // Mostra messaggi di errore/successo
 if (isset($_SESSION['error_message'])) {
     echo '<div class="alert alert-danger alert-dismissible fade show m-2" role="alert">
-            <i class="bi bi-exclamation-triangle me-2"></i>' . $_SESSION['error_message'] . '
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <span class="bi bi-exclamation-triangle me-2" aria-hidden="true"></span>' . $_SESSION['error_message'] . '
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>';
     unset($_SESSION['error_message']);
 }
 
 if (isset($_SESSION['success_message'])) {
     echo '<div class="alert alert-success alert-dismissible fade show m-2" role="alert">
-            <i class="bi bi-check-circle me-2"></i>' . $_SESSION['success_message'] . '
-            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            <span class="bi bi-check-circle me-2" aria-hidden="true"></span>' . $_SESSION['success_message'] . '
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
           </div>';
     unset($_SESSION['success_message']);
 }
@@ -114,9 +114,10 @@ function format_currency($amount)
 
     <div class="container-fluid p-0">
         <header class="d-flex align-items-center bg-body m-0 p-3 border-bottom sticky-top">
-            <a href="../index.php" class="btn btn-link text-body p-0 me-3"><i class="bi bi-arrow-left fs-4"></i></a>
+            <a href="../index.php" class="btn btn-link text-body p-0 me-3" aria-label="Torna alla Home"><span
+                    class="bi bi-arrow-left fs-4" aria-hidden="true"></span></a>
             <div>
-                <div class="fw-bold">Il tuo carrello</div>
+                <h1 class="h5 fw-bold mb-0">Il tuo carrello</h1>
                 <div class="text-muted small"><?php echo $item_count; ?> articolo/i</div>
             </div>
         </header>
@@ -127,18 +128,19 @@ function format_currency($amount)
                     <div class="card-body d-flex align-items-start">
                         <div class="flex-shrink-0 me-3">
                             <img src="<?php echo htmlspecialchars($item['image']); ?>" class="rounded"
-                                style="width:90px;height:120px;object-fit:cover;">
+                                style="width:90px;height:120px;object-fit:cover;"
+                                alt="<?php echo htmlspecialchars($item['title']); ?>">
                         </div>
                         <div class="flex-grow-1">
-                            <h5 class="card-title fw-bold mb-1"><?php echo htmlspecialchars($item['title']); ?></h5>
+                            <h2 class="card-title h5 fw-bold mb-1"><?php echo htmlspecialchars($item['title']); ?></h2>
                             <p class="card-text text-muted mb-0 small"><?php echo htmlspecialchars($item['subtitle']); ?></p>
                             <p class="card-text text-muted mb-3 small"><?php echo htmlspecialchars($item['university']); ?></p>
                             <div class="fw-bold text-body"><?php echo format_currency($item['price']); ?></div>
                         </div>
                         <form action="rimuovi.php" method="POST">
                             <input type="hidden" name="id_annuncio" value="<?php echo $item['id']; ?>">
-                            <button type="submit" class="btn btn-link text-danger p-0 ms-3"><i
-                                    class="bi bi-trash fs-4"></i></button>
+                            <button type="submit" class="btn btn-link text-danger p-0 ms-3" aria-label="Rimuovi prodotto"><span
+                                    class="bi bi-trash fs-4" aria-hidden="true"></span></button>
                         </form>
                     </div>
                 </div>
@@ -155,13 +157,13 @@ function format_currency($amount)
                 </div>
                 <form action="processa_pagamento.php" method="POST">
                     <button type="submit" class="btn btn-primary w-100 py-3 mt-3 fw-bold">
-                        <i class="bi bi-credit-card me-2"></i>Procedi al pagamento
+                        <span class="bi bi-credit-card me-2" aria-hidden="true"></span>Procedi al pagamento
                     </button>
                 </form>
             </div>
         <?php else: ?>
             <div class="text-center py-5">
-                <i class="bi bi-cart3 fs-1 text-muted"></i>
+                <span class="bi bi-cart3 fs-1 text-muted" aria-hidden="true"></span>
                 <p class="mt-3 text-muted">Il tuo carrello è vuoto.</p>
                 <a href="../index.php" class="btn btn-primary mt-3">Inizia lo shopping</a>
             </div>

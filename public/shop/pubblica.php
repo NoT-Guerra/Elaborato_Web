@@ -311,7 +311,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <header class="container-fluid bg-body border-bottom sticky-top">
         <div class="container-fluid d-flex align-items-center gap-3 p-2">
             <a href="../index.php" class="btn btn-link text-body p-0" aria-label="Torna al menu">
-                <i class="bi bi-arrow-left fs-4"></i>
+                <span class="bi bi-arrow-left fs-4"></span>
             </a>
             <div>
                 <h1 class="h5 mb-0 fw-bold">Pubblica un annuncio</h1>
