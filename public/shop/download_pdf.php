@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vendita_id']) && isse
     $annuncio_id = intval($_POST['annuncio_id']);
     $user_id = $_SESSION['user_id'];
 
-    // Verifica che l'utente sia l'acquirente legittimo di questo PDF
+    // verifica che l'utente sia chi ha comprato questo PDF
     $sql = "SELECT v.id_vendita, ap.pdf_path, ap.original_filename
             FROM vendita v
             JOIN annuncio a ON v.annuncio_id = a.id_annuncio
@@ -33,18 +33,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['vendita_id']) && isse
         $pdf_path = $row['pdf_path'];
         $original_filename = $row['original_filename'];
 
-        // Verifica che il file esista
-        // Path adjusted: shop/ -> ../assets/pdf/...
+        // verifica che file esista
         $real_path = __DIR__ . '/../' . $pdf_path;
         if (file_exists($real_path)) {
-            // Imposta gli header per il download
+            // header per il download
             header('Content-Type: application/pdf');
             header('Content-Disposition: attachment; filename="' . $original_filename . '"');
             header('Content-Length: ' . filesize($real_path));
             header('Cache-Control: private, max-age=0, must-revalidate');
             header('Pragma: public');
 
-            // Leggi e invia il file
+            // legge e invia il file
             readfile($real_path);
             exit;
         } else {
