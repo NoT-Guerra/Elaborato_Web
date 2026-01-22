@@ -10,7 +10,7 @@ require_once __DIR__ . '/../../app/config/database.php';
 
 $user_id = $_SESSION['user_id'];
 
-// Recupera gli acquisti dell'utente
+// recupera gli acquisti dell'utente
 $sql = "SELECT 
             v.id_vendita,
             v.prezzo_vendita,
@@ -48,13 +48,13 @@ $stmt->close();
 <html lang="it">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>I miei acquisti - UniboMarket</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
     <script>
-        // Gestione tema scuro/chiaro
+        // gestione tema scuro/chiaro
         (function () {
             const tema = localStorage.getItem('temaPreferito') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             document.documentElement.setAttribute('data-bs-theme', tema);
@@ -64,7 +64,6 @@ $stmt->close();
 
 <body class="bg-body">
 
-    <!-- Header simile a index.php -->
     <header class="sticky-top bg-body border-bottom shadow-sm">
         <div class="container-fluid p-3">
             <div class="d-flex align-items-center justify-content-between">
@@ -92,7 +91,6 @@ $stmt->close();
                     <div class="col-md-6 col-lg-4">
                         <div class="card h-100 border-0 shadow-sm">
                             <?php
-                            // Logic for image URL
                             $img_db = $acquisto['immagine_url'];
                             $immagine_url = 'https://images.unsplash.com/photo-1543002588-bfa74002ed7e?auto=format&fit=crop&w=600';
                             if (!empty($img_db)) {
@@ -153,8 +151,8 @@ $stmt->close();
 
                                     <?php if ($has_pdf): ?>
                                         <form action="../shop/download_pdf.php" method="POST">
-                                            <input type="hidden" name="vendita_id" value="<?php echo $acquisto['id_vendita']; ?>">
-                                            <input type="hidden" name="annuncio_id" value="<?php echo $acquisto['id_annuncio']; ?>">
+                                            <input type="hidden" name="vendita_id" value="<?php echo $acquisto['id_vendita']; ?>"/>
+                                            <input type="hidden" name="annuncio_id" value="<?php echo $acquisto['id_annuncio']; ?>"/>
                                             <button type="submit" class="btn btn-primary w-100">
                                                 <span class="bi bi-download me-2" aria-hidden="true"></span>
                                                 Scarica "<?php echo htmlspecialchars($acquisto['original_filename']); ?>"

@@ -2,31 +2,29 @@
 session_start();
 require_once __DIR__ . '/../../app/config/database.php';
 
-// accesso non eseguito
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] != true) {
     header('Location: ../auth/login.php');
     exit;
 }
 
-// accesso eseguito ma non è admin
+// controllo admin
 if (!isset($_SESSION['is_admin']) || $_SESSION['is_admin'] != true) {
     header('Location: ../index.php');
     exit;
 }
 
-// Verifica che la connessione sia stata stabilita
+// controllo connessione 
 if (!isset($conn) || !($conn instanceof mysqli) || $conn->connect_error) {
     die("Errore di connessione al database");
 }
 
-// Recupera dati dal database usando MySQLi
+//recupero dati da db 
 $stats = ['total_users' => 0, 'active_announcements' => 0, 'completed_sales' => 0];
 $users = [];
 $announcements = [];
 $subjects = [];
 $faculties = [];
 
-// Statistiche
 $query = "
     SELECT 
         (SELECT COUNT(*) FROM utenti) as total_users,
@@ -40,7 +38,6 @@ if ($result && $row = $result->fetch_assoc()) {
 if ($result)
     $result->free();
 
-// Utenti
 $query = "
     SELECT 
         u.id_utente as id,
@@ -60,7 +57,6 @@ if ($result) {
     $result->free();
 }
 
-// Annunci
 $query = "
     SELECT 
         a.id_annuncio as id,
@@ -88,7 +84,6 @@ if ($result) {
     $result->free();
 }
 
-// Materie (Corsi di studio)
 $query = "SELECT DISTINCT nome_corso FROM corso_studio ORDER BY nome_corso";
 $result = $conn->query($query);
 if ($result) {
@@ -98,7 +93,6 @@ if ($result) {
     $result->free();
 }
 
-// Facoltà
 $query = "SELECT id_facolta, nome_facolta FROM facolta ORDER BY nome_facolta";
 $result = $conn->query($query);
 if ($result) {
@@ -113,13 +107,13 @@ if ($result) {
 <html lang="it">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Pannello Admin - UniboMarket</title>
 
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="../assets/css/style.css">
     <style>
         [data-bs-theme="dark"] #btn-tema {
@@ -236,7 +230,7 @@ if ($result) {
 </head>
 
 <body>
-    <!-- Header -->
+    <!-- header -->
     <header class="sticky-top border-bottom py-3" role="banner">
         <div class="container-fluid">
             <div class="d-flex align-items-center justify-content-between">
@@ -259,7 +253,7 @@ if ($result) {
 
     <main id="main-content" class="container-fluid py-4" role="main">
         <h2 class="visually-hidden">Statistiche e Gestione Marketplace</h2>
-        <!-- Statistiche -->
+        <!-- stat -->
         <div class="row mb-4 g-3">
             <div class="col-12 col-md-4">
                 <div class="card border-0 shadow-sm h-100">
@@ -306,7 +300,7 @@ if ($result) {
             </div>
         </div>
 
-        <!-- Tabs -->
+        <!-- tabs -->
         <ul class="nav nav-tabs mb-4" id="adminTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active fw-semibold" id="users-tab" data-bs-target="#users" data-bs-toggle="tab"
@@ -327,10 +321,8 @@ if ($result) {
                 </button>
             </li>
         </ul>
-
-        <!-- Contenuto Tabs -->
         <div class="tab-content">
-            <!-- Utenti -->
+            <!-- utenti -->
             <div class="tab-pane fade show active" id="users" role="tabpanel" aria-labelledby="users-tab">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header border-bottom py-3">
@@ -384,14 +376,13 @@ if ($result) {
                 </div>
             </div>
 
-            <!-- Annunci -->
+            <!-- annunci -->
             <div class="tab-pane fade" id="announcements" role="tabpanel" aria-labelledby="announcements-tab">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header border-bottom py-3">
                         <h3 class="h5 card-title mb-0 fw-bold"><span class="fas fa-file-alt me-2"
                                 aria-hidden="true"></span>Moderazione Annunci</h3>
                     </div>
-                    <!-- Announcements Table accessibility improvement -->
                     <div class="card-body p-0">
                         <div class="table-responsive">
                             <table class="table table-hover mb-0 table-responsive-stack"
@@ -444,7 +435,7 @@ if ($result) {
                 </div>
             </div>
 
-            <!-- Categorie -->
+            <!-- categorie -->
             <div class="tab-pane fade" id="categories" role="tabpanel" aria-labelledby="categories-tab">
                 <div class="row g-4">
                     <div class="col-lg-6">
@@ -534,7 +525,7 @@ if ($result) {
         </div>
     </main>
 
-    <!-- Modals -->
+    <!-- password -->
     <div class="modal fade" id="resetPasswordModal">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -547,7 +538,7 @@ if ($result) {
                     <div class="mb-3">
                         <label for="newPassword" class="form-label fw-semibold">Nuova Password</label>
                         <input type="password" class="form-control" id="newPassword" placeholder="Minimo 6 caratteri"
-                            minlength="6" required>
+                            minlength="6" required />
                         <div id="passwordHelp" class="form-text">La password deve essere di almeno 6 caratteri</div>
                     </div>
                 </div>
@@ -559,10 +550,10 @@ if ($result) {
         </div>
     </div>
 
-    <!-- Scripts -->
+    <!-- scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Passa i dati PHP a JavaScript
+        // passo dati php a javascript
         const users = <?php echo json_encode($users); ?>;
         const announcements = <?php echo json_encode($announcements); ?>;
         let subjects = <?php echo json_encode($subjects); ?>;
@@ -575,12 +566,11 @@ if ($result) {
             loadSubjects();
             loadFaculties();
 
-            // Event listeners
             document.getElementById('addSubjectBtn').addEventListener('click', addSubject);
             document.getElementById('addFacultyBtn').addEventListener('click', addFaculty);
             document.getElementById('confirmResetBtn').addEventListener('click', confirmReset);
 
-            // Tema
+            // parte del tema da copiare nei vari file
             const btnTema = document.getElementById('btn-tema');
             if (btnTema) {
                 btnTema.addEventListener('click', () => {
@@ -597,7 +587,6 @@ if ($result) {
                 }
             });
         }
-
         function applyTheme() {
             const tema = localStorage.getItem('temaPreferito') ||
                 (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
@@ -736,7 +725,6 @@ if ($result) {
                         loadFaculties();
                         input.value = '';
                         showToast('Facoltà aggiunta');
-                        // Aggiorna anche il dropdown delle materie
                         const facultySelect = document.getElementById('subjectFaculty');
                         const option = new Option(data.faculty, data.id);
                         facultySelect.add(option);
@@ -780,7 +768,6 @@ if ($result) {
         }
 
         function showToast(message) {
-            // Rimuovi toast esistenti
             const existingToasts = document.querySelectorAll('.toast');
             existingToasts.forEach(toast => toast.remove());
 
@@ -802,10 +789,7 @@ if ($result) {
         }
 
         function updateStats() {
-            // Aggiorna statistiche utenti
             document.getElementById('totalUsers').textContent = users.length;
-
-            // Aggiorna statistiche annunci attivi
             const activeCount = announcements.filter(a => a.status === 'attivo').length;
             document.getElementById('activeAnnouncements').textContent = activeCount;
         }
@@ -938,7 +922,6 @@ if ($result) {
                     });
             }
         };
-
         document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>

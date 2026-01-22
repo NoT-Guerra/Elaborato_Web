@@ -1,17 +1,15 @@
 <?php
 session_start();
 
-// --- CONFIGURAZIONE DATABASE ---
 require_once __DIR__ . '/../../app/config/database.php';
 
-// --- CONTROLLO UTENTE ---
 if (!isset($_SESSION['user_id'])) {
     header('Location: ../auth/login.php');
     exit;
 }
 $id_utente_loggato = $_SESSION['user_id'];
 
-// --- RECUPERO PREFERITI ---
+// recupero dei preferiti
 $sql = "SELECT 
             a.id_annuncio, 
             a.titolo, 
@@ -19,7 +17,6 @@ $sql = "SELECT
             a.immagine_url,
             a.descrizione,
             a.data_pubblicazione,
-            -- a.is_digitale removed
             cs.nome_corso,
             f.nome_facolta,
             cp.nome_categoria,
@@ -40,7 +37,7 @@ $favorite_items = $result->fetch_all(MYSQLI_ASSOC);
 $item_count = count($favorite_items);
 $stmt->close();
 
-// Conta articoli nel carrello per header
+// conta articoli nel carrello
 $cart_count = 0;
 $stmtCart = $conn->prepare("SELECT COUNT(*) FROM carrello WHERE utente_id = ?");
 $stmtCart->bind_param("i", $id_utente_loggato);
@@ -49,10 +46,9 @@ $stmtCart->bind_result($cart_count);
 $stmtCart->fetch();
 $stmtCart->close();
 
-// Conta preferiti (sarà uguale a item_count, ma lo facciamo per coerenza con index)
+// conta preferiti
 $fav_count = $item_count;
 
-// Helper function
 function format_currency($amount)
 {
     return '€' . number_format($amount, 2, ',', '.');
@@ -62,13 +58,13 @@ function format_currency($amount)
 <html lang="it">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>I tuoi Preferiti - UniboMarket</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
     <script>
-        // Gestione tema
+        // gestione tema
         (function () {
             const tema = localStorage.getItem('temaPreferito') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             document.documentElement.setAttribute('data-bs-theme', tema);
@@ -102,7 +98,6 @@ function format_currency($amount)
             object-fit: cover;
         }
 
-        /* Usiamo btn-preferiti come stile, ma qui sarà per rimuovere */
         .btn-preferiti {
             position: absolute;
             top: 10px;
@@ -166,7 +161,6 @@ function format_currency($amount)
             border-radius: 50%;
         }
 
-        /* Stili per categorie (richiesti per i badge) */
         .categoria-libro {
             background-color: #e3f2fd !important;
             color: #1565c0 !important;
@@ -227,7 +221,6 @@ function format_currency($amount)
             color: #e0e0e0 !important;
         }
 
-        /* Accessibilità: Contrasto elevato per i badge */
         .categoria-libro {
             color: #0d47a1 !important;
         }
@@ -255,8 +248,7 @@ function format_currency($amount)
 </head>
 
 <body class="bg-body">
-
-    <!-- Header (semplificato ma coerente) -->
+    
     <header class="d-flex align-items-center bg-body m-0 p-3 border-bottom sticky-top shadow-sm">
         <a href="../index.php" class="btn btn-link text-body p-0 me-3" aria-label="Torna alla Home"><span
                 class="bi bi-arrow-left fs-4" aria-hidden="true"></span></a>
@@ -283,7 +275,7 @@ function format_currency($amount)
                     $condizione_lower = strtolower($annuncio['nome_condizione']);
                     $classe_categoria = 'categoria-' . $categoria_lower;
 
-                    // Calcolo tempo
+                    // gestione calcolo del tempo
                     $data_pubblicazione = date('d/m/Y', strtotime($annuncio['data_pubblicazione']));
                     $oggi = date('Y-m-d');
                     $data_pub = date('Y-m-d', strtotime($annuncio['data_pubblicazione']));
@@ -309,7 +301,6 @@ function format_currency($amount)
                     ?>
                     <div class="col-xl-3 col-lg-4 col-md-6">
                         <div class="card h-100 border-0 shadow-sm card-annuncio">
-                            <!-- Bottone Rimuovi preferiti -->
                             <button class="btn-preferiti remove-fav-btn" data-id="<?php echo $annuncio['id_annuncio']; ?>"
                                 aria-label="Rimuovi dai preferiti">
                                 <span class="bi bi-x-lg text-danger" aria-hidden="true"></span>
@@ -377,7 +368,6 @@ function format_currency($amount)
         <?php endif; ?>
     </div>
 
-    <!-- Toast -->
     <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">
@@ -406,7 +396,7 @@ function format_currency($amount)
             toast.show();
         }
 
-        // Aggiungi al carrello
+        // aggiungi al carrello
         document.querySelectorAll('.add-to-cart-btn').forEach(btn => {
             btn.addEventListener('click', function () {
                 const id = this.dataset.id;
@@ -427,11 +417,11 @@ function format_currency($amount)
             });
         });
 
-        // Rimuovi preferito (usando AJAX per fluidità)
+        // rimuovi preferito
         document.querySelectorAll('.remove-fav-btn').forEach(btn => {
             btn.addEventListener('click', function () {
                 const id = this.dataset.id;
-                const cardCol = this.closest('.col-xl-3'); // Selettore della colonna
+                const cardCol = this.closest('.col-xl-3');
 
                 fetch('rimuovi_preferiti.php', {
                     method: 'POST',
@@ -441,12 +431,10 @@ function format_currency($amount)
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            // Rimuovi card con animazione
                             cardCol.style.transition = "opacity 0.3s";
                             cardCol.style.opacity = "0";
                             setTimeout(() => {
                                 cardCol.remove();
-                                // Se non ci sono più elementi, ricarica per mostrare "vuoto"
                                 if (document.querySelectorAll('.card-annuncio').length === 0) {
                                     location.reload();
                                 }

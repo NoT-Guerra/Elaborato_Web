@@ -1,6 +1,4 @@
-/* Mantieni leggibili i pulsanti Login/Registrati al passaggio del mouse
-   sia in tema chiaro che scuro. Le regole usano le variabili di Bootstrap
-   per adattarsi al tema impostato con `data-bs-theme`. */
+/* mantieni leggibili i pulsanti login e registrati al passaggio del mouse sia in tema chiaro che scuro */
 #btn-login.btn-outline-dark:hover,
 #btn-register.btn-outline-dark:hover,
 #btn-login.btn-outline-dark:focus,
@@ -18,7 +16,7 @@
     border-color: currentColor !important;
 }
 
-/* Icone ereditano il colore del bottone */
+/* icone con il colore del bottone */
 #btn-login .bi,
 #btn-register .bi {
     color: inherit !important;
@@ -32,7 +30,7 @@
     --admin-danger: #dc3545;
 }
 
-/* Stili per tema scuro */
+/* stili per tema scuro */
 [data-bs-theme="dark"] {
     --bs-body-bg: #212529;
     --bs-body-color: #e9ecef;
@@ -155,7 +153,7 @@
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.5) !important;
 }
 
-/* Stili comuni */
+/* stili comuni */
 .admin-card {
     transition: transform 0.2s, box-shadow 0.2s;
     border: 1px solid var(--bs-border-color);
