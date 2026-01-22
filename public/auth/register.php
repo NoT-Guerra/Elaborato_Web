@@ -186,7 +186,7 @@ if ($result) {
                             <div class="col-6">
                                 <label for="nome" class="form-label">Nome</label>
                                 <input type="text" class="form-control <?php echo isset($errors['nome']) ? 'is-invalid' : ''; ?>" 
-                                       id="nome" name="nome" placeholder="Mario" 
+                                       id="nome" name="nome" placeholder="Nome" 
                                        value="<?php echo htmlspecialchars($nome); ?>" required>
                                 <?php if (isset($errors['nome'])): ?>
                                     <div class="error-message"><?php echo htmlspecialchars($errors['nome']); ?></div>
@@ -195,7 +195,7 @@ if ($result) {
                             <div class="col-6">
                                 <label for="cognome" class="form-label">Cognome</label>
                                 <input type="text" class="form-control <?php echo isset($errors['cognome']) ? 'is-invalid' : ''; ?>" 
-                                       id="cognome" name="cognome" placeholder="Rossi" 
+                                       id="cognome" name="cognome" placeholder="Cognome" 
                                        value="<?php echo htmlspecialchars($cognome); ?>" required>
                                 <?php if (isset($errors['cognome'])): ?>
                                     <div class="error-message"><?php echo htmlspecialchars($errors['cognome']); ?></div>

@@ -102,10 +102,10 @@ CREATE TABLE preferiti (
     UNIQUE (utente_id, annuncio_id)
 ) ENGINE=InnoDB;
 
-/* VENDITE */
+/* VENDITE - MODIFICATO: rimosso UNIQUE da annuncio_id */
 CREATE TABLE vendita (
     id_vendita INT AUTO_INCREMENT PRIMARY KEY,
-    annuncio_id INT NOT NULL UNIQUE, -- un annuncio può essere venduto una sola volta
+    annuncio_id INT NOT NULL, -- RIMOSSO: UNIQUE
     acquirente_id INT NOT NULL,
     venditore_id INT NOT NULL,
     prezzo_vendita DECIMAL(8,2) NOT NULL,
@@ -113,7 +113,10 @@ CREATE TABLE vendita (
 
     FOREIGN KEY (annuncio_id) REFERENCES annuncio(id_annuncio),
     FOREIGN KEY (acquirente_id) REFERENCES utenti(id_utente),
-    FOREIGN KEY (venditore_id) REFERENCES utenti(id_utente)
+    FOREIGN KEY (venditore_id) REFERENCES utenti(id_utente),
+    
+    -- Aggiunto: Vincolo univoco composto per evitare che un utente acquisti due volte lo stesso annuncio
+    UNIQUE KEY vendita_unica (annuncio_id, acquirente_id)
 ) ENGINE=InnoDB;
 
 CREATE TABLE annuncio_pdf (
