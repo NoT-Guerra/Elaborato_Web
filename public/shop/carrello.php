@@ -1,8 +1,7 @@
 <?php
-// 1. Inizio sessione (deve essere la primissima cosa)
 session_start();
 
-// Mostra messaggi di errore/successo
+// mostra messaggi di errore o successo
 if (isset($_SESSION['error_message'])) {
     echo '<div class="alert alert-danger alert-dismissible fade show m-2" role="alert">
             <span class="bi bi-exclamation-triangle me-2" aria-hidden="true"></span>' . $_SESSION['error_message'] . '
@@ -18,20 +17,14 @@ if (isset($_SESSION['success_message'])) {
           </div>';
     unset($_SESSION['success_message']);
 }
-
-// --- CONFIGURAZIONE DATABASE ---
 require_once __DIR__ . '/../../app/config/database.php';
 
-// --- CONTROLLO SESSIONE E UTENTE ---
-// Verifica se l'utente è loggato. 
 if (!isset($_SESSION['user_id'])) {
-    // NOTA: In produzione qui metteresti header('Location: ../auth/login.php');
     $id_utente_loggato = 1;
 } else {
     $id_utente_loggato = $_SESSION['user_id'];
 }
 
-// --- RECUPERO DATI DAL DB ---
 $sql = "SELECT 
             a.id_annuncio, 
             a.titolo, 
@@ -52,10 +45,10 @@ $result = $stmt->get_result();
 $db_items = $result->fetch_all(MYSQLI_ASSOC);
 $stmt->close();
 
-// Trasformiamo i dati per il template HTML
+// trasforma i dati per il template html
 $cart_items = [];
 foreach ($db_items as $row) {
-    // Gestione immagine: se inizia con http usa quella, altrimenti aggiungi prefisso assets e usa basename
+    // gestione immagine: se inizia con http usa quella, altrimenti aggiungi prefisso assets e usa basename
     $img_db = $row['immagine_url'];
     if (!empty($img_db)) {
         if (str_starts_with($img_db, 'http')) {
@@ -77,12 +70,11 @@ foreach ($db_items as $row) {
     ];
 }
 
-// Calcoli
 $subtotal = 0;
 foreach ($cart_items as $item) {
     $subtotal += $item['price'];
 }
-$total = $subtotal; // Spedizione gratuita
+$total = $subtotal;
 $item_count = count($cart_items);
 
 function format_currency($amount)
@@ -94,13 +86,13 @@ function format_currency($amount)
 <html lang="it">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Carrello</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <script>
-        // Gestione tema scuro/chiaro
+        // tema scuro/chiaro
         (function () {
             const tema = localStorage.getItem('temaPreferito') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             document.documentElement.setAttribute('data-bs-theme', tema);
@@ -109,9 +101,6 @@ function format_currency($amount)
 </head>
 
 <body class="bg-body">
-
-
-
     <div class="container-fluid p-0">
         <header class="d-flex align-items-center bg-body m-0 p-3 border-bottom sticky-top">
             <a href="../index.php" class="btn btn-link text-body p-0 me-3" aria-label="Torna alla Home"><span
@@ -129,7 +118,7 @@ function format_currency($amount)
                         <div class="flex-shrink-0 me-3">
                             <img src="<?php echo htmlspecialchars($item['image']); ?>" class="rounded"
                                 style="width:90px;height:120px;object-fit:cover;"
-                                alt="<?php echo htmlspecialchars($item['title']); ?>">
+                                alt="<?php echo htmlspecialchars($item['title']); ?>" />
                         </div>
                         <div class="flex-grow-1">
                             <h2 class="card-title h5 fw-bold mb-1"><?php echo htmlspecialchars($item['title']); ?></h2>
@@ -138,7 +127,7 @@ function format_currency($amount)
                             <div class="fw-bold text-body"><?php echo format_currency($item['price']); ?></div>
                         </div>
                         <form action="rimuovi.php" method="POST">
-                            <input type="hidden" name="id_annuncio" value="<?php echo $item['id']; ?>">
+                            <input type="hidden" name="id_annuncio" value="<?php echo $item['id']; ?>" />
                             <button type="submit" class="btn btn-link text-danger p-0 ms-3" aria-label="Rimuovi prodotto"><span
                                     class="bi bi-trash fs-4" aria-hidden="true"></span></button>
                         </form>

@@ -1,18 +1,16 @@
 <?php
 session_start();
-
-// Verifica se l'utente arriva da un acquisto valido
 if (!isset($_SESSION['purchase_success']) || !$_SESSION['purchase_success']) {
     header('Location: carrello.php');
     exit;
 }
 
-// Recupera i dati dalla sessione
+// recupoero dati sessione
 $items = $_SESSION['purchase_items'];
 $total = $_SESSION['purchase_total'];
 $date = $_SESSION['purchase_date'];
 
-// Pulisci la sessione dopo aver recuperato i dati
+// puizia sessione dopo recuperato dati
 unset($_SESSION['purchase_success']);
 unset($_SESSION['purchase_items']);
 unset($_SESSION['purchase_total']);
@@ -23,11 +21,11 @@ unset($_SESSION['purchase_date']);
 <html lang="it">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Acquisto Confermato - UniboMarket</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" />
     <style>
         .success-icon {
             width: 80px;
@@ -72,7 +70,7 @@ unset($_SESSION['purchase_date']);
             }
         }
 
-        /* --- DARK MODE OVERRIDES --- */
+        /* --- per dark --- */
         [data-bs-theme="dark"] body {
             background-color: #1a202c;
             color: #f8f9fa;
@@ -131,7 +129,7 @@ unset($_SESSION['purchase_date']);
         }
     </style>
     <script>
-        // Carica il tema dal localStorage prima del rendering per evitare flash di luce
+        // carica il tema dal localStorage 
         const temaSalvato = localStorage.getItem('temaPreferito') || 'light';
         document.documentElement.setAttribute('data-bs-theme', temaSalvato);
     </script>
@@ -141,7 +139,7 @@ unset($_SESSION['purchase_date']);
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-8 col-md-10">
-                <!-- Header -->
+                <!-- header -->
                 <div class="text-center mb-5">
                     <div class="success-icon mb-3">
                         <span class="bi bi-check-circle-fill" aria-hidden="true"></span>
@@ -151,7 +149,7 @@ unset($_SESSION['purchase_date']);
                     </p>
                 </div>
 
-                <!-- Riepilogo acquisto -->
+                <!-- riepilogo acquisto -->
                 <div class="card shadow-sm border-0 mb-4">
                     <div class="card-header bg-white border-0 pt-4">
                         <h2 class="h4 fw-bold mb-0">
@@ -160,7 +158,7 @@ unset($_SESSION['purchase_date']);
                         <small class="text-muted">Ordine effettuato il <?php echo $date; ?></small>
                     </div>
                     <div class="card-body">
-                        <!-- Lista prodotti -->
+                        <!-- lista prodotti -->
                         <div class="mb-4">
                             <h3 class="h6 fw-bold mb-3">Prodotti acquistati:</h3>
                             <?php foreach ($items as $item): ?>
@@ -199,7 +197,7 @@ unset($_SESSION['purchase_date']);
                             <?php endforeach; ?>
                         </div>
 
-                        <!-- Totale -->
+                        <!-- tot -->
                         <div class="border-top pt-3">
                             <div class="d-flex justify-content-between align-items-center">
                                 <h3 class="h5 fw-bold mb-0">Totale pagato:</h3>
@@ -214,7 +212,7 @@ unset($_SESSION['purchase_date']);
                     </div>
                 </div>
 
-                <!-- Azioni -->
+                <!-- azioni -->
                 <div class="d-grid gap-3 d-md-flex justify-content-md-center no-print">
                     <a href="../index.php" class="btn btn-outline-primary px-4">
                         <span class="bi bi-house me-2" aria-hidden="true"></span>Torna alla Home
@@ -227,7 +225,7 @@ unset($_SESSION['purchase_date']);
                     </button>
                 </div>
 
-                <!-- Info per prodotti digitali -->
+                <!-- pdf -->
                 <?php
                 $has_digital = false;
                 foreach ($items as $item) {
@@ -252,7 +250,7 @@ unset($_SESSION['purchase_date']);
                     </div>
                 <?php endif; ?>
 
-                <!-- Info per prodotti fisici -->
+                <!-- prodotti fisici -->
                 <?php
                 $has_physical = false;
                 foreach ($items as $item) {
@@ -282,7 +280,7 @@ unset($_SESSION['purchase_date']);
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Disabilita il pulsante indietro per evitare doppi acquisti
+        // disabilita pulsante indietro per evitare doppi acquisti
         history.pushState(null, null, location.href);
         window.onpopstate = function () {
             history.go(1);
