@@ -2,10 +2,10 @@
 session_start();
 require_once __DIR__ . '/../app/config/database.php';
 
-// Verifica se l'utente è loggato
+// check utente loggato
 $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
 
-// Conta articoli nel carrello
+// conta articoli nel carrello
 $cart_count = 0;
 if ($is_logged_in && isset($_SESSION['user_id'])) {
     $stmt = $conn->prepare("SELECT COUNT(*) FROM carrello WHERE utente_id = ?");
@@ -21,11 +21,11 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 <html lang="it">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Chi Siamo - UniboMarket</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
     <style>
         :root {
             --primary-color: #0d6efd;
@@ -76,7 +76,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         [data-bs-theme="dark"] .feature-icon {
             background-color: rgba(13, 110, 253, 0.2);
             color: #90caf9;
-            /* Migliore contrasto su sfondo scuro */
         }
 
         #cart-counter-header {
@@ -95,7 +94,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
     <header class="sticky-top bg-body border-bottom shadow-sm">
         <div class="container-fluid p-2 p-sm-3">
             <div class="d-flex align-items-center justify-content-between">
-                <!-- Logo -->
                 <a href="index.php" class="d-flex align-items-center text-decoration-none text-body">
                     <div class="bg-primary rounded-3 d-flex align-items-center justify-content-center me-2 me-sm-3"
                         style="width: 48px; height: 48px;">
@@ -114,7 +112,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         </div>
     </header>
 
-    <!-- Hero Section -->
     <section class="hero-section text-center">
         <div class="container">
             <h1 class="display-4 fw-bold mb-4">Benvenuti su UniboMarket</h1>
@@ -122,7 +119,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         </div>
     </section>
 
-    <!-- Main Content -->
     <main class="container mb-5">
         <div class="row justify-content-center mb-5">
             <div class="col-lg-8 text-center">
@@ -196,7 +192,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         </div>
     </main>
 
-    <!-- Footer (Simplified) -->
     <footer class="bg-body-tertiary py-4 border-top">
         <div class="container text-center">
             <p class="text-muted mb-0">&copy;
@@ -207,7 +202,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        // Gestione Tema (riutilizzata da index.php se necessario)
+        // gestione Tema
         const temaSalvato = localStorage.getItem('temaPreferito') || 'light';
         document.documentElement.setAttribute('data-bs-theme', temaSalvato);
     </script>
