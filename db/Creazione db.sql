@@ -1,14 +1,11 @@
-/* DATABASE */
 CREATE DATABASE marketplace_universitario;
 USE marketplace_universitario;
 
-/* FACOLTA */
 CREATE TABLE facolta (
     id_facolta INT AUTO_INCREMENT PRIMARY KEY,
     nome_facolta VARCHAR(100) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
 
-/* UTENTI */
 CREATE TABLE utenti (
     id_utente INT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(50) NOT NULL,
@@ -22,7 +19,6 @@ CREATE TABLE utenti (
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
-/* CORSI DI STUDIO */
 CREATE TABLE corso_studio (
     id_corso INT AUTO_INCREMENT PRIMARY KEY,
     nome_corso VARCHAR(100) NOT NULL,
@@ -31,19 +27,16 @@ CREATE TABLE corso_studio (
         ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
-/* CATEGORIE PRODOTTI */
 CREATE TABLE categoria_prodotto (
     id_categoria INT AUTO_INCREMENT PRIMARY KEY,
     nome_categoria VARCHAR(50) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
 
-/* CONDIZIONI PRODOTTO */
 CREATE TABLE condizione_prodotto (
     id_condizione INT AUTO_INCREMENT PRIMARY KEY,
     nome_condizione VARCHAR(50) NOT NULL UNIQUE
 ) ENGINE=InnoDB;
 
-/* ANNUNCIO */
 CREATE TABLE annuncio (
     id_annuncio INT AUTO_INCREMENT PRIMARY KEY,
     titolo VARCHAR(100) NOT NULL,
@@ -74,7 +67,6 @@ CREATE TABLE annuncio (
         ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
-/* CARRELLO */
 CREATE TABLE carrello (
     id_carrello INT AUTO_INCREMENT PRIMARY KEY,
     utente_id INT NOT NULL,
@@ -88,7 +80,6 @@ CREATE TABLE carrello (
     UNIQUE (utente_id, annuncio_id)
 ) ENGINE=InnoDB;
 
-/* PREFERITI */
 CREATE TABLE preferiti (
     id_preferito INT AUTO_INCREMENT PRIMARY KEY,
     utente_id INT NOT NULL,
@@ -102,10 +93,9 @@ CREATE TABLE preferiti (
     UNIQUE (utente_id, annuncio_id)
 ) ENGINE=InnoDB;
 
-/* VENDITE - MODIFICATO: rimosso UNIQUE da annuncio_id */
 CREATE TABLE vendita (
     id_vendita INT AUTO_INCREMENT PRIMARY KEY,
-    annuncio_id INT NOT NULL, -- RIMOSSO: UNIQUE
+    annuncio_id INT NOT NULL,
     acquirente_id INT NOT NULL,
     venditore_id INT NOT NULL,
     prezzo_vendita DECIMAL(8,2) NOT NULL,
@@ -114,8 +104,6 @@ CREATE TABLE vendita (
     FOREIGN KEY (annuncio_id) REFERENCES annuncio(id_annuncio),
     FOREIGN KEY (acquirente_id) REFERENCES utenti(id_utente),
     FOREIGN KEY (venditore_id) REFERENCES utenti(id_utente),
-    
-    -- Aggiunto: Vincolo univoco composto per evitare che un utente acquisti due volte lo stesso annuncio
     UNIQUE KEY vendita_unica (annuncio_id, acquirente_id)
 ) ENGINE=InnoDB;
 
