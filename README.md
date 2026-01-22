@@ -32,8 +32,8 @@ Un marketplace web dedicato agli studenti per la compravendita di libri, appunti
 ## Tech Stack
 - **Backend**: PHP 
 - **Database**: MySQL normalizzato in 3NF
-- **Frontend**: HTML5, Vanilla CSS, JavaScript
-- **Web Server**: Apache (XAMPP/MAMP consigliati)
+- **Frontend**: HTML5, CSS, JavaScript
+- **Web Server**: Apache (XAMPP)
 
 ## Database
 Il database modella un marketplace universitario garantendo normalizzazione (3NF), integrità dei dati e supporto alla vendita multipla di contenuti digitali.
