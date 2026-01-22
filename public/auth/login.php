@@ -11,7 +11,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (!empty($email) && !empty($password)) {
 
-        // 1. Query aggiornata con i nomi corretti delle colonne (id_utente)
         // Recuperiamo l'hash della password salvato nel DB
         $stmt = $conn->prepare("
             SELECT u.id_utente, u.nome, u.cognome, u.email, u.password, u.isAdmin, f.nome_facolta
@@ -28,13 +27,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $user = $result->fetch_assoc();
             $stmt->close();
 
-            // 2. VERIFICA DELL'HASH:
+            //VERIFICA DELL'HASH:
             // password_verify confronta la stringa in chiaro col l'hash memorizzato
             if ($user && password_verify($password, $user['password'])) {
 
                 session_regenerate_id(true);
 
-                // Salviamo i dati corretti in sessione
+                // salviamo i dati corretti in sessione
                 $_SESSION['loggedin'] = true;
                 $_SESSION['user_id'] = $user['id_utente'];
                 $_SESSION['email'] = $user['email'];
@@ -42,13 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['cognome'] = $user['cognome'];
                 $_SESSION['nome_facolta'] = $user['nome_facolta'] ?? 'Nessuna';
 
-                // ADMIN check from database column
+                //ADMIN check from database column
                 $_SESSION['is_admin'] = (bool) $user['isAdmin'];
 
                 header('Location: ../index.php');
                 exit;
             } else {
-                // Per sicurezza, usiamo un messaggio generico
+                //per sicurezza, usiamo un messaggio generico
                 $error_message = 'Email o password errati.';
             }
         } else {

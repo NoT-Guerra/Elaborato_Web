@@ -1,17 +1,16 @@
 <?php
-// register.php
 
 session_start();
-require_once __DIR__ . '/../../app/config/database.php'; // Il tuo file di configurazione del database
+require_once __DIR__ . '/../../app/config/database.php'; 
 
-// Inizializza le variabili
+
 $nome = $cognome = $email = $facolta = $password = $confirm_password = '';
 $errors = [];
 $success = false;
 
-// Controlla se il form è stato inviato
+//Controlla se il form è stato inviato
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Pulisci e valida i dati
+    // pulisci e valida i dati
     $nome = trim($_POST['nome'] ?? '');
     $cognome = trim($_POST['cognome'] ?? '');
     $email = trim($_POST['email'] ?? '');
@@ -20,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $confirm_password = $_POST['confirm_password'] ?? '';
     $terms_accepted = isset($_POST['terms']);
 
-    // Validazione
+    //validazione
     if (empty($nome)) {
         $errors['nome'] = 'Il nome è obbligatorio';
     } elseif (strlen($nome) < 2) {
@@ -59,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $errors['terms'] = 'Devi accettare i termini e condizioni';
     }
 
-    // Se non ci sono errori, procedi con la registrazione
+    // se non ci sono errori procedi con la registrazione
     if (empty($errors)) {
         // Controlla se l'email esiste già
         $check_email_sql = "SELECT id_utente FROM utenti WHERE email = ?";
@@ -71,34 +70,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($result->num_rows > 0) {
             $errors['email'] = 'Questa email è già registrata';
         } else {
-            // Hash della password
+            // hash della password
             $password_hash = password_hash($password, PASSWORD_DEFAULT);
             
-            // Inserisci il nuovo utente
+            // inserisci il nuovo utente
             $insert_sql = "INSERT INTO utenti (nome, cognome, email, password, facolta_id, data_registrazione) 
                            VALUES (?, ?, ?, ?, ?, NOW())";
             $stmt = $conn->prepare($insert_sql);
             $stmt->bind_param("ssssi", $nome, $cognome, $email, $password_hash, $facolta_id);
             
             if ($stmt->execute()) {
-                // Successo!
                 $success = true;
-                
-                // Pulisci il form
+                // pulisci il form
                 $nome = $cognome = $email = $facolta = '';
-                
-                // Reindirizza al login dopo 3 secondi
+                // reindirizza al login dopo 3 secondi
                 header("refresh:3;url=login.php");
             } else {
                 $errors['database'] = 'Errore durante la registrazione. Riprova più tardi.';
-                // Per debug: $errors['database'] = $stmt->error;
             }
         }
         $stmt->close();
     }
 }
 
-// Recupera la lista delle facoltà dal database
+//recupera la lista delle facoltà dal database
 $facolta_list = [];
 $sql = "SELECT id_facolta, nome_facolta FROM facolta ORDER BY nome_facolta";
 $result = $conn->query($sql);
@@ -208,7 +203,7 @@ if ($result) {
                             </div>
                         </div>
 
-                        <!-- Email -->
+                        <!-- email -->
                         <div class="mb-3">
                             <label for="email" class="form-label">Email istituzionale</label>
                             <input type="email" class="form-control <?php echo isset($errors['email']) ? 'is-invalid' : ''; ?>" 
@@ -220,7 +215,7 @@ if ($result) {
                             <div class="form-text">Devi utilizzare la tua email istituzionale @studio.unibo.it</div>
                         </div>
 
-                        <!-- Facoltà -->
+                        <!-- facoltà -->
                         <div class="mb-3">
                             <label for="facolta" class="form-label">Facoltà</label>
                             <select class="form-select <?php echo isset($errors['facolta']) ? 'is-invalid' : ''; ?>" 
@@ -241,7 +236,7 @@ if ($result) {
                             <?php endif; ?>
                         </div>
 
-                        <!-- Password -->
+                        <!--password -->
                         <div class="mb-3">
                             <label for="password" class="form-label">Password</label>
                             <div class="input-group">
@@ -258,7 +253,7 @@ if ($result) {
                             <div class="form-text">Minimo 8 caratteri</div>
                         </div>
 
-                        <!-- Conferma Password -->
+                        <!-- conferma password -->
                         <div class="mb-3">
                             <label for="confirmPassword" class="form-label">Conferma password</label>
                             <input type="password" id="confirmPassword" 
@@ -269,7 +264,7 @@ if ($result) {
                             <?php endif; ?>
                         </div>
 
-                        <!-- Termini e condizioni -->
+                        <!--termini e condizioni -->
                         <div class="form-check mb-4">
                             <input class="form-check-input <?php echo isset($errors['terms']) ? 'is-invalid' : ''; ?>" 
                                    type="checkbox" name="terms" id="terms" required>
@@ -282,7 +277,7 @@ if ($result) {
                             <?php endif; ?>
                         </div>
 
-                        <!-- Submit Button -->
+
                         <button type="submit" class="btn btn-outline-primary w-100 py-2 fw-bold">
                             Registrati
                         </button>
@@ -317,7 +312,7 @@ if ($result) {
             icon.classList.toggle("bi-eye-slash", show);
         }
         
-        // Tema
+        // tema
         (function () {
             try {
                 const tema = localStorage.getItem('temaPreferito') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
