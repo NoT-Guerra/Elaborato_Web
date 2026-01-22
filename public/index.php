@@ -1,9 +1,9 @@
 <?php
 session_start();
-//Connessione al database
+// connessione al database
 require_once __DIR__ . '/../app/config/database.php';
 
-//Query per ottenere gli annunci con le relative informazioni
+// query per ottenere gli annunci
 $sql = "SELECT 
                 a.id_annuncio,
                 a.titolo,
@@ -37,7 +37,7 @@ if ($result && $result->num_rows > 0) {
     }
 }
 
-// Ottieni categorie distinte per i filtri
+// gestione filtro categoria
 $sql_categorie = "SELECT nome_categoria FROM categoria_prodotto";
 $result_categorie = $conn->query($sql_categorie);
 $categorie = [];
@@ -47,7 +47,7 @@ if ($result_categorie && $result_categorie->num_rows > 0) {
     }
 }
 
-// Ottieni facoltà distinte per i filtri
+// gestione filtro facoltà
 $sql_facolta = "SELECT nome_facolta FROM facolta";
 $result_facolta = $conn->query($sql_facolta);
 $facolta_list = [];
@@ -57,7 +57,7 @@ if ($result_facolta && $result_facolta->num_rows > 0) {
     }
 }
 
-// Ottieni condizioni distinte per i filtri
+// gestione filtro condizioni
 $sql_condizioni = "SELECT nome_condizione FROM condizione_prodotto";
 $result_condizioni = $conn->query($sql_condizioni);
 $condizioni_list = [];
@@ -67,10 +67,10 @@ if ($result_condizioni && $result_condizioni->num_rows > 0) {
     }
 }
 
-// Verifica se l'utente è loggato
+// check utente loggato
 $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
 
-// Conta articoli nel carrello
+// conta articoli nel carrello
 $cart_count = 0;
 if ($is_logged_in && isset($_SESSION['user_id'])) {
     $stmt = $conn->prepare("SELECT COUNT(*) FROM carrello WHERE utente_id = ?");
@@ -81,7 +81,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
     $stmt->close();
 }
 
-// Ottieni i preferiti dell'utente per impostare lo stato iniziale dei cuori
+// preferiti dell'utente → per logica stato cuore (icona)
 $favorites = [];
 if ($is_logged_in && isset($_SESSION['user_id'])) {
     $stmt = $conn->prepare("SELECT annuncio_id FROM preferiti WHERE utente_id = ?");
@@ -99,11 +99,11 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 <html lang="it">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>UniboMarket - Home</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
     <style>
         .annuncio.nascosto {
             display: none !important;
@@ -154,7 +154,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 
         .filter-btn.active {
             background-color: #0a58ca !important;
-            /* Accessible Blue */
             color: white !important;
             border-color: #0a58ca !important;
         }
@@ -262,7 +261,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             border-radius: 50%;
         }
 
-        /* Stili per categorie */
         .categoria-libro {
             background-color: #e3f2fd !important;
             color: #0d47a1 !important;
@@ -293,7 +291,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             color: #212121 !important;
         }
 
-        /* Stili per tema scuro */
+        /* stili per tema scuro */
         [data-bs-theme="dark"] .categoria-libro {
             background-color: #1e3a5f !important;
             color: #90caf9 !important;
@@ -324,7 +322,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             color: #e0e0e0 !important;
         }
 
-        /* Classe generica per categorie non specificate */
+        /* classe per categoria */
         .badge[class*="categoria-"]:not(.categoria-libro):not(.categoria-appunti):not(.categoria-digitale):not(.categoria-pdf):not(.categoria-materiale):not(.categoria-altro) {
             background-color: #e8e8e8 !important;
             color: #333 !important;
@@ -335,19 +333,19 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             color: #f8f9fa !important;
         }
 
-        /* --- RIMUOVI SCORRIMENTO ORIZZONTALE SU SCHERMI PICCOLI --- */
+        /* media query- */
         @media (max-width: 767.98px) {
             .container-fluid {
                 overflow-x: hidden !important;
             }
 
-            /* Rimuovi overflow-auto dalle categorie su mobile */
+            /* rimuovi overflow-auto dalle categorie su mobile */
             .d-flex.gap-2.overflow-auto {
                 overflow-x: auto !important;
-                /* Mantieni lo scorrimento solo per i bottoni categorie */
+                /* mantieni lo scorrimento solo per i bottoni categorie */
                 flex-wrap: nowrap;
                 padding-bottom: 5px;
-                /* Spazio per scrollbar */
+                /* spazio per scrollbar */
             }
 
             body {
@@ -355,7 +353,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             }
         }
 
-        /* Header Buttons Dark Mode */
         [data-bs-theme="dark"] header .btn-dark {
             background-color: #0d6efd !important;
             border-color: #0d6efd !important;
@@ -375,11 +372,9 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 
 <body>
 
-    <!-- Header -->
     <header class="sticky-top bg-body border-bottom shadow-sm">
         <div class="container-fluid p-2 p-sm-3">
             <div class="d-flex align-items-center justify-content-between">
-                <!-- Logo -->
                 <div class="d-flex align-items-center">
                     <div class="bg-primary rounded-3 d-flex align-items-center justify-content-center me-2 me-sm-3"
                         style="width: 48px; height: 48px;">
@@ -391,10 +386,8 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     </div>
                 </div>
 
-                <!-- Azioni -->
+                <!-- azioni -->
                 <div class="d-flex align-items-center gap-2">
-                    <!-- Bottone Preferiti - visibile solo su schermi medi e grandi -->
-                    <!-- Bottone Preferiti - visibile solo su schermi medi e grandi -->
                     <a href="user/preferiti.php"
                         class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex"
                         aria-label="Vai ai preferiti">
@@ -408,7 +401,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                         </span>
                     </a>
 
-                    <!-- Bottone Carrello - visibile solo su schermi medi e grandi -->
                     <a href="shop/carrello.php"
                         class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex"
                         aria-label="Vai al carrello">
@@ -420,7 +412,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     </a>
 
                     <?php if ($is_logged_in): ?>
-                        <!-- Se l'utente è loggato, mostra Logout e Nome utente -->
+                        <!-- se l'utente è loggato, mostra Logout e Nome utente -->
                         <div class="d-none d-md-flex align-items-center">
                             <span class="me-3 text-muted">
                                 <span class="bi bi-person-circle me-1"></span>
@@ -431,7 +423,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                             </a>
                         </div>
                     <?php else: ?>
-                        <!-- Se l'utente NON è loggato, mostra Login e Registrati -->
+                        <!-- se l'utente NON è loggato, mostra Login e Registrati -->
                         <a href="auth/login.php" class="btn btn-outline-dark d-none d-md-flex align-items-center px-3">
                             <span class="bi bi-box-arrow-in-right me-2"></span>Login
                         </a>
@@ -442,21 +434,17 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                         </a>
                     <?php endif; ?>
 
-                    <!-- Bottone Pubblica - già responsive -->
                     <a href="shop/pubblica.php"
                         class="btn btn-dark d-flex align-items-center justify-content-center px-3">
                         <span class="bi bi-plus-circle"></span>
                         <span class="d-none d-md-inline ms-2">Pubblica</span>
                     </a>
 
-                    <!-- Bottone Tema - rimane sempre visibile -->
-                    <!-- Bottone Tema - rimane sempre visibile -->
                     <button id="btn-tema" class="btn btn-outline-secondary" aria-label="Cambia tema">
                         <span id="icona-luna" class="bi bi-moon"></span>
                         <span id="icona-sole" class="bi bi-sun d-none"></span>
                     </button>
 
-                    <!-- Bottone menu a tendina - rimane sempre visibile -->
                     <button class="btn btn-link text-body p-0 ms-2" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#menuMobile" aria-label="Menu navigazione">
                         <span class="bi bi-list fs-2"></span>
@@ -464,7 +452,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 </div>
             </div>
 
-            <!-- Menù a tendina -->
+            <!-- menù a tendina -->
             <div class="offcanvas offcanvas-end" tabindex="-1" id="menuMobile" aria-labelledby="menuMobileLabel">
                 <div class="offcanvas-header border-bottom">
                     <h2 class="offcanvas-title h5 fw-bold" id="menuMobileLabel">UniboMarket</h2>
@@ -473,7 +461,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 <div class="offcanvas-body p-0">
                     <div class="p-3 d-grid gap-2">
                         <?php if ($is_logged_in): ?>
-                            <!-- Se loggato, mostra Logout e nome utente nel menu mobile -->
+                            <!-- se loggato, mostra Logout e nome utente nel menu mobile -->
                             <div class="text-center mb-2">
                                 <span class="bi bi-person-circle fs-2 mb-2"></span>
                                 <h3 class="h6 mb-0">
@@ -486,7 +474,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                 <span class="bi bi-box-arrow-right"></span> Logout
                             </a>
                         <?php else: ?>
-                            <!-- Se NON loggato, mostra Login e Registrati nel menu mobile -->
+                            <!-- se NON loggato, mostra Login e Registrati nel menu mobile -->
                             <a href="auth/login.php"
                                 class="btn btn-dark w-100 py-2 d-flex align-items-center justify-content-center gap-2">
                                 <span class="bi bi-box-arrow-in-right"></span> Login
@@ -507,7 +495,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                         <a href="shop/carrello.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                             <span class="bi bi-cart me-3"></span> Carrello
                         </a>
-                        <!-- Aggiungi questo link -->
                         <a href="user/miei_acquisti.php"
                             class="list-group-item list-group-item-action border-0 py-3 px-4">
                             <span class="bi bi-bag-check me-3"></span> I miei acquisti
@@ -528,7 +515,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 </div>
             </div>
 
-            <!-- Categorie -->
+            <!-- categorie -->
             <div class="mt-3 pt-2 border-top">
                 <div class="d-flex gap-2 overflow-auto" id="category-filters">
                     <button class="btn btn-sm btn-primary rounded-pill px-3 filter-btn active" data-category="tutti"
@@ -542,12 +529,12 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 </div>
             </div>
 
-            <!-- Ricerca -->
+            <!-- barra di ricerca -->
             <div class="mt-3">
                 <div class="input-group">
                     <span class="input-group-text bg-transparent"><span class="bi bi-search"></span></span>
                     <label for="searchInput" class="visually-hidden">Cerca libri o appunti</label>
-                    <input type="text" id="searchInput" class="form-control" placeholder="Cerca libri o appunti...">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Cerca libri o appunti..."/>
                 </div>
             </div>
         </div>
@@ -555,7 +542,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 
     <main class="container-fluid py-4">
         <div class="row g-4">
-            <!-- Filtri -->
+            <!-- filtri -->
             <aside class="col-lg-3 col-md-4">
                 <div class="card shadow-sm border-0">
                     <div class="card-body">
@@ -589,7 +576,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                             <label for="filterPrezzo" class="form-label small fw-semibold">Prezzo max: <span
                                     id="prezzoValore" class="text-primary">100€</span></label>
                             <input type="range" id="filterPrezzo" class="form-range" min="0" max="150" step="5"
-                                value="100">
+                                value="100"/>
                             <div class="d-flex justify-content-between small text-muted">
                                 <span>0€</span>
                                 <span>150€</span>
@@ -603,7 +590,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 </div>
             </aside>
 
-            <!-- Annunci -->
+            <!-- annunci -->
             <section class="col-lg-9 col-md-8">
                 <h2 class="visually-hidden">Lista Annunci</h2>
                 <div class="row g-4" id="lista-annunci">
@@ -632,7 +619,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                 }
                             }
 
-                            // URL immagine: dal DB (locale o remota) o default
+                            // url img da db oppure di default se manca
                             $img_db = $annuncio['immagine_url'];
                             if (!empty($img_db)) {
                                 if (str_starts_with($img_db, 'http')) {
@@ -658,7 +645,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                                         aria-label="<?php echo $is_fav ? 'Rimuovi dai preferiti' : 'Aggiungi ai preferiti'; ?>">
                                         <span class="bi <?php echo $heart_class; ?>" aria-hidden="true"></span>
                                     </button>
-                                    <!-- Link attorno all'immagine -->
+                                    <!-- link nell'img per andare ala pag annuncio -->
                                     <a href="shop/annuncio.php?id=<?php echo $annuncio['id_annuncio']; ?>"
                                         class="img-wrapper d-block text-decoration-none">
                                         <img src="<?php echo $immagine_url; ?>"
@@ -730,7 +717,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
         </div>
     </main>
 
-    <!-- Footer -->
+    <!-- footer -->
     <footer class="text-body pt-3 pb-3 border-top">
         <div class="container-fluid px-3 px-lg-5">
             <div class="row">
@@ -794,7 +781,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // --- Gestione Tema ---
+        // gestione tema
         const btnTema = document.getElementById('btn-tema');
         const iconaLuna = document.getElementById('icona-luna');
         const iconaSole = document.getElementById('icona-sole');
@@ -816,7 +803,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             applicaTema(nuovoTema);
         });
 
-        // --- Filtri ---
+        // gestione filtri
         const searchInput = document.getElementById('searchInput');
         const filterFacolta = document.getElementById('filterFacolta');
         const filterCondizioni = document.getElementById('filterCondizioni');
@@ -849,26 +836,24 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             });
         }
 
-        // Gestione dei bottoni di filtro categorie
+        // gestione button filtro categorie
         const categoryContainer = document.getElementById('category-filters');
         const filterAllBtn = document.getElementById('filter-all');
 
-        // Event delegation per i bottoni di categoria
         categoryContainer.addEventListener('click', function (e) {
             if (e.target.classList.contains('filter-btn')) {
                 const clickedCategory = e.target.getAttribute('data-category');
 
-                // Rimuove le classi attive da tutti i bottoni
+                // rimuove le classi attive da tutti i bottoni
                 filterBtns.forEach(btn => {
                     btn.classList.remove('active', 'btn-primary');
                     btn.classList.add('btn-outline-secondary');
                 });
 
-                // Aggiunge le classi attive al bottone cliccato
+                // aggiunge le classi attive al bottone cliccato
                 e.target.classList.remove('btn-outline-secondary');
                 e.target.classList.add('active', 'btn-primary');
 
-                // Applica il filtro
                 filtraAnnunci();
             }
         });
@@ -880,7 +865,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             filterPrezzo.value = 100;
             prezzoValore.textContent = '100€';
 
-            // Ripristina solo il bottone "Tutti" come attivo
             filterBtns.forEach(btn => {
                 btn.classList.remove('active', 'btn-primary');
                 btn.classList.add('btn-outline-secondary');
@@ -893,15 +877,11 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             filtraAnnunci();
         }
 
-        // Listener per i filtri
+        // listener per i filtri
         searchInput.addEventListener('input', filtraAnnunci);
         filterFacolta.addEventListener('change', filtraAnnunci);
         filterCondizioni.addEventListener('change', filtraAnnunci);
         filterPrezzo.addEventListener('input', filtraAnnunci);
-
-        // --- Preferiti (Server Side) ---
-        // Funzione per aggiornare il contatore NON implementata dinamicamente nell'header per ora, 
-        // ma potremmo farlo se richiesto. Al caricamento PHP lo imposta.
 
         document.querySelectorAll('.btn-preferiti').forEach(btn => {
             btn.addEventListener('click', function (e) {
@@ -909,7 +889,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                 const icon = this.querySelector('span.bi');
                 const id = this.dataset.id;
 
-                // Determina azione basata sullo stato attuale
                 const isAdded = icon.classList.contains('bi-suit-heart-fill');
                 const url = isAdded ? 'user/rimuovi_preferiti.php' : 'user/aggiungi_preferiti.php';
 
@@ -921,7 +900,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     .then(res => res.json())
                     .then(data => {
                         if (data.success) {
-                            // Aggiorna contatore header
+                            // aggiornamento contatore header
                             const counter = document.getElementById('fav-counter-header');
                             if (data.count !== undefined && counter) {
                                 counter.textContent = data.count;
@@ -948,16 +927,9 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             });
         });
 
-        // --- Carrello (Versione DB) ---
-        function aggiornaContatoreCarrello() {
-            // Nota: per un badge persistente al refresh servirebbe un endpoint API che restituisce il count.
-            // Per ora lo lasciamo non implementato o potremmo implementarlo in futuro.
-        }
-
-        // --- Gestione Toast ---
+        // gestione hamburger
         function showToast(message, isSuccess = true) {
             let toastEl = document.getElementById('liveToast');
-            // Se non esiste (non dovrebbe accadere se l'HTML è corretto), crealo al volo o ignora
             if (!toastEl) return;
 
             const toastBody = toastEl.querySelector('.toast-body');
@@ -965,7 +937,7 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
 
             toastBody.textContent = message;
 
-            // Colore header in base al tipo
+            // colore header in base al tipo
             if (isSuccess) {
                 toastHeader.classList.remove('text-danger');
                 toastHeader.classList.add('text-success');
@@ -992,7 +964,6 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
                     .then(data => {
                         if (data.success) {
                             showToast(data.message, true);
-                            // Aggiorna badge visuale
                             const counter = document.getElementById('cart-counter-header');
                             if (data.count !== undefined) {
                                 counter.textContent = data.count;
@@ -1009,15 +980,13 @@ if ($is_logged_in && isset($_SESSION['user_id'])) {
             });
         });
 
-        // --- Inizializzazione ---
+        // inizializzazione
         document.addEventListener('DOMContentLoaded', () => {
             const temaSalvato = localStorage.getItem('temaPreferito') || 'light';
             applicaTema(temaSalvato);
-            aggiornaContatoreCarrello();
         });
     </script>
 
-    <!-- Toast Container -->
     <div class="toast-container position-fixed top-0 start-50 translate-middle-x p-3" style="z-index: 1050">
         <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="toast-header">

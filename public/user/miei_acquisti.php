@@ -103,7 +103,7 @@ $stmt->close();
                             ?>
                             <img src="<?php echo htmlspecialchars($immagine_url); ?>" class="card-img-top"
                                 alt="<?php echo htmlspecialchars($acquisto['titolo']); ?>"
-                                style="height: 200px; object-fit: cover;">
+                                style="height: 200px; object-fit: cover;"/>
 
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">

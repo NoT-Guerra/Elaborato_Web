@@ -2,13 +2,13 @@
 session_start();
 require_once __DIR__ . '/../../app/config/database.php';
 
-// Controlla se l'utente è admin
+//controlla se l'utente è admin
 if (!isset($_SESSION['loggedin'], $_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     header('Location: ../index.php');
     exit;
 }
 
-// Controlla input
+// controlla input
 if (!isset($_POST['user_id'], $_POST['new_password']) || !is_numeric($_POST['user_id'])) {
     die(json_encode(['success' => false, 'error' => 'Dati non validi']));
 }
@@ -23,7 +23,7 @@ if (strlen($newPassword) < 6) {
 // Hash della password
 $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
 
-// Aggiorna la password dell'utente
+//Aggiorna la password dell'utente
 $stmt = $conn->prepare("UPDATE utenti SET password = ? WHERE id_utente = ?");
 $stmt->bind_param("si", $hashedPassword, $userId);
 
