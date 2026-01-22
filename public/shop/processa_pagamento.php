@@ -7,7 +7,6 @@ if (!isset($_SESSION['user_id'])) {
 }
 $user_id = $_SESSION['user_id'];
 
-// MODIFICA 1: Rimuovi la condizione "a.is_venduto = 0" dalla query per permettere acquisti multipli di PDF
 $sql = "SELECT 
             c.annuncio_id,
             a.titolo,
@@ -51,7 +50,7 @@ try {
         $is_digitale = $item['is_digitale'];
         $nome_categoria = strtolower($item['nome_categoria']);
 
-        // MODIFICA 2: Verifica se l'utente ha già acquistato questo annuncio
+        // verifica se l'utente ha già acquistato questo annuncio
         $check_acquisto_sql = "SELECT COUNT(*) as gia_acquistato 
                               FROM vendita 
                               WHERE annuncio_id = ? AND acquirente_id = ?";
@@ -66,7 +65,7 @@ try {
             throw new Exception("Hai già acquistato l'articolo '{$item['titolo']}'.");
         }
 
-        // MODIFICA 3: Verifica se annuncio è ancora disponibile (logica diversa per digitale/fisico)
+        // verifica se annuncio è ancora disponibile 
         $check_sql = "SELECT is_attivo, is_venduto FROM annuncio WHERE id_annuncio = ? FOR UPDATE";
         $check_stmt = $conn->prepare($check_sql);
         $check_stmt->bind_param("i", $annuncio_id);
@@ -79,12 +78,12 @@ try {
             throw new Exception("L'articolo '{$item['titolo']}' non è più attivo.");
         }
 
-        // MODIFICA 4: Per prodotti FISICI, verifica che non sia già venduto
+        // per prodotti FISICI, verifica che non sia già venduto
         if ($nome_categoria !== 'pdf' && $is_digitale != 1 && $annuncio['is_venduto']) {
             throw new Exception("L'articolo '{$item['titolo']}' (prodotto fisico) è già stato venduto.");
         }
 
-        // MODIFICA 5: Inserimento vendita
+        // inserimento vendita
         $insert_vendita = "INSERT INTO vendita (annuncio_id, acquirente_id, venditore_id, prezzo_vendita) 
                            VALUES (?, ?, ?, ?)";
         $stmt_vendita = $conn->prepare($insert_vendita);
@@ -92,12 +91,12 @@ try {
         $stmt_vendita->execute();
         $stmt_vendita->close();
 
-        // MODIFICA 6: Aggiornamento annuncio (solo per prodotti fisici)
+        // aggiornamento annuncio (solo per prodotti fisici)
         if ($nome_categoria === 'pdf' || $is_digitale == 1) {
-            // Prodotti digitali: NON aggiornare is_venduto, rimane attivo per altri acquisti
-            // L'annuncio rimane con is_venduto = 0 e is_attivo = 1
+            // prodotti digitali: NON aggiornare is_venduto, rimane attivo per altri acquisti
+            // annuncio rimane con is_venduto = 0 e is_attivo = 1
         } else {
-            // Prodotti fisici: marcare come venduto e non più attivo
+            // prodotti fisici: marcare come venduto e non più attivo
             $update_annuncio = "UPDATE annuncio SET is_venduto = 1, is_attivo = 0 WHERE id_annuncio = ?";
             $stmt_update = $conn->prepare($update_annuncio);
             $stmt_update->bind_param("i", $annuncio_id);
@@ -105,14 +104,14 @@ try {
             $stmt_update->close();
         }
 
-        // MODIFICA 7: Rimozione dal carrello (solo per l'utente corrente)
+        // rimozione dal carrello (solo per l'utente corrente)
         $delete_carrello = "DELETE FROM carrello WHERE annuncio_id = ? AND utente_id = ?";
         $stmt_delete = $conn->prepare($delete_carrello);
         $stmt_delete->bind_param("ii", $annuncio_id, $user_id);
         $stmt_delete->execute();
         $stmt_delete->close();
 
-        // MODIFICA 8: Rimozione dai preferiti (solo per prodotti fisici venduti)
+        // rimozione dai preferiti (solo per prodotti fisici venduti)
         if ($nome_categoria !== 'pdf' && $is_digitale != 1) {
             $delete_preferiti = "DELETE FROM preferiti WHERE annuncio_id = ?";
             $stmt_pref = $conn->prepare($delete_preferiti);
@@ -121,7 +120,7 @@ try {
             $stmt_pref->close();
         }
 
-        // MODIFICA 9: Per prodotti fisici, rimuovi dal carrello di TUTTI gli altri utenti
+        // per prodotti fisici, rimuovi dal carrello di TUTTI gli altri utenti
         if ($nome_categoria !== 'pdf' && $is_digitale != 1) {
             $delete_carrello_altri = "DELETE FROM carrello WHERE annuncio_id = ? AND utente_id != ?";
             $stmt_delete_altri = $conn->prepare($delete_carrello_altri);
