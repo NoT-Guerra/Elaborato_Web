@@ -2,7 +2,7 @@
 session_start();
 require_once __DIR__ . '/../../app/config/database.php';
 
-// Controlla se l'utente è loggato
+// controllo login
 if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
     header('Location: ../auth/login.php');
     exit;
@@ -10,11 +10,11 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
 $user_id = $_SESSION['user_id'];
 
-// Gestione eliminazione annuncio
+// funzione elimina annuncio
 if (isset($_GET['elimina']) && is_numeric($_GET['elimina'])) {
     $annuncio_id = $_GET['elimina'];
 
-    // Verifica che l'annuncio appartenga all'utente
+    // check corrispondenza annuncio utente
     $check_stmt = $conn->prepare("SELECT venditore_id FROM annuncio WHERE id_annuncio = ?");
     $check_stmt->bind_param("i", $annuncio_id);
     $check_stmt->execute();
@@ -25,31 +25,31 @@ if (isset($_GET['elimina']) && is_numeric($_GET['elimina'])) {
     if ($venditore_id == $user_id) {
         $conn->begin_transaction();
         try {
-            // 1. Elimina dalla tabella vendita
+            // elimina annuncio dalla tab di vendita
             $stmt_v = $conn->prepare("DELETE FROM vendita WHERE annuncio_id = ?");
             $stmt_v->bind_param("i", $annuncio_id);
             $stmt_v->execute();
             $stmt_v->close();
 
-            // 2. Elimina dai preferiti
+            // elimina dai preferiti
             $stmt_p = $conn->prepare("DELETE FROM preferiti WHERE annuncio_id = ?");
             $stmt_p->bind_param("i", $annuncio_id);
             $stmt_p->execute();
             $stmt_p->close();
 
-            // 3. Elimina dal carrello
+            // togli dal carrello
             $stmt_c = $conn->prepare("DELETE FROM carrello WHERE annuncio_id = ?");
             $stmt_c->bind_param("i", $annuncio_id);
             $stmt_c->execute();
             $stmt_c->close();
 
-            // 4. Elimina PDF associati
+            // togli pdf associati
             $stmt_pdf = $conn->prepare("DELETE FROM annuncio_pdf WHERE annuncio_id = ?");
             $stmt_pdf->bind_param("i", $annuncio_id);
             $stmt_pdf->execute();
             $stmt_pdf->close();
 
-            // 5. Elimina l'annuncio
+            // elimina annuncio
             $delete_stmt = $conn->prepare("DELETE FROM annuncio WHERE id_annuncio = ?");
             $delete_stmt->bind_param("i", $annuncio_id);
             $delete_stmt->execute();
@@ -66,7 +66,7 @@ if (isset($_GET['elimina']) && is_numeric($_GET['elimina'])) {
     }
 }
 
-// Query per ottenere gli annunci dell'utente
+// query per ottenere gli annunci dell'utente
 $sql = "SELECT 
             a.id_annuncio,
             a.titolo,
@@ -103,7 +103,7 @@ if ($result && $result->num_rows > 0) {
 }
 $stmt->close();
 
-// Ottieni numero di articoli nel carrello
+// numero di articoli nel carrello
 $cart_count = 0;
 $cart_stmt = $conn->prepare("SELECT COUNT(*) FROM carrello WHERE utente_id = ?");
 $cart_stmt->bind_param("i", $user_id);
@@ -113,7 +113,7 @@ $cart_stmt->fetch();
 $cart_stmt->fetch();
 $cart_stmt->close();
 
-// Ottieni numero di articoli nei preferiti
+// numeri di articoli nei preferiti
 $fav_count = 0;
 $fav_stmt = $conn->prepare("SELECT COUNT(*) FROM preferiti WHERE utente_id = ?");
 $fav_stmt->bind_param("i", $user_id);
@@ -128,11 +128,11 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
 <html lang="it">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>UniboMarket - I miei annunci</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"/>
     <style>
         .card-annuncio {
             transition: transform 0.2s, box-shadow 0.2s;
@@ -204,7 +204,6 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             padding: 0.25rem 0.75rem;
         }
 
-        /* Stili per categorie */
         .categoria-libro {
             background-color: #e3f2fd !important;
             color: #1565c0 !important;
@@ -235,7 +234,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             color: #616161 !important;
         }
 
-        /* Stili per tema scuro */
+        /* gestione tema scuro */
         [data-bs-theme="dark"] .categoria-libro {
             background-color: #1e3a5f !important;
             color: #90caf9 !important;
@@ -266,7 +265,6 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             color: #e0e0e0 !important;
         }
 
-        /* Modal di conferma */
         .modal-confirm {
             color: #636363;
             width: 400px;
@@ -349,7 +347,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             background: #ee3535;
         }
 
-        /* Dark Mode Contrast Improvements */
+        /* gestione contrasto nel tema dark */
         [data-bs-theme="dark"] body {
             background-color: #17191c !important;
         }
@@ -368,7 +366,6 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             border-color: #2d3748;
         }
 
-        /* Header Buttons Dark Mode */
         [data-bs-theme="dark"] header .btn-dark {
             background-color: #0d6efd !important;
             border-color: #0d6efd !important;
@@ -384,7 +381,6 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             color: #000 !important;
         }
 
-        /* Cart/Fav Badge Style */
         #cart-counter-header,
         #fav-counter-header {
             position: absolute;
@@ -396,7 +392,6 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             border-radius: 50%;
         }
 
-        /* Theme Toggle Button Dark Mode */
         [data-bs-theme="dark"] #btn-tema {
             color: #fff !important;
             border-color: #fff !important;
@@ -405,11 +400,9 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
 </head>
 
 <body>
-    <!-- Header identico a index.php -->
     <header class="sticky-top bg-body border-bottom shadow-sm">
         <div class="container-fluid p-2 p-sm-3">
             <div class="d-flex align-items-center justify-content-between">
-                <!-- Logo -->
                 <div class="d-flex align-items-center">
                     <div class="bg-primary rounded-3 d-flex align-items-center justify-content-center me-2 me-sm-3"
                         style="width: 48px; height: 48px;">
@@ -423,9 +416,8 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                     </div>
                 </div>
 
-                <!-- Azioni -->
-                <div class="d-flex align-items-center gap-2">
-                    <!-- Bottone Preferiti -->
+                <!-- azioni che compi -->
+                <div class="d-flex align-items-center gap-2">>
                     <a href="preferiti.php" class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex"
                         aria-label="Vai ai preferiti">
                         <span class="bi bi-suit-heart" aria-hidden="true"></span>
@@ -435,7 +427,6 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                         </span>
                     </a>
 
-                    <!-- Bottone Carrello -->
                     <a href="../shop/carrello.php"
                         class="btn btn-link text-body p-1 p-sm-2 position-relative d-none d-sm-flex"
                         aria-label="Vai al carrello">
@@ -446,7 +437,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                         </span>
                     </a>
 
-                    <!-- Nome utente e Logout -->
+                    <!-- nome utente e logout -->
                     <div class="d-none d-md-flex align-items-center">
                         <span class="me-3 text-muted">
                             <span class="bi bi-person-circle me-1" aria-hidden="true"></span>
@@ -458,20 +449,20 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                         </a>
                     </div>
 
-                    <!-- Bottone Pubblica -->
+                    <!-- pubblica -->
                     <a href="../shop/pubblica.php"
                         class="btn btn-dark d-flex align-items-center justify-content-center px-3">
                         <span class="bi bi-plus-circle" aria-hidden="true"></span>
                         <span class="d-none d-md-inline ms-2">Pubblica</span>
                     </a>
 
-                    <!-- Bottone Tema -->
+                    <!-- button del tema -->
                     <button id="btn-tema" class="btn btn-outline-secondary" aria-label="Cambia tema">
                         <span id="icona-luna" class="bi bi-moon" aria-hidden="true"></span>
                         <span id="icona-sole" class="bi bi-sun d-none" aria-hidden="true"></span>
                     </button>
 
-                    <!-- Bottone menu a tendina -->
+                    <!-- button hamburger -->
                     <button class="btn btn-link text-body p-0 ms-2" type="button" data-bs-toggle="offcanvas"
                         data-bs-target="#menuMobile" aria-label="Menu navigazione">
                         <span class="bi bi-list fs-2" aria-hidden="true"></span>
@@ -479,7 +470,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                 </div>
             </div>
 
-            <!-- Menù a tendina -->
+            <!-- gestione menù tendina -->
             <div class="offcanvas offcanvas-end" tabindex="-1" id="menuMobile" aria-labelledby="menuMobileLabel">
                 <div class="offcanvas-header border-bottom">
                     <h2 class="offcanvas-title h5 fw-bold" id="menuMobileLabel">UniboMarket</h2>
@@ -515,13 +506,10 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                         </a>
                         <hr class="my-0 opacity-10">
                         <?php if (isset($_SESSION['is_admin']) && $_SESSION['is_admin']): ?>
-                            <a href="../admin/index.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
+                            <a href="../admin/admin.php" class="list-group-item list-group-item-action border-0 py-3 px-4">
                                 <span class="bi bi-shield-lock me-3" aria-hidden="true"></span> Pannello Admin
                             </a>
                         <?php endif; ?>
-                        <a href="#" class="list-group-item list-group-item-action border-0 py-3 px-4">
-                            <span class="bi bi-question-circle me-3" aria-hidden="true"></span> Aiuto e Supporto
-                        </a>
                     </div>
                 </div>
             </div>
@@ -529,7 +517,6 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
     </header>
 
     <main class="container-fluid py-4">
-        <!-- Messaggi di successo/errore -->
         <?php if (isset($success_message)): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <?php echo htmlspecialchars($success_message); ?>
@@ -557,11 +544,10 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                     $categoria_lower = strtolower($annuncio['nome_categoria']);
                     $classe_categoria = 'categoria-' . $categoria_lower;
 
-                    // Formatta la data
                     $data_pubblicazione = date('d/m/Y H:i', strtotime($annuncio['data_pubblicazione']));
                     $data_modifica = $annuncio['data_modifica'] ? date('d/m/Y H:i', strtotime($annuncio['data_modifica'])) : null;
 
-                    // URL immagine di default
+                    // gestione img di default
                     $img_db = $annuncio['immagine_url'];
                     if (!empty($img_db)) {
                         if (str_starts_with($img_db, 'http')) {
@@ -575,7 +561,6 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                     ?>
                     <div class="col-xl-3 col-lg-4 col-md-6 col-12">
                         <div class="card h-100 border-0 shadow-sm card-annuncio">
-                            <!-- Badge stato -->
                             <div class="status-badge">
                                 <?php if ($annuncio['is_venduto']): ?>
                                     <span class="badge bg-danger">Venduto</span>
@@ -586,7 +571,6 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                                 <?php endif; ?>
                             </div>
 
-                            <!-- Pulsanti azione -->
                             <div class="action-buttons">
                                 <button class="btn-action"
                                     onclick="confirmDelete(<?php echo $annuncio['id_annuncio']; ?>, '<?php echo htmlspecialchars(addslashes($annuncio['titolo'])); ?>')"
@@ -600,13 +584,11 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
 
                             </div>
 
-                            <!-- Immagine -->
                             <div class="img-wrapper">
                                 <img src="<?php echo $immagine_url; ?>"
                                     alt="<?php echo htmlspecialchars($annuncio['titolo']); ?>">
                             </div>
 
-                            <!-- Contenuto -->
                             <div class="card-body">
                                 <div class="d-flex justify-content-between align-items-start mb-2">
                                     <h3 class="h6 fw-bold mb-0 text-truncate">
@@ -617,12 +599,10 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                                     </span>
                                 </div>
 
-                                <!-- Descrizione completa -->
                                 <p class="small text-muted mb-3">
                                     <?php echo nl2br(htmlspecialchars($annuncio['descrizione'])); ?>
                                 </p>
 
-                                <!-- Informazioni -->
                                 <div class="mb-3">
                                     <span class="badge <?php echo $classe_categoria; ?> border me-2">
                                         <span class="bi bi-book me-1" aria-hidden="true"></span>
@@ -646,7 +626,6 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                                     <?php endif; ?>
                                 </div>
 
-                                <!-- Date -->
                                 <div class="border-top pt-2">
                                     <small class="text-muted d-block">
                                         <span class="bi bi-calendar me-1" aria-hidden="true"></span>
@@ -665,7 +644,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
                 <?php endforeach; ?>
             </div>
         <?php else: ?>
-            <!-- Stato vuoto -->
+
             <div class="empty-state text-center">
                 <div class="mb-3">
                     <span class="bi bi-collection empty-state-icon text-muted" aria-hidden="true"></span>
@@ -679,7 +658,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
         <?php endif; ?>
     </main>
 
-    <!-- Modal di conferma eliminazione -->
+    <!-- gestione conferma eliminazione -->
     <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
@@ -702,7 +681,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        // Gestione Tema (stessa di index.php)
+        // gestione Tema 
         const btnTema = document.getElementById('btn-tema');
         const iconaLuna = document.getElementById('icona-luna');
         const iconaSole = document.getElementById('icona-sole');
@@ -724,7 +703,7 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             applicaTema(nuovoTema);
         });
 
-        // Funzione per conferma eliminazione
+        // conferma eliminazione
         function confirmDelete(id, titolo) {
             const deleteModal = new bootstrap.Modal(document.getElementById('deleteModal'));
             document.getElementById('annuncioTitolo').textContent = titolo;
@@ -732,13 +711,12 @@ $is_logged_in = isset($_SESSION['loggedin']) && $_SESSION['loggedin'];
             deleteModal.show();
         }
 
-        // Inizializzazione tema
+        // tema
         document.addEventListener('DOMContentLoaded', () => {
             const temaSalvato = localStorage.getItem('temaPreferito') || 'light';
             applicaTema(temaSalvato);
         });
     </script>
-
 
 </body>
 
