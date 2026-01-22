@@ -4,13 +4,11 @@ require_once __DIR__ . '/../../app/config/database.php';
 
 header('Content-Type: application/json');
 
-// Controlla se l'utente è admin
 if (!isset($_SESSION['loggedin'], $_SESSION['is_admin']) || $_SESSION['is_admin'] !== true) {
     echo json_encode(['success' => false, 'error' => 'Accesso non autorizzato']);
     exit;
 }
 
-// Controlla se il campo faculty è presente
 if (!isset($_POST['faculty']) || trim($_POST['faculty']) === '') {
     echo json_encode(['success' => false, 'error' => 'Nome della facoltà non valido']);
     exit;
@@ -18,7 +16,7 @@ if (!isset($_POST['faculty']) || trim($_POST['faculty']) === '') {
 
 $faculty = trim($_POST['faculty']);
 
-// Controlla se la facoltà esiste già
+// controlla se la facoltà esiste già
 $stmt = $conn->prepare("SELECT COUNT(*) FROM facolta WHERE nome_facolta = ?");
 $stmt->bind_param("s", $faculty);
 $stmt->execute();
@@ -31,7 +29,7 @@ if ($count > 0) {
     exit;
 }
 
-// Inserisce la nuova facoltà
+// nuova facoltà
 $stmt = $conn->prepare("INSERT INTO facolta (nome_facolta) VALUES (?)");
 $stmt->bind_param("s", $faculty);
 
